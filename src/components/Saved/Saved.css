@@ -1,0 +1,222 @@
+.saved-screen {
+  min-height: 100svh;
+  background: var(--color-bg);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+}
+
+.saved-header {
+  padding: 40px 20px 14px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.saved-title {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.saved-counts { display: flex; gap: 7px; flex-shrink: 0; }
+
+.saved-count-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: rgba(46,15,32,0.07);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.saved-count-pill--wish {
+  background: var(--color-accent-pale);
+  color: var(--color-accent);
+}
+
+/* ── Tabs ── */
+.saved-tabs {
+  display: flex;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.saved-tab-btn {
+  flex: 1;
+  padding: 13px 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.saved-tab-btn--active {
+  color: var(--color-accent);
+  font-weight: 600;
+  border-bottom-color: var(--color-accent);
+}
+
+.saved-tab-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saved-content { flex: 1; }
+
+/* ── Filter bar ── */
+.saved-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+/* ── Card list ── */
+.saved-card-list {
+  background: #fff;
+}
+
+/* ── Wishlist item ── */
+.wish-item-wrap {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.wish-item-wrap:last-child { border-bottom: none; }
+
+.wish-priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+}
+
+.wish-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 12px;
+}
+
+.wish-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  border: 1px solid;
+}
+
+.wish-action-btn--visited {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+.wish-action-btn--visited:hover {
+  background: var(--color-accent-light);
+  border-color: var(--color-accent-light);
+}
+
+.wish-action-btn--remove {
+  background: transparent;
+  border-color: var(--color-border-light);
+  color: var(--color-text-muted);
+}
+
+.wish-action-btn--remove:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-dark);
+}
+
+/* ── Empty state ── */
+.wishlist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.wishlist-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-light);
+}
+
+.wishlist-empty-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-dark);
+  margin: 0;
+}
+
+.wishlist-empty-sub {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* ── Toast ── */
+.saved-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-dark);
+  color: #fff;
+  font-size: 13px;
+  padding: 9px 18px;
+  border-radius: 20px;
+  z-index: 200;
+  white-space: nowrap;
+  animation: toast-up 0.2s ease;
+}
+
+@keyframes toast-up {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
