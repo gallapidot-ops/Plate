@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase }       from './lib/supabase'
 import { getProfile }     from './lib/auth'
-import { getPendingRequestCount } from './lib/db'
+import { getPendingRequestCount, removeFromWishlist } from './lib/db'
 import Auth               from './components/Auth/Auth'
 import ProfileSetup       from './components/ProfileSetup/ProfileSetup'
 import Home               from './components/Home/Home'
@@ -75,6 +75,7 @@ export default function App() {
   const [showSwipe,      setShowSwipe]      = useState(false)
   const [viewingUserId,  setViewingUserId]  = useState(null) // UserProfile overlay
   const [notifCount,     setNotifCount]     = useState(0)
+  const [addPrefill,     setAddPrefill]     = useState(null) // prefill data for AddPlace
   const [showSplash,     setShowSplash]     = useState(
     () => !sessionStorage.getItem('plate_splash_shown')
   )
@@ -138,6 +139,51 @@ export default function App() {
     setNotifCount(count)
   }, [])
 
+  // Wishlist → "I've been here!" opens AddPlace pre-filled with the place
+  function handleWishlistVisit(wishlistItem) {
+    setAddPrefill({ place: wishlistItem, wishlistPlaceId: wishlistItem.id })
+    setScreen('add')
+  }
+
+  // Edit an existing saved place
+  function handleEditPlace(rawPlace) {
+    const primaryMealType = rawPlace.meal_types?.[0] ?? null
+    const existingRating  = rawPlace.ratings?.[primaryMealType]
+    setAddPrefill({
+      editMode:       true,
+      placeId:        rawPlace.id,
+      place:          { ...rawPlace, placeId: rawPlace.google_place_id },
+      experienceType: rawPlace.experience_type ?? null,
+      mealType:       primaryMealType,
+      extraTypes:     rawPlace.meal_types?.slice(1) ?? [],
+      date:           rawPlace.last_visited ?? '',
+      isRegular:      rawPlace.is_regular   ?? false,
+      price:          existingRating?.price ?? null,
+      rating: {
+        taste:     existingRating?.taste     ?? null,
+        spread:    existingRating?.spread    ?? null,
+        aesthetic: existingRating?.aesthetic ?? null,
+        service:   existingRating?.service   ?? null,
+      },
+      note: rawPlace.personal_note ?? '',
+      tags: rawPlace.tags          ?? [],
+    })
+    setSelectedPlace(null)
+    setScreen('add')
+  }
+
+  // After AddPlace saves — clean up wishlist if needed, navigate back
+  const handleAddSaved = useCallback(async (savedData) => {
+    const prefill = addPrefill
+    setAddPrefill(null)
+    if (prefill?.wishlistPlaceId) {
+      try { await removeFromWishlist(prefill.wishlistPlaceId) } catch (e) { console.error(e) }
+      setScreen('profile')
+    } else {
+      setScreen('home')
+    }
+  }, [addPrefill])
+
   function renderContent() {
     if (authUser === undefined) {
       return <div style={{ height: '100svh', background: 'var(--color-bg)' }} />
@@ -160,7 +206,11 @@ export default function App() {
         {/* Place detail overlay */}
         {!showSwipe && selectedPlace && (
           <div className="place-page-overlay">
-            <PlacePage place={selectedPlace} onBack={() => setSelectedPlace(null)} />
+            <PlacePage
+              place={selectedPlace}
+              onBack={() => setSelectedPlace(null)}
+              onEdit={handleEditPlace}
+            />
           </div>
         )}
 
@@ -180,14 +230,15 @@ export default function App() {
           <AppHeader
             onOpenInbox={() => setScreen('notifications')}
             notifCount={notifCount}
+            onGoHome={() => setScreen('home')}
           />
         )}
 
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
           {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} currentUserId={authUser?.id} />}
-          {screen === 'add'           && <AddPlace onSaved={() => setScreen('home')} />}
+          {screen === 'add'           && <AddPlace key={addPrefill ? JSON.stringify({p: addPrefill.placeId ?? addPrefill.place?.name, e: addPrefill.editMode}) : 'new'} onSaved={handleAddSaved} prefill={addPrefill} />}
           {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
-          {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
+          {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} onWishlistVisit={handleWishlistVisit} />}
         </div>
 
         {!hideNav && (
@@ -200,7 +251,7 @@ export default function App() {
                   item.accent        ? 'bottom-nav-item--accent' : '',
                   screen === item.id ? 'bottom-nav-item--active' : '',
                 ].filter(Boolean).join(' ')}
-                onClick={() => setScreen(item.id)}
+                onClick={() => { setScreen(item.id); if (item.id !== 'add') setAddPrefill(null) }}
               >
                 <span style={{ position: 'relative', display: 'inline-flex' }}>
                   {item.icon}

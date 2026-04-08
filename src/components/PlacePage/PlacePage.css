@@ -118,6 +118,14 @@
   text-shadow: 0 1px 8px rgba(0,0,0,0.22);
 }
 
+.pp-regular-icon {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 8px;
+  color: rgba(255,255,255,0.85);
+  opacity: 0.9;
+}
+
 .pp-exp-badge {
   display: inline-flex;
   align-items: center;

@@ -14,7 +14,7 @@ async function getUserId() {
 
 export async function savePlace(placeData) {
   const {
-    name, address, photo_url,
+    name, address, city, photo_url,
     personal_note, is_regular, last_visited,
     meal_types, experience_type,
     ratings, computed_score, price_tier, tags,
@@ -29,6 +29,7 @@ export async function savePlace(placeData) {
     .insert({
       name,
       address:         address         ?? null,
+      city:            city            ?? null,
       photo_url:       photo_url       ?? null,
       personal_note:   personal_note   ?? null,
       is_regular:      !!is_regular,
@@ -66,6 +67,64 @@ export async function savePlace(placeData) {
   }
 
   return place
+}
+
+export async function updatePlace(placeId, placeData) {
+  const {
+    name, address, city, photo_url,
+    personal_note, is_regular, last_visited,
+    meal_types, experience_type,
+    ratings, computed_score, price_tier, tags,
+    lat, lng, website,
+  } = placeData
+
+  const userId          = await getUserId()
+  const primaryMealType = meal_types?.[0] ?? null
+
+  // Update the place row
+  const { error: placeErr } = await supabase
+    .from('places')
+    .update({
+      name,
+      address:       address       ?? null,
+      city:          city          ?? null,
+      photo_url:     photo_url     ?? null,
+      personal_note: personal_note ?? null,
+      is_regular:    !!is_regular,
+      last_visited: is_regular
+        ? null
+        : (last_visited || new Date().toISOString().split('T')[0]),
+      lat:           lat           ?? null,
+      lng:           lng           ?? null,
+      website:       website       ?? null,
+    })
+    .eq('id',         placeId)
+    .eq('created_by', userId)
+
+  if (placeErr) throw new Error(`places update: ${placeErr.message}`)
+
+  // Replace all ratings for this user+place
+  await supabase.from('place_ratings').delete()
+    .eq('place_id', placeId).eq('user_id', userId)
+
+  const ratingRows = (meal_types ?? []).filter(Boolean).map(mt => ({
+    place_id:        placeId,
+    user_id:         userId,
+    meal_type:       mt,
+    experience_type: experience_type ?? null,
+    taste:           ratings?.[mt]?.taste     ?? null,
+    spread:          ratings?.[mt]?.spread    ?? null,
+    aesthetic:       ratings?.[mt]?.aesthetic ?? null,
+    service:         ratings?.[mt]?.service   ?? null,
+    price:           price_tier ?? null,
+    computed_score:  mt === primaryMealType ? (computed_score ?? 0) : null,
+    tags:            mt === primaryMealType ? (tags ?? []) : [],
+  }))
+
+  if (ratingRows.length > 0) {
+    const { error: ratingErr } = await supabase.from('place_ratings').insert(ratingRows)
+    if (ratingErr) throw new Error(`place_ratings insert (update): ${ratingErr.message}`)
+  }
 }
 
 export async function getMyPlaces() {
@@ -132,14 +191,15 @@ export async function getWishlist() {
 export async function addToWishlist(placeId, opts = {}) {
   const userId = await getUserId()
 
-  const { error } = await supabase.from('wishlists').upsert({
-    user_id:         userId,
-    place_id:        placeId,
-    added_from:      opts.added_from      ?? 'Discovery',
-    added_note:      opts.added_note      ?? null,
-    priority:        opts.priority        ?? 'medium',
-    wish_meal_type:  opts.wish_meal_type  ?? null,
-  })
+  const row = {
+    user_id:    userId,
+    place_id:   placeId,
+    added_from: opts.added_from ?? 'Discovery',
+    added_note: opts.added_note ?? null,
+    priority:   opts.priority   ?? 'medium',
+  }
+
+  const { error } = await supabase.from('wishlists').upsert(row)
 
   if (error) throw new Error(`addToWishlist: ${error.message}`)
 }

@@ -268,38 +268,51 @@ function FollowListDrawer({ title, users, onClose }) {
 }
 
 /* ── Wishlist card ── */
-function WishlistCard({ item, onOpenPlace, onRemove }) {
+function WishlistCard({ item, onOpenPlace, onRemove, onVisit }) {
   const addedByUser = item.added_from && item.added_from !== 'Discovery'
   return (
     <div className="pf-wish-card">
-      <button className="pf-wish-card-main" onClick={() => onOpenPlace?.(item)}>
-        <img src={item.photo_url} alt={item.name} className="pf-wish-img" />
-        <div className="pf-wish-body">
-          <div className="pf-wish-top">
-            <span className="pf-wish-name">{item.name}</span>
-            {item.priority === 'high' && (
-              <span className="pf-wish-priority pf-wish-priority--high">⭐ Must-go</span>
+      {/* Top row: image + info + X */}
+      <div className="pf-wish-top-row">
+        <button className="pf-wish-card-main" onClick={() => onOpenPlace?.(item)}>
+          {item.photo_url
+            ? <img src={item.photo_url} alt={item.name} className="pf-wish-img" />
+            : <div className="pf-wish-img pf-wish-img--placeholder" />
+          }
+          <div className="pf-wish-body">
+            <div className="pf-wish-top">
+              <span className="pf-wish-name">{item.name}</span>
+              {item.priority === 'high' && (
+                <span className="pf-wish-priority pf-wish-priority--high">⭐ Must-go</span>
+              )}
+            </div>
+            {item.added_note && (
+              <span className="pf-wish-note">"{item.added_note}"</span>
             )}
+            <span className="pf-wish-meta">
+              {addedByUser ? `Recommended by ${item.added_from}` : 'Discovery'}
+            </span>
           </div>
-          {item.added_note && (
-            <span className="pf-wish-note">"{item.added_note}"</span>
-          )}
-          <span className="pf-wish-meta">
-            {addedByUser ? `Recommended by ${item.added_from}` : 'Discovery'}
-          </span>
-        </div>
-      </button>
-      <button className="pf-wish-remove" onClick={() => onRemove?.(item.id)} aria-label="Remove from Wishlist">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 6 6 18M6 6l12 12"/>
+        </button>
+        <button className="pf-wish-remove" onClick={() => onRemove?.(item.id)} aria-label="Remove from Wishlist">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      {/* Visit button */}
+      <button className="pf-wish-visit-btn" onClick={() => onVisit?.(item)}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6 9 17l-5-5"/>
         </svg>
+        I've been here!
       </button>
     </div>
   )
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null }) {
+export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null }) {
   const isViewMode = !!viewedProfile
   const displayProfile = isViewMode ? viewedProfile : currentProfile
 
@@ -553,7 +566,7 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
               No places in your Wishlist yet
             </p>
           ) : wishlist.map(item => (
-            <WishlistCard key={item.id} item={item} onOpenPlace={onOpenPlace} onRemove={handleRemoveWishlist} />
+            <WishlistCard key={item.id} item={item} onOpenPlace={onOpenPlace} onRemove={handleRemoveWishlist} onVisit={onWishlistVisit} />
           ))}
         </div>
       )}
@@ -653,7 +666,17 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
                     className="pf-visit-card"
                     onClick={() => onOpenPlace?.(p)}
                   >
-                    <span className="pf-visit-name">{p.name}</span>
+                    <span className="pf-visit-name">
+                      {p.name}
+                      {p.is_regular && (
+                        <svg className="pf-visit-regular-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
+                          <path d="M17 1l4 4-4 4"/>
+                          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                          <path d="M7 23l-4-4 4-4"/>
+                          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                        </svg>
+                      )}
+                    </span>
                     <div className="pf-visit-meta-row">
                       <span className="pf-visit-score">
                         <span className="pf-visit-score-val">{p.computed_score}</span>

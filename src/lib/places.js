@@ -84,6 +84,7 @@ export async function getPlaceDetails(placeId) {
     'id',
     'displayName',
     'formattedAddress',
+    'addressComponents',
     'location',
     'photos',
     'websiteUri',
@@ -104,6 +105,12 @@ export async function getPlaceDetails(placeId) {
 
   const p = await res.json()
 
+  // Extract city from address components — prefer 'locality', fall back to 'sublocality_level_1'
+  const addrComponents = p.addressComponents ?? []
+  const localityComp = addrComponents.find(c => c.types?.includes('locality'))
+    ?? addrComponents.find(c => c.types?.includes('sublocality_level_1'))
+  const city = localityComp?.longText ?? null
+
   // Build a direct photo URL for the first photo
   const photoName = p.photos?.[0]?.name
   const photo_url = photoName
@@ -114,6 +121,7 @@ export async function getPlaceDetails(placeId) {
     placeId:  p.id,
     name:     p.displayName?.text ?? '',
     address:  p.formattedAddress  ?? '',
+    city,
     lat:      p.location?.latitude  ?? null,
     lng:      p.location?.longitude ?? null,
     photo_url,

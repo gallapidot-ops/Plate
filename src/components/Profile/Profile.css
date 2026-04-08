@@ -598,6 +598,14 @@
   letter-spacing: 0.01em;
 }
 
+.pf-visit-regular-icon {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 5px;
+  color: var(--color-accent);
+  opacity: 0.65;
+}
+
 .pf-visit-meta-row {
   display: flex;
   align-items: center;
@@ -1030,7 +1038,7 @@
 
 .pf-wish-card {
   display: flex;
-  align-items: stretch;
+  flex-direction: column;
   background: var(--color-surface);
   border-radius: 20px;
   overflow: hidden;
@@ -1043,6 +1051,12 @@
 .pf-wish-card:hover {
   box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
   transform: translateY(-1px);
+}
+
+/* Top row: card-main + remove button */
+.pf-wish-top-row {
+  display: flex;
+  align-items: stretch;
 }
 
 .pf-wish-card-main {
@@ -1075,6 +1089,36 @@
 .pf-wish-remove:hover {
   color: #e85555;
   background: rgba(232,85,85,0.06);
+}
+
+/* "I've been here!" visit button */
+.pf-wish-visit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-accent);
+  font-size: 12.5px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  touch-action: manipulation;
+}
+
+.pf-wish-visit-btn:hover {
+  background: rgba(61,79,124,0.06);
+}
+
+/* Placeholder for wishlist items without photo */
+.pf-wish-img--placeholder {
+  background: var(--color-bg);
 }
 
 .pf-wish-img {

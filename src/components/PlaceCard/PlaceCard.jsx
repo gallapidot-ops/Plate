@@ -44,7 +44,17 @@ export default function PlaceCard({ place, onClick, mealTypeFilter, right, meta 
       <div className="pc-body">
         {meta && <div className="pc-meta">{meta}</div>}
         <div className="pc-name-row">
-          <span className="pc-name">{place.name}</span>
+          <span className="pc-name">
+            {place.name}
+            {place.is_regular && (
+              <svg className="pc-regular-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
+                <path d="M17 1l4 4-4 4"/>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                <path d="M7 23l-4-4 4-4"/>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+              </svg>
+            )}
+          </span>
           {score !== null && (
             <span className="pc-score">
               <span className="pc-score-val">{score}</span>

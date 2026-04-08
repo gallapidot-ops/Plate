@@ -131,6 +131,16 @@
   letter-spacing: 0.02em;
 }
 
+/* ── Regular spot icon ── */
+.pc-regular-icon {
+  display: inline;
+  vertical-align: middle;
+  margin-right: 5px;
+  color: var(--color-accent);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
 /* ── Right slot ── */
 .pc-right {
   flex-shrink: 0;

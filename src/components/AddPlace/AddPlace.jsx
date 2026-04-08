@@ -4,7 +4,7 @@ import {
   TASTE_OPTIONS, SPREAD_OPTIONS, AESTHETIC_OPTIONS, SERVICE_OPTIONS,
   TAGS, computeScore,
 } from '../../data/scoring'
-import { savePlace, addPlaceToWishlist } from '../../lib/db'
+import { savePlace, updatePlace, addPlaceToWishlist } from '../../lib/db'
 import { autocomplete, getPlaceDetails } from '../../lib/places'
 import './AddPlace.css'
 
@@ -584,7 +584,7 @@ function SaveAnimation({ place, photo, score, onDone }) {
 }
 
 /* ── Done screen ──────────────────────────────────────────────────── */
-function DoneScreen({ place, score, isWishlist, onHome }) {
+function DoneScreen({ place, score, isWishlist, isEdit, onHome }) {
   const [copied, setCopied] = useState(false)
 
   function handleShare() {
@@ -618,7 +618,7 @@ function DoneScreen({ place, score, isWishlist, onHome }) {
         )}
 
         {/* Labels */}
-        <p className="ap-done-status">{isWishlist ? 'Added to Wishlist!' : 'Saved!'}</p>
+        <p className="ap-done-status">{isWishlist ? 'Added to Wishlist!' : isEdit ? 'Updated!' : 'Saved!'}</p>
         <p className="ap-done-name">{place?.name}</p>
 
         {/* Share */}
@@ -641,20 +641,23 @@ function DoneScreen({ place, score, isWishlist, onHome }) {
 }
 
 /* ── Main ─────────────────────────────────────────────────────────── */
-export default function AddPlace({ onSaved }) {
+export default function AddPlace({ onSaved, prefill = null }) {
+  const isEditMode  = !!prefill?.editMode
+  const editPlaceId = prefill?.placeId ?? null
+
   const [step,           setStep]           = useState(0)
-  const [place,          setPlace]          = useState(null)
+  const [place,          setPlace]          = useState(prefill?.place          ?? null)
   const [photo,          setPhoto]          = useState(null)
-  const [experienceType, setExperienceType] = useState(null)
-  const [mealType,       setMealType]       = useState(null)
-  const [extraTypes,     setExtraTypes]     = useState([])
-  const [date,           setDate]           = useState('')
-  const [isRegular,      setIsRegular]      = useState(false)
+  const [experienceType, setExperienceType] = useState(prefill?.experienceType ?? null)
+  const [mealType,       setMealType]       = useState(prefill?.mealType       ?? null)
+  const [extraTypes,     setExtraTypes]     = useState(prefill?.extraTypes     ?? [])
+  const [date,           setDate]           = useState(prefill?.date           ?? '')
+  const [isRegular,      setIsRegular]      = useState(prefill?.isRegular      ?? false)
   const [with_,          setWith]           = useState('')
-  const [price,          setPrice]          = useState(null)
-  const [rating,         setRating]         = useState({ taste: null, spread: null, aesthetic: null, service: null })
-  const [note,           setNote]           = useState('')
-  const [tags,           setTags]           = useState([])
+  const [price,          setPrice]          = useState(prefill?.price          ?? null)
+  const [rating,         setRating]         = useState(prefill?.rating         ?? { taste: null, spread: null, aesthetic: null, service: null })
+  const [note,           setNote]           = useState(prefill?.note           ?? '')
+  const [tags,           setTags]           = useState(prefill?.tags           ?? [])
   const [saving,         setSaving]         = useState(false)
   const [done,           setDone]           = useState(false)
   const [savedData,      setSavedData]      = useState(null)
@@ -684,7 +687,9 @@ export default function AddPlace({ onSaved }) {
       price_tier:      price,
     }
     setSavedData(data)
-    savePromiseRef.current = savePlace(data)
+    savePromiseRef.current = isEditMode && editPlaceId
+      ? updatePlace(editPlaceId, data)
+      : savePlace(data)
     setSaving(true)
   }
 
@@ -706,18 +711,19 @@ export default function AddPlace({ onSaved }) {
       await addPlaceToWishlist(
         { name: place.name, address: place.address, photo_url: photo || place?.photo_url },
         {
-          added_from:     'Added by me',
-          added_note:     wishNote || null,
-          priority:       priority ?? 'medium',
-          wish_meal_type: mealType ?? null,
+          added_from: 'Added by me',
+          added_note: wishNote || null,
+          priority:   priority ?? 'medium',
         }
       )
+      setSavedData({ ...place, isWishlist: true })
+      setDone(true)
     } catch (e) {
       console.error('[AddPlace] wishlist save failed:', e)
+      alert('Could not save to Wishlist. Please try again.')
+    } finally {
+      setSaving(false)
     }
-    setSaving(false)
-    setSavedData({ ...place, isWishlist: true })
-    setDone(true)
   }
 
   /* Done screen */
@@ -727,6 +733,7 @@ export default function AddPlace({ onSaved }) {
         place={place}
         score={savedData?.isWishlist ? null : score}
         isWishlist={savedData?.isWishlist}
+        isEdit={isEditMode}
         onHome={() => onSaved?.(savedData)}
       />
     )

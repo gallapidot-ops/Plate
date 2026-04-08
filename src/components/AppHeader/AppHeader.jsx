@@ -1,8 +1,8 @@
 import './AppHeader.css'
 
-function PlateLogo() {
-  return (
-    <div className="ah-logo">
+function PlateLogo({ onClick }) {
+  const inner = (
+    <>
       <div className="ah-logo-mark">
         <svg className="ah-bars-svg" width="93" height="105" viewBox="0 0 93 105" fill="none">
           <rect x="0"  y="55" width="18" height="50"  rx="9" fill="#3D4F7C" fillOpacity="0.40" />
@@ -16,14 +16,22 @@ function PlateLogo() {
         <div className="ah-wordmark">PLATE</div>
         <div className="ah-tagline">discover · rate · share</div>
       </div>
-    </div>
+    </>
   )
+  if (onClick) {
+    return (
+      <button className="ah-logo-btn" onClick={onClick} aria-label="Go to Search" type="button">
+        {inner}
+      </button>
+    )
+  }
+  return <div className="ah-logo">{inner}</div>
 }
 
-export default function AppHeader({ onOpenInbox, notifCount = 0 }) {
+export default function AppHeader({ onOpenInbox, notifCount = 0, onGoHome }) {
   return (
     <header className="app-header">
-      <PlateLogo />
+      <PlateLogo onClick={onGoHome} />
       <button
         className="app-header-dm-btn"
         onClick={onOpenInbox}
