@@ -14,7 +14,7 @@ async function getUserId() {
 
 export async function savePlace(placeData) {
   const {
-    name, address, photo_url,
+    name, address, city, photo_url,
     personal_note, is_regular, last_visited,
     meal_types, experience_type,
     ratings, computed_score, price_tier, tags,
@@ -42,6 +42,8 @@ export async function savePlace(placeData) {
     website:         website         ?? null,
     created_by:      userId,
   }
+  if (city != null) placeRow.city = city   // requires migration 008
+
   console.log('[savePlace] inserting place row:', placeRow)
 
   const { data: place, error: placeErr } = await supabase
@@ -87,7 +89,7 @@ export async function savePlace(placeData) {
 
 export async function updatePlace(placeId, placeData) {
   const {
-    name, address, photo_url,
+    name, address, city, photo_url,
     personal_note, is_regular, last_visited,
     meal_types, experience_type,
     ratings, computed_score, price_tier, tags,
@@ -110,6 +112,8 @@ export async function updatePlace(placeId, placeData) {
     lng:           lng           ?? null,
     website:       website       ?? null,
   }
+  if (city != null) updateRow.city = city   // requires migration 008
+
   // Update the place row
   const { error: placeErr } = await supabase
     .from('places')

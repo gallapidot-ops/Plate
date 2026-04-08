@@ -101,10 +101,14 @@ export async function getPlaceDetails(placeId) {
 
   const p = await res.json()
 
-  // Extract city from address components — prefer 'locality', fall back to 'sublocality_level_1'
+  // Extract city from address components:
+  // locality (exact city) → sublocality_level_1 → administrative_area_level_2
+  // Never use administrative_area_level_1 (that's the district/state, e.g. "Tel Aviv District")
   const addrComponents = p.addressComponents ?? []
-  const localityComp = addrComponents.find(c => c.types?.includes('locality'))
-    ?? addrComponents.find(c => c.types?.includes('sublocality_level_1'))
+  const localityComp =
+    addrComponents.find(c => c.types?.includes('locality')) ??
+    addrComponents.find(c => c.types?.includes('sublocality_level_1')) ??
+    addrComponents.find(c => c.types?.includes('administrative_area_level_2'))
   const city = localityComp?.longText ?? null
 
   // Build a direct photo URL for the first photo
