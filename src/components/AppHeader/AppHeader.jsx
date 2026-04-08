@@ -6,10 +6,10 @@ export default function AppHeader({ onOpenInbox, notifCount = 0, onGoHome }) {
     <header className="app-header">
       {onGoHome ? (
         <button className="ah-logo-btn" onClick={onGoHome} aria-label="Go to Search" type="button">
-          <PlateCircleLogo size={40} />
+          <PlateCircleLogo size={40} circleFill="#E8527A" />
         </button>
       ) : (
-        <PlateCircleLogo size={40} />
+        <PlateCircleLogo size={40} circleFill="#E8527A" />
       )}
 
       {onOpenInbox && (

@@ -1,0 +1,53 @@
+/* ══════════════════════════════════════════
+   MASCOT ANIMATIONS
+   Sequence:
+   0.1s  → whole character bounces in from below
+   0.75s → body wobble on landing
+   1.0s  → right arm waves hello (full arm motion)
+══════════════════════════════════════════ */
+
+/* 1. Whole character bounce-in */
+.plate-mascot {
+  animation: mascot-bounce-in 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+@keyframes mascot-bounce-in {
+  0%   { transform: translateY(80px) scale(0.85); opacity: 0; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* 2. Body + head wobble on landing */
+.mascot-body-group {
+  transform-origin: 60px 66px; /* pivot at top of torso */
+  animation: mascot-wobble 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.72s both;
+}
+
+@keyframes mascot-wobble {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(5deg); }
+  55%  { transform: rotate(-4deg); }
+  80%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* 3. Right arm wave — rotate around shoulder at (60, 88) */
+.mascot-arm-wave {
+  transform-origin: 60px 88px;
+  animation: mascot-wave 1.6s cubic-bezier(0.4, 0, 0.2, 1) 1.0s both;
+}
+
+@keyframes mascot-wave {
+  0%   { transform: rotate(0deg); }
+  18%  { transform: rotate(-70deg); }
+  36%  { transform: rotate(-30deg); }
+  54%  { transform: rotate(-65deg); }
+  72%  { transform: rotate(-20deg); }
+  88%  { transform: rotate(-50deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Left arm — just inherits the bounce-in from parent, stays still */
+.mascot-arm-left {
+  /* no separate animation */
+}
