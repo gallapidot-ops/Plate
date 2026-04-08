@@ -180,21 +180,23 @@
 }
 
 .splash-wordmark {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-logo);
   font-size: 32px;
-  font-weight: 900;
-  letter-spacing: 10px;
+  font-weight: 700;
+  letter-spacing: 8px;
   color: #1A1A2E;
-  text-indent: 10px;
+  text-indent: 8px;
   line-height: 1;
+  transform: scaleX(0.91);
+  display: inline-block;
   opacity: 0;
   animation: splash-fade-up 0.5s ease-out 0.85s forwards;
 }
 
 .splash-tagline {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Nunito', -apple-system, sans-serif;
   font-size: 10px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 3px;
   color: var(--color-accent);
   text-indent: 3px;
