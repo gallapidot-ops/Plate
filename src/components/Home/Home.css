@@ -23,27 +23,23 @@
   align-items: center;
 }
 
-/* ── Bars ── */
-.plate-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 7px;
-  height: 46px;          /* tallest bar height */
+/* ── SVG bars ── */
+.plate-bars-svg {
+  display: block;
+  overflow: visible;
 }
 
 .plate-bar {
-  width: 22px;
-  border-radius: 11px 11px 2px 2px;
-  background: #3D4F7C;
-  transform-origin: bottom center;
+  transform-box: fill-box;
+  transform-origin: 50% 100%; /* bottom of each rect */
   transform: scaleY(0);
   animation: plate-bar-rise 0.6s ease-out forwards;
 }
 
-.plate-bar--1 { height: 20px; opacity: 0.40; animation-delay: 0.10s; }
-.plate-bar--2 { height: 33px; opacity: 0.65; animation-delay: 0.25s; }
-.plate-bar--3 { height: 46px; opacity: 1.00; animation-delay: 0.40s; }
-.plate-bar--4 { height: 33px; opacity: 0.65; animation-delay: 0.30s; }
+.plate-bar--1 { animation-delay: 0.10s; }
+.plate-bar--2 { animation-delay: 0.25s; }
+.plate-bar--3 { animation-delay: 0.40s; }
+.plate-bar--4 { animation-delay: 0.30s; }
 
 @keyframes plate-bar-rise {
   from { transform: scaleY(0); }
@@ -51,33 +47,34 @@
 }
 
 /* ── Baseline ── */
-/* bars total width: 4×22 + 3×7 = 109px */
+/* SVG total width = 75 + 18 = 93px */
 .plate-baseline {
-  width: 109px;
+  width: 93px;
   height: 1.5px;
   background: #3D4F7C;
   opacity: 0;
-  margin-bottom: 12px;
+  margin-top: 2px;
+  margin-bottom: 14px;
   animation: plate-fade-up 0.4s ease-out 0.70s forwards;
 }
 
 /* ── Wordmark ── */
 .plate-wordmark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 400;
-  letter-spacing: 8px;
+  letter-spacing: 10px;
   color: #3D4F7C;
-  text-indent: 8px;       /* offset trailing letter-spacing */
+  text-indent: 10px;
   opacity: 0;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   animation: plate-fade-up 0.5s ease-out 0.85s forwards;
 }
 
 /* ── Tagline ── */
 .plate-tagline {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 3px;
   color: #8A7A85;

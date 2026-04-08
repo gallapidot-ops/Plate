@@ -85,26 +85,22 @@
   align-items: center;
 }
 
-.splash-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 7px;
-  height: 46px;
+.splash-bars-svg {
+  display: block;
+  overflow: visible;
 }
 
 .splash-bar {
-  width: 22px;
-  border-radius: 11px 11px 2px 2px;
-  background: #3D4F7C;
-  transform-origin: bottom center;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
   transform: scaleY(0);
   animation: splash-bar-rise 0.6s ease-out forwards;
 }
 
-.splash-bar--1 { height: 20px; opacity: 0.40; animation-delay: 0.10s; }
-.splash-bar--2 { height: 33px; opacity: 0.65; animation-delay: 0.25s; }
-.splash-bar--3 { height: 46px; opacity: 1.00; animation-delay: 0.40s; }
-.splash-bar--4 { height: 33px; opacity: 0.65; animation-delay: 0.30s; }
+.splash-bar--1 { animation-delay: 0.10s; }
+.splash-bar--2 { animation-delay: 0.25s; }
+.splash-bar--3 { animation-delay: 0.40s; }
+.splash-bar--4 { animation-delay: 0.30s; }
 
 @keyframes splash-bar-rise {
   from { transform: scaleY(0); }
@@ -112,29 +108,30 @@
 }
 
 .splash-baseline {
-  width: 109px;
+  width: 93px;
   height: 1.5px;
   background: #3D4F7C;
   opacity: 0;
-  margin-bottom: 12px;
+  margin-top: 2px;
+  margin-bottom: 14px;
   animation: splash-fade-up 0.4s ease-out 0.70s forwards;
 }
 
 .splash-wordmark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 26px;
+  font-size: 32px;
   font-weight: 400;
-  letter-spacing: 8px;
+  letter-spacing: 10px;
   color: #3D4F7C;
-  text-indent: 8px;
+  text-indent: 10px;
   opacity: 0;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   animation: splash-fade-up 0.5s ease-out 0.85s forwards;
 }
 
 .splash-tagline {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 400;
   letter-spacing: 3px;
   color: #8A7A85;
