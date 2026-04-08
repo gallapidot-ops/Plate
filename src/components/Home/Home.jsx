@@ -56,7 +56,7 @@ function MealCard({ item, active, onClick }) {
   const { Icon } = item
   return (
     <div
-      className={`meal-card ${active ? 'meal-card--active' : ''}`}
+      className={`meal-card meal-card--${item.id}${active ? ' meal-card--active' : ''}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
