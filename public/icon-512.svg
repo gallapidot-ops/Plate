@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <filter id="s" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="12" dy="12" stdDeviation="18" flood-color="rgba(0,0,0,0.09)"/>
+      <feDropShadow dx="-10" dy="-10" stdDeviation="14" flood-color="rgba(255,255,255,0.95)"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#EFECE6" filter="url(#s)"/>
+  <!-- Bars: max height=256, widths=56, gaps=30, total=4×56+3×30=314, centered: (512-314)/2=99 -->
+  <rect x="99"  y="256" width="56" height="144" rx="28" fill="#3D4F7C" fill-opacity="0.40"/>
+  <rect x="185" y="192" width="56" height="208" rx="28" fill="#3D4F7C" fill-opacity="0.65"/>
+  <rect x="271" y="144" width="56" height="256" rx="28" fill="#3D4F7C" fill-opacity="1.00"/>
+  <rect x="357" y="214" width="56" height="186" rx="28" fill="#3D4F7C" fill-opacity="0.65"/>
+  <!-- Baseline -->
+  <rect x="99" y="410" width="314" height="9" rx="4.5" fill="#3D4F7C"/>
+</svg>

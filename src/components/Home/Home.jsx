@@ -388,7 +388,7 @@ export default function Home({ onSearch }) {
 
   return (
     <div className="home">
-      {/* Header */}
+      {/* Logo — fixed at top, never scrolls */}
       <div className="home-header">
         <PlateLogo />
       </div>
@@ -408,135 +408,135 @@ export default function Home({ onSearch }) {
       {/* People tab */}
       {tab === 'people' && <PeopleTab />}
 
-      {/* Places tab content */}
-      {tab === 'places' && <>
+      {/* Places tab — middle content + pinned CTA */}
+      {tab === 'places' && (
+        <div className="home-places-layout">
 
-      {/* Meal type label */}
-      <div className="meal-section-label">
-        <span className="field-label">Meal Type</span>
-        {mealType && (
-          <span className="meal-selected-badge">
-            {MEAL_TYPES.find(m => m.id === mealType)?.label}
-          </span>
-        )}
-      </div>
+          {/* Scrollable middle content */}
+          <div className="home-places-body">
 
-      {/* Meal type swipe strip */}
-      <div className="meal-strip-wrap">
-        <div className="meal-strip" ref={scrollRef}>
-          {MEAL_TYPES.map(item => (
-            <MealCard
-              key={item.id}
-              item={item}
-              active={mealType === item.id}
-              onClick={() => setMealType(prev => prev === item.id ? null : item.id)}
-            />
-          ))}
-        </div>
-        {/* Fade indicators */}
-        <div className="meal-strip-fade meal-strip-fade--right" />
-        <div className="meal-strip-fade meal-strip-fade--left" />
-      </div>
-
-      {/* Core Experience – quick inline picker */}
-      <div className="home-section">
-        <label className="field-label">Core Experience</label>
-        <div className="exp-strip-wrap">
-          <div className="exp-strip">
-            {EXPERIENCES.map(({ id, label, Icon }) => (
-              <div
-                key={id}
-                className={`exp-card${filters.experience === id ? ' exp-card--active' : ''}`}
-                role="button"
-                tabIndex={0}
-                onClick={() => setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
-                onKeyDown={e => e.key === 'Enter' && setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
-              >
-                <Icon size={20} strokeWidth={1.5} className="exp-card-icon" />
-                <span className="exp-card-label">{label}</span>
+            {/* Meal type */}
+            <div className="meal-section-label">
+              <span className="field-label">Meal Type</span>
+              {mealType && (
+                <span className="meal-selected-badge">
+                  {MEAL_TYPES.find(m => m.id === mealType)?.label}
+                </span>
+              )}
+            </div>
+            <div className="meal-strip-wrap">
+              <div className="meal-strip" ref={scrollRef}>
+                {MEAL_TYPES.map(item => (
+                  <MealCard
+                    key={item.id}
+                    item={item}
+                    active={mealType === item.id}
+                    onClick={() => setMealType(prev => prev === item.id ? null : item.id)}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            </div>
 
-      {/* Location */}
-      <div className="home-section">
-        <label className="field-label">Location</label>
-        <div className="location-wrap">
-          <svg className="location-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-          </svg>
-          <input
-            className="field-input location-input"
-            type="text"
-            placeholder="City, neighborhood, street..."
-            value={location}
-            onChange={e => setLocation(e.target.value)}
-          />
-        </div>
-      </div>
+            {/* Core Experience */}
+            <div className="home-section">
+              <label className="field-label">Core Experience</label>
+              <div className="exp-strip-wrap">
+                <div className="exp-strip">
+                  {EXPERIENCES.map(({ id, label, Icon }) => (
+                    <div
+                      key={id}
+                      className={`exp-card${filters.experience === id ? ' exp-card--active' : ''}`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
+                      onKeyDown={e => e.key === 'Enter' && setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
+                    >
+                      <Icon size={18} strokeWidth={1.5} className="exp-card-icon" />
+                      <span className="exp-card-label">{label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-      {/* More filters */}
-      <div className="home-section home-more-row">
-        <button
-          type="button"
-          className={`more-btn ${activeCount > 0 ? 'more-btn--active' : ''}`}
-          onClick={() => setDrawerOpen(true)}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="4" x2="20" y1="6" y2="6"/><line x1="8" x2="20" y1="12" y2="12"/><line x1="12" x2="20" y1="18" y2="18"/>
-          </svg>
-          More Filters
-          {activeCount > 0 && <span className="more-btn-badge">{activeCount}</span>}
-        </button>
+            {/* Location */}
+            <div className="home-section">
+              <label className="field-label">Location</label>
+              <div className="location-wrap">
+                <svg className="location-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                <input
+                  className="field-input location-input"
+                  type="text"
+                  placeholder="City, neighborhood, street..."
+                  value={location}
+                  onChange={e => setLocation(e.target.value)}
+                />
+              </div>
+            </div>
 
-        {activeCount > 0 && (
-          <div className="active-filters-preview">
-            {filters.experience && (
-              <span className="active-filter-chip">
-                {EXPERIENCES.find(e => e.id === filters.experience)?.label}
-              </span>
+            {/* More filters */}
+            <div className="home-section home-more-row">
+              <button
+                type="button"
+                className={`more-btn ${activeCount > 0 ? 'more-btn--active' : ''}`}
+                onClick={() => setDrawerOpen(true)}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" x2="20" y1="6" y2="6"/><line x1="8" x2="20" y1="12" y2="12"/><line x1="12" x2="20" y1="18" y2="18"/>
+                </svg>
+                More Filters
+                {activeCount > 0 && <span className="more-btn-badge">{activeCount}</span>}
+              </button>
+              {activeCount > 0 && (
+                <div className="active-filters-preview">
+                  {filters.experience && (
+                    <span className="active-filter-chip">
+                      {EXPERIENCES.find(e => e.id === filters.experience)?.label}
+                    </span>
+                  )}
+                  {filters.tags.slice(0, 2).map(t => (
+                    <span key={t} className="active-filter-chip">
+                      {TAGS.find(tag => tag.id === t)?.label}
+                    </span>
+                  ))}
+                  {filters.tags.length > 2 && (
+                    <span className="active-filter-chip">+{filters.tags.length - 2}</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+          </div>{/* end home-places-body */}
+
+          {/* Search CTA — pinned to bottom */}
+          <div className="home-cta">
+            <button
+              type="button"
+              className="search-btn"
+              disabled={!mealType}
+              onClick={handleSearch}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              Search
+            </button>
+            {!mealType && (
+              <p className="search-hint">Select a meal type to continue</p>
             )}
-            {filters.tags.slice(0, 2).map(t => (
-              <span key={t} className="active-filter-chip">
-                {TAGS.find(tag => tag.id === t)?.label}
-              </span>
-            ))}
-            {filters.tags.length > 2 && (
-              <span className="active-filter-chip">+{filters.tags.length - 2}</span>
-            )}
           </div>
-        )}
-      </div>
 
-      {/* Search CTA */}
-      <div className="home-cta">
-        <button
-          type="button"
-          className="search-btn"
-          disabled={!mealType}
-          onClick={handleSearch}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
-          Search
-        </button>
-        {!mealType && (
-          <p className="search-hint">Select a meal type to continue</p>
-        )}
-      </div>
+        </div>
+      )}{/* end places tab */}
 
-      {/* Drawer */}
       <Drawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         filters={filters}
         setFilters={setFilters}
       />
-
-      </> /* end Places tab */}
     </div>
   )
 }
