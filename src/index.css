@@ -22,8 +22,8 @@
   --color-border-light:    rgba(61, 79, 124, 0.10);
 
   /* Typography */
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans:  'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', 'Frank Ruhl Libre', Georgia, serif;
+  --font-sans:  'Inter', 'Heebo', system-ui, sans-serif;
 
   /* Misc */
   --radius:    50px;
