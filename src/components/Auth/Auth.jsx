@@ -67,10 +67,19 @@ export default function Auth() {
     <div className="auth-screen">
       <div className="auth-inner">
 
-        {/* Logo */}
-        <div className="auth-logo">
-          <span className="auth-logo-text">Plate</span>
-          <p className="auth-logo-sub">Your places, together</p>
+        {/* Logo — neumorphic card, vertical layout, same as splash */}
+        <div className="auth-logo-card">
+          <div className="auth-logo-inner">
+            <svg className="splash-bars-svg" width="93" height="105" viewBox="0 0 93 105" fill="none">
+              <rect className="splash-bar splash-bar--1" x="0"  y="55" width="18" height="50"  rx="9" fill="#3D4F7C" fillOpacity="0.40" />
+              <rect className="splash-bar splash-bar--2" x="25" y="25" width="18" height="80"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
+              <rect className="splash-bar splash-bar--3" x="50" y="0"  width="18" height="105" rx="9" fill="#3D4F7C" fillOpacity="1.00" />
+              <rect className="splash-bar splash-bar--4" x="75" y="35" width="18" height="70"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
+            </svg>
+            <div className="splash-baseline" />
+            <div className="splash-wordmark">PLATE</div>
+            <div className="splash-tagline">discover · rate · share</div>
+          </div>
         </div>
 
         {/* Google */}
