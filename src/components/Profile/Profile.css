@@ -562,8 +562,15 @@
   gap: 10px;
 }
 
+.pf-visit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .pf-visit-card {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -577,6 +584,28 @@
   box-shadow: var(--shadow);
   transition: transform 0.15s, box-shadow 0.15s;
   touch-action: manipulation;
+}
+
+.pf-visit-delete {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface);
+  box-shadow: var(--shadow);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.pf-visit-delete:hover {
+  opacity: 1;
+  color: #C0392B;
 }
 
 .pf-visit-card:hover {

@@ -544,3 +544,21 @@ export async function getPlaceCountByUser(userId) {
   if (error) return 0
   return count ?? 0
 }
+
+/** Delete a place (and its ratings) owned by the current user. */
+export async function deletePlace(placeId) {
+  const userId = await getUserId()
+
+  // Ratings are deleted first (FK constraint); then the place row.
+  await supabase.from('place_ratings')
+    .delete()
+    .eq('place_id', placeId)
+    .eq('user_id',  userId)
+
+  const { error } = await supabase.from('places')
+    .delete()
+    .eq('id',         placeId)
+    .eq('created_by', userId)
+
+  if (error) throw new Error(`deletePlace: ${error.message}`)
+}
