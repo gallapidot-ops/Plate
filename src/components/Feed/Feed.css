@@ -36,14 +36,14 @@
 .feed-item-wrap {
   background: var(--color-surface);
   border-radius: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: none;
   overflow: hidden;
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .feed-item-wrap:hover {
   transform: translateY(-2px);
-  box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
+  box-shadow: none;
 }
 
 /* Meta row inside card */
@@ -59,7 +59,7 @@
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .feed-meta-name {

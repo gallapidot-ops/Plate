@@ -572,6 +572,7 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
           <div className="home-places-body">
 
             {/* Meal type */}
+            <div className="home-section-heading">What are you after?</div>
             <div className="meal-strip-wrap">
               <div className="meal-strip" ref={scrollRef}>
                 {MEAL_TYPES.map(item => (
@@ -593,7 +594,7 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
                   onClick={() => setExpTooltip(t => !t)}
                   aria-label="What is Core Experience?"
                 >●</button>
-                <span className="exp-label-editorial">Core Experience</span>
+                <span className="exp-label-editorial">The vibe?</span>
                 {expTooltip && (
                   <div className="exp-tooltip" role="tooltip">
                     The mood and purpose of your visit — not just what you eat, but how you want to feel.

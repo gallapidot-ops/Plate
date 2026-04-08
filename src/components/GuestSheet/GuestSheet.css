@@ -55,7 +55,7 @@
   height: 58px;
   border-radius: 50%;
   background: var(--color-surface);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   display: flex;
   align-items: center;
   justify-content: center;

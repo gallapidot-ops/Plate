@@ -23,7 +23,8 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: var(--shadow);
+  border: 3px solid #1A1A2E;
+  box-shadow: 3px 3px 0 #1A1A2E;
 }
 
 .pf-avatar--initials {
@@ -130,19 +131,19 @@
   height: 36px;
   border-radius: 50%;
   background: var(--color-surface);
-  border: none;
+  border: 2px solid #1A1A2E;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--color-text-secondary);
-  box-shadow: var(--shadow);
-  transition: all 0.15s;
+  color: var(--color-text-primary);
+  box-shadow: 2px 2px 0 #1A1A2E;
+  transition: background 0.15s;
   touch-action: manipulation;
 }
 
 .pf-back-btn:hover {
-  box-shadow: var(--shadow-inset);
+  background: rgba(196, 33, 74, 0.1);
   color: var(--color-accent);
 }
 
@@ -152,31 +153,30 @@
   padding: 7px 14px;
   border-radius: 20px;
   background: var(--color-accent);
-  border: none;
-  color: #fff;
+  border: 2px solid #1A1A2E;
+  color: var(--color-surface);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: opacity 0.15s;
+  box-shadow: 2px 2px 0 #1A1A2E;
+  transition: transform 0.1s;
   touch-action: manipulation;
   white-space: nowrap;
   letter-spacing: 0.02em;
 }
 
-.pf-view-follow-btn:hover { opacity: 0.85; }
+.pf-view-follow-btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 #1A1A2E; }
 .pf-view-follow-btn:disabled { opacity: 0.6; cursor: default; }
 
 .pf-view-follow-btn--following {
   background: var(--color-surface);
-  color: var(--color-text-secondary);
-  box-shadow: var(--shadow-inset);
+  color: var(--color-text-primary);
 }
 
 .pf-view-follow-btn--requested {
   background: var(--color-surface);
-  color: var(--color-text-muted);
-  box-shadow: var(--shadow);
+  color: var(--color-text-secondary);
 }
 
 .pf-gear-btn {
@@ -184,21 +184,21 @@
   height: 36px;
   border-radius: 50%;
   background: var(--color-surface);
-  border: none;
+  border: 2px solid #1A1A2E;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s;
   flex-shrink: 0;
-  box-shadow: var(--shadow);
+  box-shadow: 2px 2px 0 #1A1A2E;
   touch-action: manipulation;
 }
 
 .pf-gear-btn:hover {
+  background: rgba(196, 33, 74, 0.1);
   color: var(--color-accent);
-  box-shadow: var(--shadow-inset);
 }
 
 /* ════════════════════════════════════════
@@ -206,14 +206,16 @@
 ════════════════════════════════════════ */
 .pf-section {
   background: var(--color-surface);
-  border-radius: 20px;
+  border-radius: 18px;
+  border: 3px solid #1A1A2E;
+  box-shadow: 4px 4px 0 #1A1A2E;
   padding: 20px 22px;
   margin: 0 16px 14px;
-  box-shadow: var(--shadow);
 }
 
 .pf-section--chart {
   background: var(--color-bg);
+  border: none;
   box-shadow: none;
   padding: 0 0 14px;
   margin: 0;
@@ -228,7 +230,7 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-secondary);
-  font-weight: 400;
+  font-weight: 900;
   margin: 0 0 14px;
   font-family: var(--font-sans);
 }
@@ -258,46 +260,46 @@
   padding: 12px 18px;
   background: var(--color-surface);
   border-radius: 18px;
-  border: 1px solid transparent;
+  border: 2px solid #1A1A2E;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: box-shadow 0.18s, border-color 0.18s, color 0.18s;
+  box-shadow: 3px 3px 0 #1A1A2E;
+  transition: background 0.15s;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
 .pf-cat-chip:hover {
-  box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
+  background: rgba(196, 33, 74, 0.08);
 }
 
 .pf-cat-chip--active {
-  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.10), inset -2px -2px 5px rgba(255,255,255,0.80);
-  border-color: rgba(61,79,124,0.3);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 3px 3px 0 #1A1A2E;
 }
 
 .pf-cat-chip-name {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-text-primary);
   white-space: nowrap;
-  transition: color 0.18s;
+  transition: color 0.15s;
 }
 
 .pf-cat-chip--active .pf-cat-chip-name {
-  color: var(--color-accent);
+  color: var(--color-surface);
 }
 
 .pf-cat-chip-count {
   font-size: 11px;
   font-family: var(--font-sans);
   color: var(--color-text-secondary);
-  opacity: 0.65;
-  transition: color 0.18s, opacity 0.18s;
+  transition: color 0.15s;
 }
 
 .pf-cat-chip--active .pf-cat-chip-count {
-  color: var(--color-accent);
+  color: rgba(245, 239, 226, 0.8);
   opacity: 0.8;
 }
 
@@ -334,7 +336,7 @@
   cursor: pointer;
   transition: all 0.15s;
   color: var(--color-text-secondary);
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-exp-bubble:hover {
@@ -343,10 +345,10 @@
 }
 
 .pf-exp-bubble--active {
-  background: rgba(61,79,124,0.07);
+  background: rgba(196,33,74,0.07);
   border-color: var(--color-accent);
   color: var(--color-accent);
-  box-shadow: var(--shadow-inset);
+  box-shadow: none;
 }
 
 .pf-exp-icon { flex-shrink: 0; opacity: 0.72; }
@@ -374,7 +376,7 @@
 }
 
 .pf-exp-bubble--active .pf-exp-count {
-  background: rgba(61,79,124,0.14);
+  background: rgba(196,33,74,0.14);
   color: var(--color-accent);
 }
 
@@ -407,18 +409,18 @@
   flex-shrink: 0;
   font-family: var(--font-sans);
   transition: all 0.18s;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-city-bubble:hover {
   transform: translateY(-1px);
-  box-shadow: 6px 6px 14px rgba(0,0,0,0.08), -2px -2px 6px rgba(255,255,255,0.9);
+  box-shadow: none;
 }
 
 .pf-city-bubble--active {
   border-color: var(--color-accent);
-  background: rgba(61,79,124,0.06);
-  box-shadow: var(--shadow-inset);
+  background: rgba(196,33,74,0.06);
+  box-shadow: none;
 }
 
 .pf-city-bubble--home {
@@ -441,7 +443,7 @@
   font-size: 11px;
   font-weight: 400;
   color: var(--color-accent);
-  background: rgba(61,79,124,0.08);
+  background: rgba(196,33,74,0.08);
   border-radius: 50px;
   padding: 2px 8px;
   min-width: 18px;
@@ -570,24 +572,23 @@
   gap: 7px;
   padding: 16px 20px;
   background: var(--color-surface);
-  border-radius: 20px;
-  border: none;
+  border-radius: 18px;
+  border: 3px solid #1A1A2E;
   cursor: pointer;
   text-align: left;
-  box-shadow: var(--shadow);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 4px 4px 0 #1A1A2E;
+  transition: transform 0.1s;
   touch-action: manipulation;
 }
 
-
 .pf-visit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #1A1A2E;
 }
 
 .pf-visit-card:active {
-  box-shadow: var(--shadow-inset);
-  transform: translateY(0);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #1A1A2E;
 }
 
 .pf-visit-name {
@@ -728,11 +729,11 @@
   justify-content: center;
   color: var(--color-text-secondary);
   transition: all 0.15s;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-drawer-close:hover {
-  box-shadow: var(--shadow-inset);
+  box-shadow: none;
 }
 
 .pf-drawer-list {
@@ -781,7 +782,7 @@
   justify-content: center;
   cursor: pointer;
   position: relative;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-set-avatar-initials {
@@ -850,7 +851,7 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  box-shadow: var(--shadow);
+  box-shadow: none;
   margin-top: 4px;
   padding: 6px 0;
   list-style: none;
@@ -885,7 +886,7 @@
   transition: border-color 0.15s;
 }
 
-.pf-set-privacy-row--active { border-color: var(--color-accent); background: rgba(61,79,124,0.04); }
+.pf-set-privacy-row--active { border-color: var(--color-accent); background: rgba(196,33,74,0.04); }
 
 .pf-set-privacy-label {
   font-size: 14px;
@@ -989,7 +990,7 @@
 }
 
 .pf-settings-privacy-row:hover { background: var(--color-bg); }
-.pf-settings-privacy-row--active { background: rgba(61,79,124,0.06); }
+.pf-settings-privacy-row--active { background: rgba(196,33,74,0.06); }
 
 /* ════════════════════════════════════════
    FOLLOW LIST
@@ -1015,7 +1016,7 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-follow-info {
@@ -1083,7 +1084,7 @@
   height: 18px;
   padding: 0 5px;
   border-radius: 50px;
-  background: rgba(61,79,124,0.08);
+  background: rgba(196,33,74,0.08);
   font-size: 10px;
   font-weight: 400;
   color: var(--color-accent);
@@ -1127,7 +1128,7 @@
   flex-shrink: 0;
   transition: all 0.15s;
   letter-spacing: 0.02em;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-exp-chip:hover {
@@ -1137,7 +1138,7 @@
 .pf-exp-chip--active {
   background: var(--color-accent);
   color: #fff;
-  box-shadow: 2px 2px 8px rgba(61,79,124,0.22), -1px -1px 4px rgba(255,255,255,0.7);
+  box-shadow: none;
 }
 
 .pf-exp-chip-count {
@@ -1200,11 +1201,11 @@
   font-family: var(--font-sans);
   transition: box-shadow 0.18s, transform 0.18s;
   width: 100%;
-  box-shadow: var(--shadow);
+  box-shadow: none;
 }
 
 .pf-wish-card:hover {
-  box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
+  box-shadow: none;
   transform: translateY(-1px);
 }
 
@@ -1268,7 +1269,7 @@
 }
 
 .pf-wish-visit-btn:hover {
-  background: rgba(61,79,124,0.06);
+  background: rgba(196,33,74,0.06);
 }
 
 /* Placeholder for wishlist items without photo */

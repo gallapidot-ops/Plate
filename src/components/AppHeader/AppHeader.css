@@ -8,8 +8,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px 10px 24px;
-  background: var(--color-bg);
-  border-bottom: 1px solid rgba(61,79,124,0.06);
+  background: #1A1A2E;
+  border-bottom: none;
 }
 
 /* ── Horizontal logo ── */
@@ -35,8 +35,8 @@
 
 .ah-baseline {
   width: 100%;
-  height: 1px;
-  background: #3D4F7C;
+  height: 1.5px;
+  background: var(--color-surface);
   margin-top: 4px;
 }
 
@@ -50,9 +50,9 @@
 .ah-wordmark {
   font-family: var(--font-serif);
   font-size: 15px;
-  font-weight: 400;
+  font-weight: 900;
   letter-spacing: 5px;
-  color: #3D4F7C;
+  color: var(--color-surface);
   text-indent: 5px;
   line-height: 1;
 }
@@ -62,7 +62,7 @@
   font-size: 7.5px;
   font-weight: 400;
   letter-spacing: 1px;
-  color: #8A7A85;
+  color: rgba(245, 239, 226, 0.6);
   text-indent: 1px;
 }
 
@@ -85,24 +85,23 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: var(--color-surface);
-  border: none;
+  background: rgba(245, 239, 226, 0.12);
+  border: 2px solid rgba(245, 239, 226, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--color-accent);
-  box-shadow: var(--shadow);
+  color: var(--color-surface);
   flex-shrink: 0;
-  transition: box-shadow 0.15s;
+  transition: background 0.15s;
   touch-action: manipulation;
 }
 
 .app-header-dm-btn:hover {
-  box-shadow: var(--shadow-inset);
+  background: rgba(245, 239, 226, 0.22);
 }
 
-/* ── Badge — terracotta #C4714A ── */
+/* ── Badge ── */
 .app-header-badge {
   position: absolute;
   top: -3px;
@@ -110,10 +109,10 @@
   min-width: 18px;
   height: 18px;
   border-radius: 50px;
-  background: #C4714A;
-  color: #fff;
+  background: var(--color-accent);
+  color: var(--color-surface);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--font-sans);
   display: flex;
   align-items: center;
