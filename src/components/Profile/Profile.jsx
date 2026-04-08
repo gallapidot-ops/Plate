@@ -596,18 +596,15 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
           {catData.length > 0 && (
             <section className="pf-section">
               <p className="pf-section-label">Categories</p>
-              <div className="pf-bubbles-scroll">
+              <div className="pf-cat-scroll">
                 {catData.map(cat => (
                   <button
                     key={cat.key}
-                    className={`pf-bubble ${activeCatKey === cat.key ? 'pf-bubble--active' : ''}`}
+                    className={`pf-cat-chip${activeCatKey === cat.key ? ' pf-cat-chip--active' : ''}`}
                     onClick={() => setActiveCatKey(cat.key)}
                   >
-                    <div className="pf-bubble-img-wrap" style={{ borderColor: cat.color }}>
-                      <img src={cat.lastPhoto} alt={cat.name} className="pf-bubble-img" />
-                    </div>
-                    <span className="pf-bubble-name">{cat.name}</span>
-                    <span className="pf-bubble-count" style={{ background: cat.color }}>{cat.count}</span>
+                    <span className="pf-cat-chip-name">{cat.name}</span>
+                    <span className="pf-cat-chip-count">{cat.count}</span>
                   </button>
                 ))}
               </div>

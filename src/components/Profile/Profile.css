@@ -234,85 +234,76 @@
 }
 
 /* ════════════════════════════════════════
-   CATEGORY BUBBLES
+   CATEGORY CHIPS (no image — meal-card style)
 ════════════════════════════════════════ */
-.pf-bubbles-scroll {
+.pf-cat-scroll {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   margin: 0 -22px;
-  padding-left: 22px;
-  padding-right: 22px;
+  padding: 0 22px 4px;
 }
 
-.pf-bubbles-scroll::-webkit-scrollbar { display: none; }
+.pf-cat-scroll::-webkit-scrollbar { display: none; }
 
-.pf-bubble {
+.pf-cat-chip {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
-  padding: 14px 12px 10px;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 18px;
+  background: var(--color-surface);
   border-radius: 18px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
   cursor: pointer;
-  flex-shrink: 0;
-  width: 84px;
-  transition: all 0.18s;
-  font-family: var(--font-sans);
-  position: relative;
   box-shadow: var(--shadow);
+  transition: box-shadow 0.18s, border-color 0.18s, color 0.18s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.pf-bubble:hover {
-  transform: translateY(-2px);
+.pf-cat-chip:hover {
   box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
 }
 
-.pf-bubble--active {
-  border-color: var(--color-accent);
-  background: rgba(61,79,124,0.06);
-  box-shadow: var(--shadow-inset);
+.pf-cat-chip--active {
+  box-shadow: inset 3px 3px 7px rgba(0,0,0,0.10), inset -2px -2px 5px rgba(255,255,255,0.80);
+  border-color: rgba(61,79,124,0.3);
 }
 
-.pf-bubble-img-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 2px solid;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.pf-bubble-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.pf-bubble-name {
-  font-size: 11px;
-  color: var(--color-text-primary);
-  font-weight: 400;
-  text-align: center;
-  line-height: 1.2;
+.pf-cat-chip-name {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
   white-space: nowrap;
-  letter-spacing: 0.02em;
+  transition: color 0.18s;
 }
 
+.pf-cat-chip--active .pf-cat-chip-name {
+  color: var(--color-accent);
+}
+
+.pf-cat-chip-count {
+  font-size: 11px;
+  font-family: var(--font-sans);
+  color: var(--color-text-secondary);
+  opacity: 0.65;
+  transition: color 0.18s, opacity 0.18s;
+}
+
+.pf-cat-chip--active .pf-cat-chip-count {
+  color: var(--color-accent);
+  opacity: 0.8;
+}
+
+/* dead class kept to avoid build errors — will be removed */
 .pf-bubble-count {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  color: #fff;
+  display: none;
   font-size: 10px;
   font-weight: 400;
   display: flex;
