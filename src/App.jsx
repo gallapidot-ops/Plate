@@ -25,30 +25,40 @@ const NAV = [
   },
 ]
 
+// Logo markup shared between splash card and the morph target feel
+function SplashLogoContent() {
+  return (
+    <>
+      <svg className="splash-bars-svg" width="93" height="105" viewBox="0 0 93 105" fill="none">
+        <rect className="splash-bar splash-bar--1" x="0"  y="55" width="18" height="50"  rx="9" fill="#3D4F7C" fillOpacity="0.40" />
+        <rect className="splash-bar splash-bar--2" x="25" y="25" width="18" height="80"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
+        <rect className="splash-bar splash-bar--3" x="50" y="0"  width="18" height="105" rx="9" fill="#3D4F7C" fillOpacity="1.00" />
+        <rect className="splash-bar splash-bar--4" x="75" y="35" width="18" height="70"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
+      </svg>
+      <div className="splash-baseline" />
+      <div className="splash-wordmark">PLATE</div>
+      <div className="splash-tagline">discover · rate · share</div>
+    </>
+  )
+}
+
 function SplashOverlay({ onDone }) {
-  const [fading, setFading] = useState(false)
+  // phase: 'hold' → 'morph' → done (unmount)
+  const [phase, setPhase] = useState('hold')
 
   useEffect(() => {
-    // Start fade after animation completes (~1.5s)
-    const fadeTimer = setTimeout(() => setFading(true), 1500)
-    // Remove from DOM after fade finishes (1.5s + 0.6s)
-    const doneTimer = setTimeout(() => onDone(), 2100)
-    return () => { clearTimeout(fadeTimer); clearTimeout(doneTimer) }
+    // Logo animation fully completes at ~1.6s; start morph just after
+    const morphTimer = setTimeout(() => setPhase('morph'), 1550)
+    // Morph takes 0.8s card + 0.2s delay on bg = 1.0s total; add 0.1s buffer
+    const doneTimer  = setTimeout(() => onDone(), 1550 + 1000)
+    return () => { clearTimeout(morphTimer); clearTimeout(doneTimer) }
   }, [onDone])
 
   return (
-    <div className={`splash-overlay${fading ? ' splash-overlay--fading' : ''}`}>
+    <div className={`splash-overlay splash-overlay--${phase}`}>
       <div className="splash-logo-card">
         <div className="splash-logo-inner">
-          <svg className="splash-bars-svg" width="93" height="105" viewBox="0 0 93 105" fill="none">
-            <rect className="splash-bar splash-bar--1" x="0"  y="55" width="18" height="50"  rx="9" fill="#3D4F7C" fillOpacity="0.40" />
-            <rect className="splash-bar splash-bar--2" x="25" y="25" width="18" height="80"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
-            <rect className="splash-bar splash-bar--3" x="50" y="0"  width="18" height="105" rx="9" fill="#3D4F7C" fillOpacity="1.00" />
-            <rect className="splash-bar splash-bar--4" x="75" y="35" width="18" height="70"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
-          </svg>
-          <div className="splash-baseline" />
-          <div className="splash-wordmark">PLATE</div>
-          <div className="splash-tagline">discover · rate · share</div>
+          <SplashLogoContent />
         </div>
       </div>
     </div>
@@ -109,7 +119,7 @@ export default function App() {
             <PlacePage place={selectedPlace} onBack={() => setSelectedPlace(null)} />
           </div>
         )}
-        <div className="app-content">
+        <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
           {screen === 'home'    && <Home onSearch={() => {}} />}
           {screen === 'add'     && <AddPlace onSaved={() => setScreen('home')} />}
           {screen === 'profile' && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
