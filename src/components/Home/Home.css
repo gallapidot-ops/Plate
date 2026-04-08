@@ -727,6 +727,14 @@
   font-family: var(--font-sans);
 }
 
+.home-people-privacy {
+  color: var(--color-text-secondary);
+  opacity: 0.55;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .home-people-follow-btn {
   padding: 7px 18px;
   border-radius: 50px;

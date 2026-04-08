@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater } from 'lucide-react'
-import { addPlaceToWishlist, searchPlaces, searchUsers } from '../../lib/db'
+import { addPlaceToWishlist, searchPlaces, searchUsers, followUser, unfollowUser, sendFollowRequest, cancelFollowRequest } from '../../lib/db'
 import './Home.css'
 
 const MEAL_TYPES = [
@@ -182,11 +182,33 @@ function Drawer({ open, onClose, filters, setFilters }) {
   )
 }
 
+/* ── Privacy icon helpers ── */
+function GlobeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  )
+}
+
+function LockIconSmall() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  )
+}
+
 /* ── People tab ── */
-function PeopleTab() {
-  const [query,     setQuery]     = useState('')
-  const [results,   setResults]   = useState([])
-  const [searching, setSearching] = useState(false)
+function PeopleTab({ onViewUser }) {
+  const [query,        setQuery]        = useState('')
+  const [results,      setResults]      = useState([])
+  const [searching,    setSearching]    = useState(false)
+  const [followStates, setFollowStates] = useState({}) // userId → 'none'|'following'|'requested'
+  const [acting,       setActing]       = useState(new Set())
 
   useEffect(() => {
     if (query.trim().length < 2) {
@@ -200,10 +222,50 @@ function PeopleTab() {
       if (!cancelled) {
         setResults(data)
         setSearching(false)
+        setFollowStates({}) // reset per new search
       }
     })
     return () => { cancelled = true }
   }, [query])
+
+  async function handleFollow(e, user) {
+    e.stopPropagation()
+    if (acting.has(user.id)) return
+    setActing(s => new Set(s).add(user.id))
+    const state = followStates[user.id] ?? 'none'
+    try {
+      if (state === 'following') {
+        await unfollowUser(user.id)
+        setFollowStates(s => ({ ...s, [user.id]: 'none' }))
+      } else if (state === 'requested') {
+        await cancelFollowRequest(user.id)
+        setFollowStates(s => ({ ...s, [user.id]: 'none' }))
+      } else if (user.privacy_level === 'public') {
+        await followUser(user.id)
+        setFollowStates(s => ({ ...s, [user.id]: 'following' }))
+      } else {
+        await sendFollowRequest(user.id)
+        setFollowStates(s => ({ ...s, [user.id]: 'requested' }))
+      }
+    } catch (err) {
+      console.error('[PeopleTab] follow:', err)
+    } finally {
+      setActing(s => { const n = new Set(s); n.delete(user.id); return n })
+    }
+  }
+
+  function followBtnLabel(user) {
+    if (acting.has(user.id)) return '…'
+    const state = followStates[user.id] ?? 'none'
+    if (state === 'following') return '✓'
+    if (state === 'requested') return '⌛'
+    return '+'
+  }
+
+  function followBtnClass(user) {
+    const state = followStates[user.id] ?? 'none'
+    return `home-people-follow-btn${state === 'following' ? ' home-people-follow-btn--following' : ''}`
+  }
 
   return (
     <div className="home-people">
@@ -227,9 +289,7 @@ function PeopleTab() {
       </div>
 
       <div className="home-people-list">
-        {searching && (
-          <p className="home-people-empty">Searching…</p>
-        )}
+        {searching && <p className="home-people-empty">Searching…</p>}
         {!searching && query.trim().length < 2 && (
           <p className="home-people-empty">Type at least 2 characters to search</p>
         )}
@@ -237,7 +297,12 @@ function PeopleTab() {
           <p className="home-people-empty">No users found for "{query}"</p>
         )}
         {!searching && results.map(user => (
-          <div key={user.id} className="home-people-card">
+          <div
+            key={user.id}
+            className="home-people-card"
+            onClick={() => onViewUser?.(user.id)}
+            style={{ cursor: 'pointer' }}
+          >
             {user.avatar_url ? (
               <img src={user.avatar_url} alt={user.name || user.username} className="home-people-avatar" />
             ) : (
@@ -245,10 +310,26 @@ function PeopleTab() {
                 {(user.username || '?')[0].toUpperCase()}
               </div>
             )}
+
             <div className="home-people-info">
               <span className="home-people-name">{user.name || user.username}</span>
-              <span className="home-people-meta">@{user.username}{user.home_city ? ` · ${user.home_city}` : ''}</span>
+              <span className="home-people-meta">
+                @{user.username}{user.home_city ? ` · ${user.home_city}` : ''}
+              </span>
             </div>
+
+            <span className="home-people-privacy" title={user.privacy_level}>
+              {user.privacy_level === 'public' ? <GlobeIcon /> : <LockIconSmall />}
+            </span>
+
+            <button
+              className={followBtnClass(user)}
+              onClick={e => handleFollow(e, user)}
+              disabled={acting.has(user.id)}
+              title={user.privacy_level === 'public' ? 'Follow' : 'Send follow request'}
+            >
+              {followBtnLabel(user)}
+            </button>
           </div>
         ))}
       </div>
@@ -404,7 +485,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   )
 }
 
-export default function Home({ onSearch }) {
+export default function Home({ onSearch, onViewUser }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -463,7 +544,7 @@ export default function Home({ onSearch }) {
       </div>
 
       {/* People tab */}
-      {tab === 'people' && <PeopleTab />}
+      {tab === 'people' && <PeopleTab onViewUser={onViewUser} />}
 
       {/* Places tab — middle content + pinned CTA */}
       {tab === 'places' && (

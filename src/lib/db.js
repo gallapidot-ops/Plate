@@ -291,10 +291,141 @@ export async function searchUsers(query) {
 
   const { data, error } = await supabase
     .from('users')
-    .select('id, name, username, avatar_url, home_city')
+    .select('id, name, username, avatar_url, home_city, privacy_level')
     .ilike('username', `%${query.trim()}%`)
     .limit(20)
 
   if (error) { console.error('[db] searchUsers:', error.message); return [] }
   return data ?? []
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FOLLOW SYSTEM
+═══════════════════════════════════════════════════════════ */
+
+/** Immediately follow a public-profile user. */
+export async function followUser(targetUserId) {
+  const userId = await getUserId()
+  const { error } = await supabase.from('follows').insert({
+    follower_id:  userId,
+    following_id: targetUserId,
+  })
+  if (error && !error.message.includes('duplicate')) throw new Error(error.message)
+}
+
+/** Unfollow a user. */
+export async function unfollowUser(targetUserId) {
+  const userId = await getUserId()
+  const { error } = await supabase.from('follows')
+    .delete()
+    .eq('follower_id',  userId)
+    .eq('following_id', targetUserId)
+  if (error) throw new Error(error.message)
+}
+
+/** Send a follow request (private / followers-only profile). */
+export async function sendFollowRequest(targetUserId) {
+  const userId = await getUserId()
+  const { error } = await supabase.from('follow_requests').upsert({
+    from_user_id: userId,
+    to_user_id:   targetUserId,
+    status:       'pending',
+  })
+  if (error) throw new Error(error.message)
+}
+
+/** Cancel (withdraw) a previously-sent follow request. */
+export async function cancelFollowRequest(targetUserId) {
+  const userId = await getUserId()
+  const { error } = await supabase.from('follow_requests')
+    .delete()
+    .eq('from_user_id', userId)
+    .eq('to_user_id',   targetUserId)
+  if (error) throw new Error(error.message)
+}
+
+/**
+ * Return current follow relationship from the logged-in user → targetUserId.
+ * Returns: 'following' | 'requested' | 'none'
+ */
+export async function getFollowStatus(targetUserId) {
+  const userId = await getUserId()
+  const [{ data: follow }, { data: request }] = await Promise.all([
+    supabase.from('follows')
+      .select('follower_id')
+      .eq('follower_id',  userId)
+      .eq('following_id', targetUserId)
+      .maybeSingle(),
+    supabase.from('follow_requests')
+      .select('status')
+      .eq('from_user_id', userId)
+      .eq('to_user_id',   targetUserId)
+      .maybeSingle(),
+  ])
+  if (follow) return 'following'
+  if (request?.status === 'pending') return 'requested'
+  return 'none'
+}
+
+/** Pending follow requests sent TO the current user (for Notifications). */
+export async function getPendingFollowRequests() {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('follow_requests')
+    .select(`
+      id, created_at,
+      from_user:from_user_id ( id, name, username, avatar_url )
+    `)
+    .eq('to_user_id', userId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  if (error) { console.error('[db] getPendingFollowRequests:', error.message); return [] }
+  return data ?? []
+}
+
+/** Count of pending requests — used for notification badge. */
+export async function getPendingRequestCount() {
+  const userId = await getUserId()
+  const { count, error } = await supabase
+    .from('follow_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('to_user_id', userId)
+    .eq('status', 'pending')
+  if (error) return 0
+  return count ?? 0
+}
+
+/**
+ * Accept a follow request:
+ * inserts follower → currentUser into follows, marks request accepted.
+ */
+export async function acceptFollowRequest(requestId, fromUserId) {
+  const userId = await getUserId()
+  const { error: fErr } = await supabase.from('follows').insert({
+    follower_id:  fromUserId,
+    following_id: userId,
+  })
+  if (fErr && !fErr.message.includes('duplicate')) throw new Error(fErr.message)
+  const { error: rErr } = await supabase.from('follow_requests')
+    .update({ status: 'accepted' })
+    .eq('id', requestId)
+  if (rErr) throw new Error(rErr.message)
+}
+
+/** Decline a follow request (marks as declined, leaves in table). */
+export async function declineFollowRequest(requestId) {
+  const { error } = await supabase.from('follow_requests')
+    .update({ status: 'declined' })
+    .eq('id', requestId)
+  if (error) throw new Error(error.message)
+}
+
+/** Number of places a user has logged. */
+export async function getPlaceCountByUser(userId) {
+  const { count, error } = await supabase
+    .from('places')
+    .select('*', { count: 'exact', head: true })
+    .eq('created_by', userId)
+  if (error) return 0
+  return count ?? 0
 }

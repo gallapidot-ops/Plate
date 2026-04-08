@@ -1,13 +1,16 @@
-import { useState, useEffect } from 'react'
-import { supabase }    from './lib/supabase'
-import { getProfile }  from './lib/auth'
-import Auth            from './components/Auth/Auth'
-import ProfileSetup    from './components/ProfileSetup/ProfileSetup'
-import Home            from './components/Home/Home'
-import AddPlace        from './components/AddPlace/AddPlace'
-import Profile         from './components/Profile/Profile'
-import Swipe           from './components/Swipe/Swipe'
-import PlacePage       from './components/PlacePage/PlacePage'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase }       from './lib/supabase'
+import { getProfile }     from './lib/auth'
+import { getPendingRequestCount } from './lib/db'
+import Auth               from './components/Auth/Auth'
+import ProfileSetup       from './components/ProfileSetup/ProfileSetup'
+import Home               from './components/Home/Home'
+import AddPlace           from './components/AddPlace/AddPlace'
+import Profile            from './components/Profile/Profile'
+import Notifications      from './components/Notifications/Notifications'
+import UserProfile        from './components/UserProfile/UserProfile'
+import Swipe              from './components/Swipe/Swipe'
+import PlacePage          from './components/PlacePage/PlacePage'
 import './App.css'
 
 const NAV = [
@@ -18,6 +21,10 @@ const NAV = [
   {
     id: 'add', label: 'Add', accent: true,
     icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>,
+  },
+  {
+    id: 'notifications', label: 'Alerts',
+    icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
   },
   {
     id: 'profile', label: 'Profile',
@@ -43,13 +50,10 @@ function SplashLogoContent() {
 }
 
 function SplashOverlay({ onDone }) {
-  // phase: 'hold' → 'morph' → done (unmount)
   const [phase, setPhase] = useState('hold')
 
   useEffect(() => {
-    // Logo animation fully completes at ~1.6s; start morph just after
     const morphTimer = setTimeout(() => setPhase('morph'), 1550)
-    // Morph takes 0.8s card + 0.2s delay on bg = 1.0s total; add 0.1s buffer
     const doneTimer  = setTimeout(() => onDone(), 1550 + 1000)
     return () => { clearTimeout(morphTimer); clearTimeout(doneTimer) }
   }, [onDone])
@@ -66,14 +70,14 @@ function SplashOverlay({ onDone }) {
 }
 
 export default function App() {
-  // undefined = still loading, null = not logged in, object = logged in
-  const [authUser,      setAuthUser]      = useState(undefined)
-  const [profile,       setProfile]       = useState(null)
-  const [screen,        setScreen]        = useState('home')
-  const [selectedPlace, setSelectedPlace] = useState(null)
-  const [showSwipe,     setShowSwipe]     = useState(false)
-  // Show splash once per session
-  const [showSplash,    setShowSplash]    = useState(
+  const [authUser,       setAuthUser]       = useState(undefined)
+  const [profile,        setProfile]        = useState(null)
+  const [screen,         setScreen]         = useState('home')
+  const [selectedPlace,  setSelectedPlace]  = useState(null)
+  const [showSwipe,      setShowSwipe]      = useState(false)
+  const [viewingUserId,  setViewingUserId]  = useState(null) // UserProfile overlay
+  const [notifCount,     setNotifCount]     = useState(0)
+  const [showSplash,     setShowSplash]     = useState(
     () => !sessionStorage.getItem('plate_splash_shown')
   )
 
@@ -85,54 +89,94 @@ export default function App() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const user = session?.user ?? null
       setAuthUser(user)
-      if (user) getProfile(user.id).then(p => setProfile(p))
+      if (user) {
+        getProfile(user.id).then(p => setProfile(p))
+        getPendingRequestCount().then(setNotifCount)
+      }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user ?? null
       setAuthUser(user)
-      if (user) getProfile(user.id).then(p => setProfile(p))
-      else      setProfile(null)
+      if (user) {
+        getProfile(user.id).then(p => setProfile(p))
+        getPendingRequestCount().then(setNotifCount)
+      } else {
+        setProfile(null)
+        setNotifCount(0)
+      }
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  /* ── Render app content (under the splash) ── */
+  // Called by Notifications when count changes (accept/decline removes items)
+  const handleNotifCountChange = useCallback((count) => {
+    setNotifCount(count)
+  }, [])
+
   function renderContent() {
     if (authUser === undefined) {
-      // Still checking session — show blank bg while splash plays
       return <div style={{ height: '100svh', background: 'var(--color-bg)' }} />
     }
     if (!authUser) return <Auth />
     if (!profile)  return <ProfileSetup user={authUser} onCreated={setProfile} />
 
+    const showUserOverlay = viewingUserId && !selectedPlace && !showSwipe
+    const hideNav         = selectedPlace || showSwipe || showUserOverlay
+
     return (
       <div className="app-shell">
+        {/* Swipe overlay */}
         {showSwipe && (
           <div className="place-page-overlay">
             <Swipe onBack={() => setShowSwipe(false)} />
           </div>
         )}
+
+        {/* Place detail overlay */}
         {!showSwipe && selectedPlace && (
           <div className="place-page-overlay">
             <PlacePage place={selectedPlace} onBack={() => setSelectedPlace(null)} />
           </div>
         )}
+
+        {/* User profile overlay (from People search) */}
+        {showUserOverlay && (
+          <div className="place-page-overlay">
+            <UserProfile
+              userId={viewingUserId}
+              currentUserId={authUser.id}
+              onBack={() => setViewingUserId(null)}
+            />
+          </div>
+        )}
+
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
-          {screen === 'home'    && <Home onSearch={() => {}} />}
-          {screen === 'add'     && <AddPlace onSaved={() => setScreen('home')} />}
-          {screen === 'profile' && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
+          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} />}
+          {screen === 'add'           && <AddPlace onSaved={() => setScreen('home')} />}
+          {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
+          {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
         </div>
-        {!selectedPlace && !showSwipe && (
+
+        {!hideNav && (
           <nav className="bottom-nav">
             {NAV.map(item => (
               <button
                 key={item.id}
-                className={`bottom-nav-item ${item.accent ? 'bottom-nav-item--accent' : ''} ${screen === item.id ? 'bottom-nav-item--active' : ''}`}
+                className={[
+                  'bottom-nav-item',
+                  item.accent        ? 'bottom-nav-item--accent' : '',
+                  screen === item.id ? 'bottom-nav-item--active' : '',
+                ].filter(Boolean).join(' ')}
                 onClick={() => setScreen(item.id)}
               >
-                {item.icon}
+                <span style={{ position: 'relative', display: 'inline-flex' }}>
+                  {item.icon}
+                  {item.id === 'notifications' && notifCount > 0 && (
+                    <span className="nav-badge">{notifCount > 9 ? '9+' : notifCount}</span>
+                  )}
+                </span>
                 <span>{item.label}</span>
               </button>
             ))}

@@ -71,6 +71,27 @@
   color: var(--color-accent);
 }
 
+/* Notification badge on bell icon */
+.nav-badge {
+  position: absolute;
+  top: -5px;
+  right: -7px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 50px;
+  background: #C0392B;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  pointer-events: none;
+}
+
 /* ════════════════════════════════════════
    SPLASH OVERLAY (fixed, once per session)
 ════════════════════════════════════════ */
