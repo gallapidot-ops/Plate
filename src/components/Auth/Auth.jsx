@@ -70,7 +70,7 @@ export default function Auth({ onGuestMode }) {
 
         {/* Logo */}
         <div className="auth-logo-card">
-          <PlateCircleLogo size={96} />
+          <PlateCircleLogo size={96} circleFill="#E8527A" />
         </div>
 
         {/* Google */}
