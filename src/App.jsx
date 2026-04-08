@@ -55,13 +55,20 @@ export default function App() {
   /* ── Loading splash ── */
   if (authUser === undefined) {
     return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '100svh', background: 'var(--color-bg)',
-        fontFamily: 'var(--font-serif)', fontSize: 42, fontStyle: 'italic',
-        fontWeight: 600, color: 'var(--color-accent)', letterSpacing: -1,
-      }}>
-        Plate
+      <div className="splash-screen">
+        <div className="splash-logo-card">
+          <div className="splash-logo-inner">
+            <div className="splash-bars">
+              <div className="splash-bar splash-bar--1" />
+              <div className="splash-bar splash-bar--2" />
+              <div className="splash-bar splash-bar--3" />
+              <div className="splash-bar splash-bar--4" />
+            </div>
+            <div className="splash-baseline" />
+            <div className="splash-wordmark">PLATE</div>
+            <div className="splash-tagline">discover · rate · share</div>
+          </div>
+        </div>
       </div>
     )
   }

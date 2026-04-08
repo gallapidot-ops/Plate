@@ -54,22 +54,16 @@ const RESERVATIONS = [
 
 function PlateLogo() {
   return (
-    <div className="plate-logo-card">
-      <div className="plate-logo-inner">
-        {/* Bars */}
-        <div className="plate-bars">
-          <div className="plate-bar plate-bar--1" />
-          <div className="plate-bar plate-bar--2" />
-          <div className="plate-bar plate-bar--3" />
-          <div className="plate-bar plate-bar--4" />
-        </div>
-        {/* Baseline */}
-        <div className="plate-baseline" />
-        {/* Wordmark */}
-        <div className="plate-wordmark">PLATE</div>
-        {/* Tagline */}
-        <div className="plate-tagline">discover · rate · share</div>
+    <div className="plate-logo-bare">
+      <div className="plate-bars">
+        <div className="plate-bar plate-bar--1" />
+        <div className="plate-bar plate-bar--2" />
+        <div className="plate-bar plate-bar--3" />
+        <div className="plate-bar plate-bar--4" />
       </div>
+      <div className="plate-baseline" />
+      <div className="plate-wordmark">PLATE</div>
+      <div className="plate-tagline">discover · rate · share</div>
     </div>
   )
 }
