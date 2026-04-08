@@ -24,24 +24,27 @@ export async function savePlace(placeData) {
   const userId          = await getUserId()
   const primaryMealType = meal_types?.[0] ?? null
 
+  const placeRow = {
+    name,
+    address:         address         ?? null,
+    photo_url:       photo_url       ?? null,
+    personal_note:   personal_note   ?? null,
+    is_regular:      !!is_regular,
+    last_visited: is_regular
+      ? null
+      : (last_visited || new Date().toISOString().split('T')[0]),
+    google_place_id: placeId         ?? null,
+    lat:             lat             ?? null,
+    lng:             lng             ?? null,
+    website:         website         ?? null,
+    created_by:      userId,
+  }
+  // city column requires migration 008 — only include when present
+  if (city != null) placeRow.city = city
+
   const { data: place, error: placeErr } = await supabase
     .from('places')
-    .insert({
-      name,
-      address:         address         ?? null,
-      city:            city            ?? null,
-      photo_url:       photo_url       ?? null,
-      personal_note:   personal_note   ?? null,
-      is_regular:      !!is_regular,
-      last_visited: is_regular
-        ? null
-        : (last_visited || new Date().toISOString().split('T')[0]),
-      google_place_id: placeId         ?? null,
-      lat:             lat             ?? null,
-      lng:             lng             ?? null,
-      website:         website         ?? null,
-      created_by:      userId,
-    })
+    .insert(placeRow)
     .select()
     .single()
 
@@ -81,23 +84,26 @@ export async function updatePlace(placeId, placeData) {
   const userId          = await getUserId()
   const primaryMealType = meal_types?.[0] ?? null
 
+  const updateRow = {
+    name,
+    address:       address       ?? null,
+    photo_url:     photo_url     ?? null,
+    personal_note: personal_note ?? null,
+    is_regular:    !!is_regular,
+    last_visited: is_regular
+      ? null
+      : (last_visited || new Date().toISOString().split('T')[0]),
+    lat:           lat           ?? null,
+    lng:           lng           ?? null,
+    website:       website       ?? null,
+  }
+  // city column requires migration 008 — only include when present
+  if (city != null) updateRow.city = city
+
   // Update the place row
   const { error: placeErr } = await supabase
     .from('places')
-    .update({
-      name,
-      address:       address       ?? null,
-      city:          city          ?? null,
-      photo_url:     photo_url     ?? null,
-      personal_note: personal_note ?? null,
-      is_regular:    !!is_regular,
-      last_visited: is_regular
-        ? null
-        : (last_visited || new Date().toISOString().split('T')[0]),
-      lat:           lat           ?? null,
-      lng:           lng           ?? null,
-      website:       website       ?? null,
-    })
+    .update(updateRow)
     .eq('id',         placeId)
     .eq('created_by', userId)
 

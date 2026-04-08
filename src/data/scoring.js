@@ -39,22 +39,22 @@ export const TASTE_OPTIONS = [
   {
     id: 'poor',
     label: 'Poor / Disappointing',
-    scores: { cafe: 0, bakery: 0, deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
+    scores: { cafe: 0, bakery: 0, deli: 0, bakery_deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
   },
   {
     id: 'basic',
     label: 'Basic',
-    scores: { cafe: 5, bakery: 5, deli: 5, brunch: 4, lunch: 4, happy_hour: 5, dinner: 4, drinks: 5 },
+    scores: { cafe: 5, bakery: 5, deli: 5, bakery_deli: 5, brunch: 4, lunch: 4, happy_hour: 5, dinner: 4, drinks: 5 },
   },
   {
     id: 'good',
     label: 'Good & Tasty',
-    scores: { cafe: 10, bakery: 10, deli: 10, brunch: 8, lunch: 7, happy_hour: 7, dinner: 9, drinks: 7 },
+    scores: { cafe: 10, bakery: 10, deli: 10, bakery_deli: 10, brunch: 8, lunch: 7, happy_hour: 7, dinner: 9, drinks: 7 },
   },
   {
     id: 'delicious',
     label: 'Delicious!',
-    scores: { cafe: 14, bakery: 15, deli: 15, brunch: 10, lunch: 10, happy_hour: 9, dinner: 12, drinks: 9 },
+    scores: { cafe: 14, bakery: 15, deli: 15, bakery_deli: 15, brunch: 10, lunch: 10, happy_hour: 9, dinner: 12, drinks: 9 },
   },
 ]
 
@@ -63,27 +63,27 @@ export const SPREAD_OPTIONS = [
   {
     id: 'minimal',
     label: 'Minimal',
-    scores: { cafe: 1, bakery: 0, deli: 0, brunch: 0, lunch: 1, happy_hour: 2, dinner: 0, drinks: 2 },
+    scores: { cafe: 1, bakery: 0, deli: 0, bakery_deli: 0, brunch: 0, lunch: 1, happy_hour: 2, dinner: 0, drinks: 2 },
   },
   {
     id: 'limited',
     label: 'Limited Choice',
-    scores: { cafe: 2, bakery: 1, deli: 1, brunch: 1, lunch: 2, happy_hour: 3, dinner: 1, drinks: 3 },
+    scores: { cafe: 2, bakery: 1, deli: 1, bakery_deli: 1, brunch: 1, lunch: 2, happy_hour: 3, dinner: 1, drinks: 3 },
   },
   {
     id: 'balanced',
     label: 'Balanced Selection',
-    scores: { cafe: 3, bakery: 2, deli: 2, brunch: 3, lunch: 3, happy_hour: 4, dinner: 2, drinks: 4 },
+    scores: { cafe: 3, bakery: 2, deli: 2, bakery_deli: 2, brunch: 3, lunch: 3, happy_hour: 4, dinner: 2, drinks: 4 },
   },
   {
     id: 'full',
     label: 'Full Experience',
-    scores: { cafe: 3, bakery: 4, deli: 4, brunch: 5, lunch: 4, happy_hour: 4, dinner: 3, drinks: 4 },
+    scores: { cafe: 3, bakery: 4, deli: 4, bakery_deli: 4, brunch: 5, lunch: 4, happy_hour: 4, dinner: 3, drinks: 4 },
   },
   {
     id: 'feast',
     label: 'The Feast',
-    scores: { cafe: 3, bakery: 5, deli: 5, brunch: 7, lunch: 5, happy_hour: 4, dinner: 4, drinks: 4 },
+    scores: { cafe: 3, bakery: 5, deli: 5, bakery_deli: 5, brunch: 7, lunch: 5, happy_hour: 4, dinner: 4, drinks: 4 },
   },
 ]
 
@@ -92,22 +92,22 @@ export const AESTHETIC_OPTIONS = [
   {
     id: 'off',
     label: 'Off',
-    scores: { cafe: 0, bakery: 0, deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
+    scores: { cafe: 0, bakery: 0, deli: 0, bakery_deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
   },
   {
     id: 'plain',
     label: 'Plain',
-    scores: { cafe: 1, bakery: 1, deli: 1, brunch: 1, lunch: 1, happy_hour: 1, dinner: 1, drinks: 1 },
+    scores: { cafe: 1, bakery: 1, deli: 1, bakery_deli: 1, brunch: 1, lunch: 1, happy_hour: 1, dinner: 1, drinks: 1 },
   },
   {
     id: 'charming',
     label: 'Charming',
-    scores: { cafe: 4, bakery: 2, deli: 2, brunch: 3, lunch: 3, happy_hour: 5, dinner: 3, drinks: 5 },
+    scores: { cafe: 4, bakery: 2, deli: 2, bakery_deli: 2, brunch: 3, lunch: 3, happy_hour: 5, dinner: 3, drinks: 5 },
   },
   {
     id: 'super_fine',
     label: 'Super Fine',
-    scores: { cafe: 5, bakery: 2, deli: 2, brunch: 5, lunch: 5, happy_hour: 8, dinner: 5, drinks: 8 },
+    scores: { cafe: 5, bakery: 2, deli: 2, bakery_deli: 2, brunch: 5, lunch: 5, happy_hour: 8, dinner: 5, drinks: 8 },
   },
 ]
 
@@ -116,22 +116,22 @@ export const SERVICE_OPTIONS = [
   {
     id: 'off',
     label: 'Off / Disorganized',
-    scores: { cafe: 0, bakery: 0, deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
+    scores: { cafe: 0, bakery: 0, deli: 0, bakery_deli: 0, brunch: 0, lunch: 0, happy_hour: 0, dinner: 0, drinks: 0 },
   },
   {
     id: 'basic',
     label: 'Basic',
-    scores: { cafe: 1, bakery: 0, deli: 0, brunch: 1, lunch: 1, happy_hour: 1, dinner: 1, drinks: 1 },
+    scores: { cafe: 1, bakery: 0, deli: 0, bakery_deli: 0, brunch: 1, lunch: 1, happy_hour: 1, dinner: 1, drinks: 1 },
   },
   {
     id: 'friendly',
     label: 'Friendly & Smooth',
-    scores: { cafe: 2, bakery: 1, deli: 1, brunch: 2, lunch: 3, happy_hour: 2, dinner: 3, drinks: 2 },
+    scores: { cafe: 2, bakery: 1, deli: 1, bakery_deli: 1, brunch: 2, lunch: 3, happy_hour: 2, dinner: 3, drinks: 2 },
   },
   {
     id: 'professional',
     label: 'Professional',
-    scores: { cafe: 3, bakery: 3, deli: 3, brunch: 3, lunch: 5, happy_hour: 4, dinner: 4, drinks: 4 },
+    scores: { cafe: 3, bakery: 3, deli: 3, bakery_deli: 3, brunch: 3, lunch: 5, happy_hour: 4, dinner: 4, drinks: 4 },
   },
 ]
 

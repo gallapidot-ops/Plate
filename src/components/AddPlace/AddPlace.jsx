@@ -36,10 +36,10 @@ const CATS = [
 
 /* ── Community averages ───────────────────────────────────────────── */
 const MOCK_AVG = {
-  taste:     { cafe: 10, bakery: 11, deli: 10, brunch: 8,  lunch: 7, happy_hour: 7,  dinner: 10, drinks: 7 },
-  spread:    { cafe: 2,  bakery: 3,  deli: 3,  brunch: 4,  lunch: 3, happy_hour: 3,  dinner: 3,  drinks: 3 },
-  aesthetic: { cafe: 3,  bakery: 1,  deli: 1,  brunch: 3,  lunch: 2, happy_hour: 5,  dinner: 4,  drinks: 5 },
-  service:   { cafe: 1,  bakery: 1,  deli: 0,  brunch: 1,  lunch: 2, happy_hour: 1,  dinner: 3,  drinks: 2 },
+  taste:     { cafe: 10, bakery: 11, deli: 10, bakery_deli: 11, brunch: 8,  lunch: 7, happy_hour: 7,  dinner: 10, drinks: 7 },
+  spread:    { cafe: 2,  bakery: 3,  deli: 3,  bakery_deli: 3,  brunch: 4,  lunch: 3, happy_hour: 3,  dinner: 3,  drinks: 3 },
+  aesthetic: { cafe: 3,  bakery: 1,  deli: 1,  bakery_deli: 1,  brunch: 3,  lunch: 2, happy_hour: 5,  dinner: 4,  drinks: 5 },
+  service:   { cafe: 1,  bakery: 1,  deli: 0,  bakery_deli: 1,  brunch: 1,  lunch: 2, happy_hour: 1,  dinner: 3,  drinks: 2 },
 }
 
 const PRICE_OPTS = [
