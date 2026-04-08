@@ -85,18 +85,20 @@ export async function getMyPlaces() {
 
   if (error) { console.error('[db] getMyPlaces:', error.message); return [] }
 
-  return (data ?? []).map(p => ({
-    ...p,
-    meal_types:      (p.place_ratings ?? []).map(r => r.meal_type).filter(Boolean),
-    computed_score:  p.place_ratings?.[0]?.computed_score ?? 0,
-    experience_type: p.place_ratings?.[0]?.experience_type ?? null,
-    ratings: Object.fromEntries(
-      (p.place_ratings ?? []).map(r => [
-        r.meal_type,
-        { taste: r.taste, spread: r.spread, aesthetic: r.aesthetic, service: r.service },
-      ])
-    ),
-  }))
+  return (data ?? [])
+    .filter(p => (p.place_ratings ?? []).length > 0)   // exclude wishlist-only entries
+    .map(p => ({
+      ...p,
+      meal_types:      (p.place_ratings ?? []).map(r => r.meal_type).filter(Boolean),
+      computed_score:  p.place_ratings?.[0]?.computed_score ?? 0,
+      experience_type: p.place_ratings?.[0]?.experience_type ?? null,
+      ratings: Object.fromEntries(
+        (p.place_ratings ?? []).map(r => [
+          r.meal_type,
+          { taste: r.taste, spread: r.spread, aesthetic: r.aesthetic, service: r.service },
+        ])
+      ),
+    }))
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -437,18 +439,20 @@ export async function getPlacesByUser(userId) {
 
   if (error) { console.error('[db] getPlacesByUser:', error.message); return [] }
 
-  return (data ?? []).map(p => ({
-    ...p,
-    meal_types:      (p.place_ratings ?? []).map(r => r.meal_type).filter(Boolean),
-    computed_score:  p.place_ratings?.[0]?.computed_score ?? 0,
-    experience_type: p.place_ratings?.[0]?.experience_type ?? null,
-    ratings: Object.fromEntries(
-      (p.place_ratings ?? []).map(r => [
-        r.meal_type,
-        { taste: r.taste, spread: r.spread, aesthetic: r.aesthetic, service: r.service },
-      ])
-    ),
-  }))
+  return (data ?? [])
+    .filter(p => (p.place_ratings ?? []).length > 0)   // exclude wishlist-only entries
+    .map(p => ({
+      ...p,
+      meal_types:      (p.place_ratings ?? []).map(r => r.meal_type).filter(Boolean),
+      computed_score:  p.place_ratings?.[0]?.computed_score ?? 0,
+      experience_type: p.place_ratings?.[0]?.experience_type ?? null,
+      ratings: Object.fromEntries(
+        (p.place_ratings ?? []).map(r => [
+          r.meal_type,
+          { taste: r.taste, spread: r.spread, aesthetic: r.aesthetic, service: r.service },
+        ])
+      ),
+    }))
 }
 
 /** Number of places a user has logged. */
