@@ -432,18 +432,21 @@ export default function Home({ onSearch }) {
       {/* Core Experience – quick inline picker */}
       <div className="home-section">
         <label className="field-label">Core Experience</label>
-        <div className="home-exp-row">
-          {EXPERIENCE_CARDS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              type="button"
-              className={`home-exp-card${filters.experience === id ? ' home-exp-card--active' : ''}`}
-              onClick={() => setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
-            >
-              <Icon size={17} strokeWidth={1.5} />
-              <span>{label}</span>
-            </button>
-          ))}
+        <div className="exp-strip-wrap">
+          <div className="exp-strip">
+            {EXPERIENCES.map(({ id, label }) => (
+              <div
+                key={id}
+                className={`exp-card${filters.experience === id ? ' exp-card--active' : ''}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
+                onKeyDown={e => e.key === 'Enter' && setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
+              >
+                <span className="exp-card-label">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
