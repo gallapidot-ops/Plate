@@ -69,14 +69,14 @@ function SwipeCard({ card, onSwipe, isTop }) {
       <div className="swipe-card-overlay" />
 
       {/* Action labels */}
-      <div className="swipe-label swipe-label--save" style={{ opacity: rightOpacity }}>שמרי</div>
-      <div className="swipe-label swipe-label--skip" style={{ opacity: leftOpacity }}>דלגי</div>
+      <div className="swipe-label swipe-label--save" style={{ opacity: rightOpacity }}>Save</div>
+      <div className="swipe-label swipe-label--skip" style={{ opacity: leftOpacity }}>Skip</div>
 
       {/* Recommender */}
       {friend && (
         <div className="swipe-recommender">
           <img src={friend.avatar} alt={friend.name} className="swipe-rec-avatar" />
-          <span>הומלץ ע"י {friend.name}</span>
+          <span>Recommended by {friend.name}</span>
         </div>
       )}
 
@@ -123,7 +123,7 @@ export default function Swipe({ onBack }) {
 
   if (cards.length === 0) {
     return (
-      <div className="swipe-screen swipe-empty" dir="rtl">
+      <div className="swipe-screen swipe-empty">
         {onBack && (
           <button className="swipe-back-btn" onClick={onBack} aria-label="חזרה">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -136,17 +136,17 @@ export default function Swipe({ onBack }) {
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
         </div>
-        <h2 className="swipe-empty-title">סיימת לגלול</h2>
-        <p className="swipe-empty-sub">שמרת {wishlist.length} מקומות לרשימה</p>
+        <h2 className="swipe-empty-title">You're all caught up</h2>
+        <p className="swipe-empty-sub">You saved {wishlist.length} places</p>
         <button className="btn-primary" onClick={() => { setCards(MOCK_SWIPE_CARDS); setWishlist([]) }}>
-          התחילי מחדש
+          Start over
         </button>
       </div>
     )
   }
 
   return (
-    <div className="swipe-screen" dir="rtl">
+    <div className="swipe-screen">
       {/* Header */}
       <div className="swipe-header">
         {onBack && (
@@ -166,14 +166,14 @@ export default function Swipe({ onBack }) {
               {wishlist.length}
             </span>
           )}
-          <span className="swipe-remaining">{cards.length} נותרו</span>
+          <span className="swipe-remaining">{cards.length} left</span>
         </div>
       </div>
 
       {/* Toast */}
       {lastAction && (
         <div className={`swipe-toast swipe-toast--${lastAction}`}>
-          {lastAction === 'saved' ? 'נשמר לרשימה' : 'דולג'}
+          {lastAction === 'saved' ? 'Saved!' : 'Skipped'}
         </div>
       )}
 
@@ -194,7 +194,7 @@ export default function Swipe({ onBack }) {
         <button
           className="swipe-btn swipe-btn--skip"
           onClick={() => handleSwipe('left')}
-          aria-label="דלגי"
+          aria-label="Skip"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6 6 18M6 6l12 12"/>
@@ -204,7 +204,7 @@ export default function Swipe({ onBack }) {
         <button
           className="swipe-btn swipe-btn--save"
           onClick={() => handleSwipe('right')}
-          aria-label="שמרי"
+          aria-label="Save"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
@@ -212,7 +212,7 @@ export default function Swipe({ onBack }) {
         </button>
       </div>
 
-      <p className="swipe-hint">החליקי ימינה לשמירה · שמאלה לדילוג</p>
+      <p className="swipe-hint">Swipe right to save · left to skip</p>
     </div>
   )
 }

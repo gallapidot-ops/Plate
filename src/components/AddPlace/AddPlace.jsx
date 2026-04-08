@@ -10,30 +10,30 @@ import './AddPlace.css'
 
 /* ── Experience types ─────────────────────────────────────────────── */
 const EXPERIENCE_LIST = [
-  { id: 'quick_light',     label: 'מהיר וקליל', desc: 'לתפוס משהו מהיר',  Icon: Zap             },
-  { id: 'catchup',         label: 'להיפגש',     desc: 'לשבת ולשוחח',      Icon: MessageCircle   },
-  { id: 'shared_table',    label: 'שולחן משותף', desc: 'מנות לשיתוף',      Icon: UtensilsCrossed },
-  { id: 'full_experience', label: 'חוויה מלאה',  desc: 'ארוחה מלאה',       Icon: Sparkles        },
+  { id: 'quick_light',     label: 'Quick & Light',      desc: 'Grab something fast', Icon: Zap             },
+  { id: 'catchup',         label: 'Catch-up / Hangout', desc: 'Sit and chat',        Icon: MessageCircle   },
+  { id: 'shared_table',    label: 'Shared Table',       desc: 'Dishes to share',     Icon: UtensilsCrossed },
+  { id: 'full_experience', label: 'Full Experience',    desc: 'Full meal',           Icon: Sparkles        },
 ]
 
 /* ── Meal types in display order ─────────────────────────────────── */
 const MEAL_TYPES_ORDERED = [
-  { id: 'brunch',     label: 'ברנץ׳' },
-  { id: 'lunch',      label: 'צהריים' },
-  { id: 'dinner',     label: 'ארוחת ערב' },
-  { id: 'cafe',       label: 'קפה' },
-  { id: 'bakery',     label: 'מאפייה' },
-  { id: 'deli',       label: 'מעדניה' },
-  { id: 'happy_hour', label: 'האפי אור' },
-  { id: 'drinks',     label: 'שתייה' },
+  { id: 'brunch',     label: 'Brunch'     },
+  { id: 'lunch',      label: 'Lunch'      },
+  { id: 'dinner',     label: 'Dinner'     },
+  { id: 'cafe',       label: 'Café'       },
+  { id: 'bakery',     label: 'Bakery'     },
+  { id: 'deli',       label: 'Deli'       },
+  { id: 'happy_hour', label: 'Happy Hour' },
+  { id: 'drinks',     label: 'Drinks'     },
 ]
 
 /* ── Rating categories ────────────────────────────────────────────── */
 const CATS = [
-  { key: 'taste',     label: 'טעם',    opts: TASTE_OPTIONS },
-  { key: 'spread',    label: 'מגוון',  opts: SPREAD_OPTIONS },
-  { key: 'aesthetic', label: 'אווירה', opts: AESTHETIC_OPTIONS },
-  { key: 'service',   label: 'שירות',  opts: SERVICE_OPTIONS },
+  { key: 'taste',     label: 'Taste Level',   opts: TASTE_OPTIONS     },
+  { key: 'spread',    label: 'The Spread',     opts: SPREAD_OPTIONS    },
+  { key: 'aesthetic', label: 'Aesthetic Mood', opts: AESTHETIC_OPTIONS },
+  { key: 'service',   label: 'Service Flow',   opts: SERVICE_OPTIONS   },
 ]
 
 /* ── Community averages ───────────────────────────────────────────── */
@@ -180,7 +180,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
       {!place && !loadingPlace ? (
         /* ── Search state ── */
         <div className="ap-search-block">
-          <p className="ap-search-prompt">איזה מקום?</p>
+          <p className="ap-search-prompt">Which place?</p>
           <div className="ap-search-field">
             {searching ? (
               <svg className="ap-search-icon ap-search-icon--spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -194,7 +194,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
             <input
               className="ap-search-input"
               type="text"
-              placeholder="חפשי מסעדה, קפה, בר..."
+              placeholder="Search restaurant, café, bar..."
               value={query}
               onChange={handleInput}
               onFocus={() => results.length > 0 && setOpen(true)}
@@ -221,14 +221,14 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
             </ul>
           )}
           {open && results.length === 0 && !searching && query.length >= 2 && (
-            <div className="ap-results ap-results--empty">לא נמצאו תוצאות</div>
+            <div className="ap-results ap-results--empty">No results found</div>
           )}
         </div>
       ) : loadingPlace ? (
         /* ── Loading place details ── */
         <div className="ap-search-block">
           <p className="ap-search-prompt" style={{ color: 'var(--color-text-muted)', fontSize: 15 }}>
-            טוענת פרטים...
+            Loading details...
           </p>
         </div>
       ) : (
@@ -250,13 +250,13 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
                   <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
                   <circle cx="12" cy="13" r="3"/>
                 </svg>
-                {photo ? 'החלפי תמונה' : 'הוסיפי תמונה'}
+                {photo ? 'Change photo' : 'Add photo'}
               </button>
               <button className="ap-hero-btn" onClick={() => { onPlaceChange(null); setQuery('') }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6 6 18M6 6l12 12"/>
                 </svg>
-                החלף
+                Change
               </button>
             </div>
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
@@ -266,7 +266,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
           <div className="ap-below-hero">
             {/* Core Experience */}
             <div className="ap-field-group">
-              <label className="ap-label">סוג חוויה</label>
+              <label className="ap-label">Core Experience</label>
               <div className="ap-exp-cards">
                 {EXPERIENCE_LIST.map(({ id, label, desc, Icon }) => (
                   <button
@@ -284,7 +284,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
 
             {/* Meal type */}
             <div className="ap-field-group">
-              <label className="ap-label">מה אכלת?</label>
+              <label className="ap-label">What did you have?</label>
               <div className="ap-chips">
                 {MEAL_TYPES_ORDERED.map(mt => (
                   <button
@@ -301,7 +301,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
             {/* Secondary meal types */}
             {mealType && (
               <div className="ap-field-group">
-                <label className="ap-label ap-label--sm">המקום גם מגיש:</label>
+                <label className="ap-label ap-label--sm">This place also serves:</label>
                 <div className="ap-chips ap-chips--sm">
                   {MEAL_TYPES_ORDERED.filter(mt => mt.id !== mealType).map(mt => (
                     <button
@@ -320,7 +320,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
       )}
 
       <div className="ap-step-footer">
-        <button className="btn-primary" onClick={onNext} disabled={!place || !expType || !mealType}>המשך</button>
+        <button className="btn-primary" onClick={onNext} disabled={!place || !expType || !mealType}>Continue</button>
       </div>
     </div>
   )
@@ -332,7 +332,7 @@ function StepVisit({ date, onDate, isRegular, onIsRegular, with_, onWith, price,
     <div className="ap-step">
 
       <div className="ap-field-group">
-        <label className="ap-label ap-label--sm">מחיר</label>
+        <label className="ap-label ap-label--sm">Price</label>
         <div className="ap-chips ap-chips--sm">
           {PRICE_OPTS.map(p => (
             <button
@@ -349,7 +349,7 @@ function StepVisit({ date, onDate, isRegular, onIsRegular, with_, onWith, price,
       <div className="ap-compact-row">
         {!isRegular && (
           <div className="ap-compact-field">
-            <label className="ap-label ap-label--sm">תאריך</label>
+            <label className="ap-label ap-label--sm">Date</label>
             <input type="date" className="ap-inline-input" value={date} onChange={e => onDate(e.target.value)} />
           </div>
         )}
@@ -363,18 +363,18 @@ function StepVisit({ date, onDate, isRegular, onIsRegular, with_, onWith, price,
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
               <circle cx="12" cy="9" r="2.5"/>
             </svg>
-            מקום קבוע
+            My Regular
           </button>
         </div>
         <div className="ap-compact-field ap-compact-field--grow">
-          <label className="ap-label ap-label--sm">מי היה איתך?</label>
-          <input type="text" className="ap-inline-input" placeholder="@username..." value={with_} onChange={e => onWith(e.target.value)} dir="rtl" />
+          <label className="ap-label ap-label--sm">Who were you with?</label>
+          <input type="text" className="ap-inline-input" placeholder="@username..." value={with_} onChange={e => onWith(e.target.value)} />
         </div>
       </div>
 
       <div className="ap-step-footer">
-        <button className="btn-ghost" onClick={onBack}>חזרה</button>
-        <button className="btn-primary" onClick={onNext}>המשך</button>
+        <button className="btn-ghost" onClick={onBack}>Back</button>
+        <button className="btn-primary" onClick={onNext}>Continue</button>
       </div>
     </div>
   )
@@ -437,7 +437,7 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
         <div className="ap-post-rating">
           {plateAvg > 0 && (
             <div className="ap-score-plate-ref">
-              ממוצע Plate: {plateAvg}
+              Plate avg: {plateAvg}
               {delta !== 0 && (
                 <span className={`ap-score-delta${delta > 0 ? ' ap-score-delta--up' : ' ap-score-delta--dn'}`}>
                   {delta > 0 ? ` +${delta}` : ` ${delta}`}
@@ -446,18 +446,17 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
             </div>
           )}
           <div className="ap-field-group">
-            <label className="ap-label">הערה אישית</label>
+            <label className="ap-label">Personal note</label>
             <textarea
               className="ap-textarea"
-              placeholder="מה הפך אותו למיוחד?"
+              placeholder="What made it special?"
               value={note}
               onChange={e => onNote(e.target.value)}
               rows={3}
-              dir="rtl"
             />
           </div>
           <div className="ap-field-group">
-            <label className="ap-label ap-label--sm">תגיות</label>
+            <label className="ap-label ap-label--sm">Tags</label>
             <div className="ap-chips ap-chips--sm">
               {TAGS.map(tag => (
                 <button
@@ -470,12 +469,12 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
               ))}
             </div>
           </div>
-          <button className="ap-save-btn btn-primary" onClick={onSave}>שמרי ב-Plate</button>
+          <button className="ap-save-btn btn-primary" onClick={onSave}>Save to Plate</button>
         </div>
       )}
 
       <div className="ap-step-footer ap-step-footer--back-only">
-        <button className="btn-ghost" onClick={onBack}>חזרה</button>
+        <button className="btn-ghost" onClick={onBack}>Back</button>
       </div>
     </div>
   )
@@ -528,12 +527,12 @@ function DoneScreen({ place, score, onHome }) {
         </div>
 
         {/* Labels */}
-        <p className="ap-done-status">נשמר בהצלחה</p>
+        <p className="ap-done-status">Saved!</p>
         <p className="ap-done-name">{place?.name}</p>
 
         {/* CTA */}
         <button className="ap-done-btn" onClick={onHome}>
-          חזרי לעמוד הראשי
+          Back to Home
         </button>
       </div>
     </div>
@@ -608,7 +607,7 @@ export default function AddPlace({ onSaved }) {
   }
 
   return (
-    <div className="ap-screen" dir="rtl">
+    <div className="ap-screen">
 
       {/* Progress */}
       <div className="ap-progress">

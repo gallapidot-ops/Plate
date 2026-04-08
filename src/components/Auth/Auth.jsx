@@ -3,17 +3,17 @@ import { signInWithGoogle, signInWithEmail, signUpWithEmail } from '../../lib/au
 import './Auth.css'
 
 const ERROR_MAP = {
-  'Invalid login credentials':          'אימייל או סיסמה שגויים',
-  'Email not confirmed':                'יש לאשר את האימייל תחילה',
-  'User already registered':            'האימייל הזה כבר רשום — נסי להתחבר',
-  'Password should be at least 6 characters': 'הסיסמה חייבת להכיל לפחות 6 תווים',
+  'Invalid login credentials':                'Incorrect email or password',
+  'Email not confirmed':                      'Please confirm your email first',
+  'User already registered':                  'This email is already registered — try signing in',
+  'Password should be at least 6 characters': 'Password must be at least 6 characters',
 }
 
 function translateError(msg) {
   for (const [key, val] of Object.entries(ERROR_MAP)) {
     if (msg?.includes(key)) return val
   }
-  return msg || 'אירעה שגיאה, נסי שוב'
+  return msg || 'Something went wrong, please try again'
 }
 
 export default function Auth() {
@@ -49,28 +49,28 @@ export default function Auth() {
 
   if (success) {
     return (
-      <div className="auth-screen" dir="rtl">
+      <div className="auth-screen">
         <div className="auth-inner">
           <div className="auth-success-icon">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5"/>
             </svg>
           </div>
-          <h2 className="auth-success-title">בדקי את האימייל שלך</h2>
-          <p className="auth-success-sub">שלחנו לך קישור לאישור ל-{email}</p>
+          <h2 className="auth-success-title">Check your email</h2>
+          <p className="auth-success-sub">We sent a confirmation link to {email}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="auth-screen" dir="rtl">
+    <div className="auth-screen">
       <div className="auth-inner">
 
         {/* Logo */}
         <div className="auth-logo">
           <span className="auth-logo-text">Plate</span>
-          <p className="auth-logo-sub">המקומות שלך, ביחד</p>
+          <p className="auth-logo-sub">Your places, together</p>
         </div>
 
         {/* Google */}
@@ -81,12 +81,12 @@ export default function Auth() {
             <path fill="#FBBC05" d="M11.097 28.299A13.858 13.858 0 0 1 10.364 24c0-1.493.256-2.943.733-4.299v-5.99H3.442A22.987 22.987 0 0 0 1 24c0 3.71.888 7.221 2.442 10.289l7.655-5.99z"/>
             <path fill="#EA4335" d="M24 10.197c3.384 0 6.424 1.163 8.812 3.448l6.61-6.61C35.463 3.296 30.233 1 24 1 15.01 1 7.237 5.993 3.442 13.711l7.655 5.99C12.912 14.253 17.994 10.197 24 10.197z"/>
           </svg>
-          המשך עם Google
+          Continue with Google
         </button>
 
         {/* Divider */}
         <div className="auth-divider">
-          <span>או</span>
+          <span>or</span>
         </div>
 
         {/* Email form */}
@@ -94,37 +94,35 @@ export default function Auth() {
           <input
             className="auth-input"
             type="email"
-            placeholder="אימייל"
+            placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
-            dir="ltr"
           />
           <input
             className="auth-input"
             type="password"
-            placeholder="סיסמה"
+            placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
             minLength={6}
-            dir="ltr"
           />
           {error && <p className="auth-error">{error}</p>}
           <button className="auth-submit-btn" type="submit" disabled={loading || !email || !password}>
-            {loading ? '...' : mode === 'signin' ? 'התחברי' : 'הירשמי'}
+            {loading ? '...' : mode === 'signin' ? 'Sign In' : 'Sign Up'}
           </button>
         </form>
 
         {/* Toggle */}
         <p className="auth-toggle">
-          {mode === 'signin' ? 'אין לך חשבון?' : 'כבר יש לך חשבון?'}
+          {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}
           {' '}
           <button
             className="auth-toggle-btn"
             onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null) }}
           >
-            {mode === 'signin' ? 'הירשמי' : 'התחברי'}
+            {mode === 'signin' ? 'Sign Up' : 'Sign In'}
           </button>
         </p>
 

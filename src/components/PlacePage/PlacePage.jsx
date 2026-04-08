@@ -13,15 +13,15 @@ const EXPERIENCE_ICONS = {
 }
 
 const MEAL_TYPE_LABELS = {
-  cafe: 'קפה', bakery: 'מאפייה', deli: 'דלי', brunch: 'ברנץ׳',
-  lunch: 'צהריים', happy_hour: 'האפי אור', dinner: 'ארוחת ערב', drinks: 'שתייה',
+  cafe: 'Café', bakery: 'Bakery', deli: 'Deli', brunch: 'Brunch',
+  lunch: 'Lunch', happy_hour: 'Happy Hour', dinner: 'Dinner', drinks: 'Drinks',
 }
 
 const EXPERIENCE_LABELS = {
-  quick_light:    'מהיר וקליל',
-  catchup:        'להיפגש / לשוחח',
-  shared_table:   'שולחן משותף',
-  full_experience:'חוויה מלאה',
+  quick_light:     'Quick & Light',
+  catchup:         'Catch-up / Hangout',
+  shared_table:    'Shared Table',
+  full_experience: 'Full Experience',
 }
 
 /* ── Score breakdown bar ── */
@@ -69,12 +69,12 @@ function ShareSheet({ place, onClose }) {
   return (
     <>
       <div className="pp-sheet-backdrop" onClick={onClose} />
-      <div className="pp-sheet" dir="rtl">
+      <div className="pp-sheet">
         <div className="pp-sheet-handle" />
 
         <div className="pp-sheet-header">
-          <span className="pp-sheet-title">שתפי מקום</span>
-          <button className="pp-sheet-close" onClick={onClose} aria-label="סגרי">
+          <span className="pp-sheet-title">Share Place</span>
+          <button className="pp-sheet-close" onClick={onClose} aria-label="Close">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
@@ -92,7 +92,7 @@ function ShareSheet({ place, onClose }) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5"/>
             </svg>
-            נשלח ל{sent}!
+            Sent to {sent}!
           </div>
         ) : (
           <>
@@ -128,7 +128,7 @@ function ShareSheet({ place, onClose }) {
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   <path d="M12 8v4M10 10h4"/>
                 </svg>
-                שיחה חדשה
+                New conversation
               </button>
             </div>
           </>
@@ -158,15 +158,15 @@ export default function PlacePage({ place: rawPlace, onBack }) {
     : []
 
   const lastVisited = place.last_visited
-    ? new Date(place.last_visited).toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(place.last_visited).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })
     : place.saved_at
-      ? `נשמר ${new Date(place.saved_at).toLocaleDateString('he-IL', { day: 'numeric', month: 'long' })}`
+      ? `Saved ${new Date(place.saved_at).toLocaleDateString('en-US', { day: 'numeric', month: 'long' })}`
       : null
 
   const websiteDisplay = place.website?.replace(/^https?:\/\//, '')
 
   return (
-    <div className="pp-screen" dir="rtl">
+    <div className="pp-screen">
 
       {/* ── Hero ── */}
       <div className="pp-hero">
@@ -246,7 +246,7 @@ export default function PlacePage({ place: rawPlace, onBack }) {
         {/* ── Score – per meal type bubbles ── */}
         {scoredTypes.length > 0 && (
           <section className="pp-section pp-section--score">
-            <p className="pp-section-label">ציון</p>
+            <p className="pp-section-label">Score</p>
 
             {/* Bubble row */}
             <div className="pp-score-bubbles">
@@ -294,38 +294,38 @@ export default function PlacePage({ place: rawPlace, onBack }) {
           <div className="pp-practical">
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
-              label="שעות" value={place.hours}
+              label="Hours" value={place.hours}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>}
-              label="מחיר" value={place.price ? PRICE_LABELS[place.price] : null}
+              label="Price" value={place.price ? PRICE_LABELS[place.price] : null}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>}
-              label="הזמנה" value={place.need_reservation ? RESERVATION_LABELS[place.need_reservation] : null}
+              label="Reservation" value={place.need_reservation ? RESERVATION_LABELS[place.need_reservation] : null}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>}
-              label="חניה" value={place.parking === true ? 'יש חניה' : place.parking === false ? 'אין חניה' : null}
+              label="Parking" value={place.parking === true ? 'Parking available' : place.parking === false ? 'No parking' : null}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>}
-              label="האפי אור" value={place.happy_hour === true ? 'יש' : place.happy_hour === false ? 'אין' : null}
+              label="Happy Hour" value={place.happy_hour === true ? 'Yes' : place.happy_hour === false ? 'No' : null}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>}
-              label="אתר"
+              label="Website"
               value={websiteDisplay}
               href={place.website ? (place.website.startsWith('http') ? place.website : `https://${place.website}`) : null}
             />
             <PracticalRow
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              label="חוויה" value={place.experience_type ? EXPERIENCE_LABELS[place.experience_type] : null}
+              label="Experience" value={place.experience_type ? EXPERIENCE_LABELS[place.experience_type] : null}
             />
             {lastVisited && (
               <PracticalRow
                 icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
-                label="ביקור אחרון" value={lastVisited}
+                label="Last visit" value={lastVisited}
               />
             )}
           </div>

@@ -18,9 +18,9 @@ function getInitials(username) {
 }
 
 const PRIVACY_OPTIONS = [
-  { id: 'public',    icon: '🌍', label: 'ציבורי',         sub: 'כולם רואים את המקומות שלך' },
-  { id: 'followers', icon: '👥', label: 'עוקבים בלבד',    sub: 'רק מי שאישרת' },
-  { id: 'private',   icon: '🔒', label: 'פרטי',           sub: 'רק את' },
+  { id: 'public',    icon: '🌍', label: 'Public',          sub: 'Everyone can see your places' },
+  { id: 'followers', icon: '👥', label: 'Followers only',  sub: 'Only people you approve'      },
+  { id: 'private',   icon: '🔒', label: 'Private',         sub: 'Just you'                     },
 ]
 
 const USERNAME_RE = /^[a-zA-Z0-9_]+$/
@@ -110,7 +110,7 @@ export default function ProfileSetup({ user, onCreated }) {
 
       onCreated(profile)
     } catch (e) {
-      setError(e.message || 'אירעה שגיאה, נסי שוב')
+      setError(e.message || 'Something went wrong, please try again')
     } finally {
       setLoading(false)
     }
@@ -119,25 +119,25 @@ export default function ProfileSetup({ user, onCreated }) {
   const canSubmit = usernameStatus === 'ok' && !loading
 
   const statusEl = {
-    checking: <span className="ps-username-status ps-username-status--checking">בודקת...</span>,
-    ok:       <span className="ps-username-status ps-username-status--ok">✓ פנוי</span>,
-    taken:    <span className="ps-username-status ps-username-status--err">✗ תפוס</span>,
-    invalid:  <span className="ps-username-status ps-username-status--err">רק אותיות באנגלית, מספרים וקו תחתון</span>,
-    short:    <span className="ps-username-status ps-username-status--err">לפחות 3 תווים</span>,
+    checking: <span className="ps-username-status ps-username-status--checking">Checking...</span>,
+    ok:       <span className="ps-username-status ps-username-status--ok">✓ Available</span>,
+    taken:    <span className="ps-username-status ps-username-status--err">✗ Taken</span>,
+    invalid:  <span className="ps-username-status ps-username-status--err">Letters, numbers and underscores only</span>,
+    short:    <span className="ps-username-status ps-username-status--err">At least 3 characters</span>,
   }[usernameStatus] ?? null
 
   const bg     = avatarColor(username)
   const initials = getInitials(username)
 
   return (
-    <div className="ps-screen" dir="rtl">
+    <div className="ps-screen">
       <div className="ps-inner">
 
         {/* Header */}
         <div className="ps-header">
           <span className="ps-header-logo">Plate</span>
-          <h1 className="ps-header-title">יצירת הפרופיל שלך</h1>
-          <p className="ps-header-sub">שלב 2 מתוך 2</p>
+          <h1 className="ps-header-title">Create Your Profile</h1>
+          <p className="ps-header-sub">Step 2 of 2</p>
         </div>
 
         {/* Avatar */}
@@ -157,13 +157,13 @@ export default function ProfileSetup({ user, onCreated }) {
               </svg>
             </div>
           </div>
-          <span className="ps-avatar-hint">העלי תמונת פרופיל</span>
+          <span className="ps-avatar-hint">Add profile photo</span>
         </div>
         <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
 
         {/* Username */}
         <div className="ps-field">
-          <label className="ps-label">שם משתמשת <span className="ps-required">*</span></label>
+          <label className="ps-label">Username <span className="ps-required">*</span></label>
           <div className="ps-input-wrap">
             <input
               className={`ps-input${usernameStatus === 'ok' ? ' ps-input--ok' : usernameStatus && usernameStatus !== 'checking' ? ' ps-input--err' : ''}`}
@@ -172,7 +172,6 @@ export default function ProfileSetup({ user, onCreated }) {
               value={username}
               onChange={handleUsernameChange}
               maxLength={20}
-              dir="ltr"
               autoComplete="off"
             />
           </div>
@@ -181,12 +180,12 @@ export default function ProfileSetup({ user, onCreated }) {
 
         {/* City */}
         <div className="ps-field">
-          <label className="ps-label">עיר בית</label>
+          <label className="ps-label">Home City</label>
           <div className="ps-city-wrap">
             <input
               className="ps-input"
               type="text"
-              placeholder="תל אביב, ירושלים..."
+              placeholder="Tel Aviv, Jerusalem..."
               value={city}
               onChange={handleCityInput}
               onBlur={() => setTimeout(() => setCityOpen(false), 150)}
@@ -214,7 +213,7 @@ export default function ProfileSetup({ user, onCreated }) {
 
         {/* Privacy */}
         <div className="ps-field">
-          <label className="ps-label">פרטיות</label>
+          <label className="ps-label">Privacy</label>
           <div className="ps-privacy-cards">
             {PRIVACY_OPTIONS.map(opt => (
               <button
@@ -246,7 +245,7 @@ export default function ProfileSetup({ user, onCreated }) {
           onClick={handleSubmit}
           disabled={!canSubmit}
         >
-          {loading ? 'יוצרת פרופיל...' : 'צרי את הפרופיל שלי'}
+          {loading ? 'Creating profile...' : 'Create my profile'}
         </button>
 
       </div>

@@ -4,59 +4,59 @@ import { addPlaceToWishlist } from '../../lib/db'
 import './Home.css'
 
 const EXPERIENCE_CARDS = [
-  { id: 'quick_light',     label: 'מהיר וקליל', Icon: Zap             },
-  { id: 'catchup',         label: 'להיפגש',     Icon: MessageCircle   },
-  { id: 'shared_table',    label: 'שולחן משותף', Icon: UtensilsCrossed },
-  { id: 'full_experience', label: 'חוויה מלאה',  Icon: Sparkles        },
+  { id: 'quick_light',     label: 'Quick & Light',      Icon: Zap             },
+  { id: 'catchup',         label: 'Catch-up / Hangout', Icon: MessageCircle   },
+  { id: 'shared_table',    label: 'Shared Table',        Icon: UtensilsCrossed },
+  { id: 'full_experience', label: 'Full Experience',     Icon: Sparkles        },
 ]
 
 const MEAL_TYPES = [
-  { id: 'cafe',       label: 'קפה',          en: 'Café',        img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80' },
-  { id: 'bakery',     label: 'מאפייה',       en: 'Bakery',      img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80' },
-  { id: 'deli',       label: 'דלי',          en: 'Deli',        img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80' },
-  { id: 'brunch',     label: 'ברנץ׳',        en: 'Brunch',      img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80' },
-  { id: 'lunch',      label: 'צהריים',       en: 'Lunch',       img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80' },
-  { id: 'happy_hour', label: 'האפי אור',    en: 'Happy Hour',  img: 'https://images.unsplash.com/photo-1575023782549-62ca0d244b39?w=800&q=80' },
-  { id: 'dinner',     label: 'ארוחת ערב',   en: 'Dinner',      img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80' },
-  { id: 'drinks',     label: 'שתייה',       en: 'Drinks',      img: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80' },
+  { id: 'cafe',       label: 'Café',       img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80' },
+  { id: 'bakery',     label: 'Bakery',     img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80' },
+  { id: 'deli',       label: 'Deli',       img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80' },
+  { id: 'brunch',     label: 'Brunch',     img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80' },
+  { id: 'lunch',      label: 'Lunch',      img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80' },
+  { id: 'happy_hour', label: 'Happy Hour', img: 'https://images.unsplash.com/photo-1575023782549-62ca0d244b39?w=800&q=80' },
+  { id: 'dinner',     label: 'Dinner',     img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80' },
+  { id: 'drinks',     label: 'Drinks',     img: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80' },
 ]
 
 const EXPERIENCES = [
-  { id: 'quick_light',    label: 'מהיר וקליל' },
-  { id: 'catchup',        label: 'לפגוש / לשוחח' },
-  { id: 'shared_table',   label: 'שולחן משותף' },
-  { id: 'full_experience',label: 'חוויה מלאה' },
+  { id: 'quick_light',     label: 'Quick & Light'      },
+  { id: 'catchup',         label: 'Catch-up / Hangout' },
+  { id: 'shared_table',    label: 'Shared Table'        },
+  { id: 'full_experience', label: 'Full Experience'     },
 ]
 
 const TAGS = [
-  { id: 'kosher',         label: 'כשר' },
-  { id: 'pet_friendly',   label: 'ידידותי לכלבים' },
-  { id: 'celebration',    label: 'חגיגה' },
-  { id: 'date',           label: 'דייט' },
-  { id: 'business',       label: 'פגישת עסקים' },
-  { id: 'healthy',        label: 'בריא' },
-  { id: 'brunch_buffet',  label: 'בופה ברנץ׳' },
-  { id: 'large_group',    label: 'מתאים ל-6+' },
-  { id: 'nice_view',      label: 'נוף יפה' },
-  { id: 'outdoor',        label: 'ישיבת חוץ בלבד' },
-  { id: 'vegan',          label: 'ידידותי לטבעונים' },
-  { id: 'work_friendly',  label: 'מתאים לעבודה' },
-  { id: 'romantic',       label: 'רומנטי' },
-  { id: 'group_friendly', label: 'מתאים לקבוצות' },
+  { id: 'kosher',         label: 'Kosher'         },
+  { id: 'pet_friendly',   label: 'Pet Friendly'   },
+  { id: 'celebration',    label: 'Celebration'    },
+  { id: 'date',           label: 'Date Night'     },
+  { id: 'business',       label: 'Business'       },
+  { id: 'healthy',        label: 'Healthy'        },
+  { id: 'brunch_buffet',  label: 'Brunch Buffet'  },
+  { id: 'large_group',    label: 'Large Group 6+' },
+  { id: 'nice_view',      label: 'Nice View'      },
+  { id: 'outdoor',        label: 'Outdoor'        },
+  { id: 'vegan',          label: 'Vegan'          },
+  { id: 'work_friendly',  label: 'Work-Friendly'  },
+  { id: 'romantic',       label: 'Romantic'       },
+  { id: 'group_friendly', label: 'Group Friendly' },
 ]
 
 const PRICES = [
-  { id: 'overpriced',        label: 'יקר מדי' },
-  { id: 'fair',              label: 'הגיוני' },
-  { id: 'great_value',       label: 'תמורה מצוינת' },
-  { id: 'worth_every_penny', label: 'שווה כל שקל' },
+  { id: 'overpriced',        label: 'Overpriced'        },
+  { id: 'fair',              label: 'Reasonable'        },
+  { id: 'great_value',       label: 'Great Value'       },
+  { id: 'worth_every_penny', label: 'Worth Every Penny' },
 ]
 
 const RESERVATIONS = [
-  { id: 'grab_go',   label: 'ללא ישיבה' },
-  { id: 'walk_in',   label: 'כניסה חופשית' },
-  { id: 'weekends',  label: 'הזמנה בסופ"ש' },
-  { id: 'required',  label: 'הזמנה חובה' },
+  { id: 'grab_go',  label: 'No seating / Grab & Go'  },
+  { id: 'walk_in',  label: 'Walk-in'                  },
+  { id: 'weekends', label: 'Book on weekends'          },
+  { id: 'required', label: 'Reservation required'     },
 ]
 
 function MealCard({ item, active, onClick }) {
@@ -71,8 +71,7 @@ function MealCard({ item, active, onClick }) {
       <img src={item.img} alt={item.label} className="meal-card-img" />
       <div className="meal-card-overlay" />
       <div className="meal-card-content">
-        <span className="meal-card-en">{item.en}</span>
-        <span className="meal-card-he">{item.label}</span>
+        <span className="meal-card-en">{item.label}</span>
       </div>
       {active && <div className="meal-card-check">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -106,7 +105,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
         <div className="drawer-scroll">
           {/* Experience */}
           <div className="drawer-section">
-            <h3 className="drawer-section-title">סוג חוויה</h3>
+            <h3 className="drawer-section-title">Core Experience</h3>
             <div className="drawer-chips">
               {EXPERIENCES.map(exp => (
                 <button
@@ -123,7 +122,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
 
           {/* Tags */}
           <div className="drawer-section">
-            <h3 className="drawer-section-title">תגיות</h3>
+            <h3 className="drawer-section-title">Tags</h3>
             <div className="drawer-chips">
               {TAGS.map(tag => (
                 <button
@@ -140,7 +139,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
 
           {/* Price */}
           <div className="drawer-section">
-            <h3 className="drawer-section-title">מחיר</h3>
+            <h3 className="drawer-section-title">Price</h3>
             <div className="drawer-chips">
               {PRICES.map(p => (
                 <button
@@ -157,7 +156,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
 
           {/* Reservation */}
           <div className="drawer-section">
-            <h3 className="drawer-section-title">הזמנה מראש</h3>
+            <h3 className="drawer-section-title">Need Reservation</h3>
             <div className="drawer-chips">
               {RESERVATIONS.map(r => (
                 <button
@@ -179,10 +178,10 @@ function Drawer({ open, onClose, filters, setFilters }) {
             className="btn-ghost drawer-clear"
             onClick={() => setFilters(f => ({ ...f, experience: null, tags: [], price: null, reservation: null }))}
           >
-            נקה הכל
+            Clear all
           </button>
           <button type="button" className="btn-primary" onClick={onClose}>
-            סגור
+            Close
           </button>
         </div>
       </div>
@@ -226,10 +225,9 @@ function PeopleTab() {
         </svg>
         <input
           className="home-people-input"
-          placeholder="חפשי לפי @username"
+          placeholder="Search by @username"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          dir="rtl"
         />
         {query && (
           <button className="home-people-clear" onClick={() => setQuery('')} aria-label="נקה">
@@ -242,20 +240,20 @@ function PeopleTab() {
 
       <div className="home-people-list">
         {results.length === 0 ? (
-          <p className="home-people-empty">לא נמצאו משתמשים</p>
+          <p className="home-people-empty">No users found</p>
         ) : results.map(user => (
           <div key={user.id} className="home-people-card">
             <img src={user.avatar} alt={user.name} className="home-people-avatar" />
             <div className="home-people-info">
               <span className="home-people-name">{user.name}</span>
               <span className="home-people-meta" dir="ltr">{user.username}</span>
-              <span className="home-people-places">{user.places} מקומות</span>
+              <span className="home-people-places">{user.places} places</span>
             </div>
             <button
               className={`home-people-follow-btn ${follows[user.id] ? 'home-people-follow-btn--following' : ''}`}
               onClick={() => toggleFollow(user.id)}
             >
-              {follows[user.id] ? 'עוקבת' : 'עקבי'}
+              {follows[user.id] ? 'Following' : 'Follow'}
             </button>
           </div>
         ))}
@@ -285,16 +283,16 @@ const MOCK_RESULTS = {
 }
 
 const RESULTS_TABS = [
-  { id: 'mine',    label: 'המקומות שלי' },
-  { id: 'social',  label: 'אני + עוקבים' },
-  { id: 'explore', label: 'Explore' },
+  { id: 'mine',    label: 'My Places'      },
+  { id: 'social',  label: 'Me + Following' },
+  { id: 'explore', label: 'Explore'        },
 ]
 
 const EXP_LABELS = {
-  quick_light:     'מהיר וקליל',
-  catchup:         'להיפגש',
-  shared_table:    'שולחן משותף',
-  full_experience: 'חוויה מלאה',
+  quick_light:     'Quick & Light',
+  catchup:         'Catch-up / Hangout',
+  shared_table:    'Shared Table',
+  full_experience: 'Full Experience',
 }
 
 function ResultsPanel({ mealType, onBack }) {
@@ -328,7 +326,7 @@ function ResultsPanel({ mealType, onBack }) {
         </button>
         <div className="home-results-title-wrap">
           <span className="home-results-title">{mealLabel}</span>
-          <span className="home-results-count">{results.length} מקומות</span>
+          <span className="home-results-count">{results.length} places</span>
         </div>
       </div>
 
@@ -349,7 +347,7 @@ function ResultsPanel({ mealType, onBack }) {
       {/* Results list */}
       <div className="home-results-list">
         {results.length === 0 ? (
-          <p className="home-results-empty">אין תוצאות בקטגוריה הזו</p>
+          <p className="home-results-empty">No results in this category</p>
         ) : results.map(place => {
           const isSaved   = savedToWishlist.has(place.name)
           const isSaving  = savingWishlist.has(place.name)
@@ -373,7 +371,7 @@ function ResultsPanel({ mealType, onBack }) {
                 className={`home-result-bookmark${isSaved ? ' home-result-bookmark--saved' : ''}`}
                 onClick={() => handleBookmark(place)}
                 disabled={isSaving || isSaved}
-                aria-label={isSaved ? 'נשמר ב-Wishlist' : 'הוסיפי ל-Wishlist'}
+                aria-label={isSaved ? 'Saved to Wishlist' : 'Add to Wishlist'}
               >
                 {isSaving ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}>
@@ -428,13 +426,13 @@ export default function Home({ onSearch }) {
   }
 
   return (
-    <div className="home" dir="rtl">
+    <div className="home">
       {/* Header */}
       <div className="home-header">
         <h1 className="home-title">
           <span className="home-title-plate">Plate</span>
         </h1>
-        <p className="home-subtitle">איפה הולכים היום?</p>
+        <p className="home-subtitle">Where are we going today?</p>
       </div>
 
       {/* Sub-tabs */}
@@ -442,11 +440,11 @@ export default function Home({ onSearch }) {
         <button
           className={`home-subtab ${tab === 'places' ? 'home-subtab--active' : ''}`}
           onClick={() => setTab('places')}
-        >מקומות</button>
+        >Places</button>
         <button
           className={`home-subtab ${tab === 'people' ? 'home-subtab--active' : ''}`}
           onClick={() => setTab('people')}
-        >אנשים</button>
+        >People</button>
       </div>
 
       {/* People tab */}
@@ -457,7 +455,7 @@ export default function Home({ onSearch }) {
 
       {/* Meal type label */}
       <div className="meal-section-label">
-        <span className="field-label">סוג ארוחה</span>
+        <span className="field-label">Meal Type</span>
         {mealType && (
           <span className="meal-selected-badge">
             {MEAL_TYPES.find(m => m.id === mealType)?.label}
@@ -484,7 +482,7 @@ export default function Home({ onSearch }) {
 
       {/* Core Experience – quick inline picker */}
       <div className="home-section">
-        <label className="field-label">סוג חוויה</label>
+        <label className="field-label">Core Experience</label>
         <div className="home-exp-row">
           {EXPERIENCE_CARDS.map(({ id, label, Icon }) => (
             <button
@@ -502,7 +500,7 @@ export default function Home({ onSearch }) {
 
       {/* Location */}
       <div className="home-section">
-        <label className="field-label">מיקום</label>
+        <label className="field-label">Location</label>
         <div className="location-wrap">
           <svg className="location-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
@@ -510,10 +508,9 @@ export default function Home({ onSearch }) {
           <input
             className="field-input location-input"
             type="text"
-            placeholder="עיר, שכונה, רחוב..."
+            placeholder="City, neighborhood, street..."
             value={location}
             onChange={e => setLocation(e.target.value)}
-            dir="rtl"
           />
         </div>
       </div>
@@ -528,7 +525,7 @@ export default function Home({ onSearch }) {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" x2="20" y1="6" y2="6"/><line x1="8" x2="20" y1="12" y2="12"/><line x1="12" x2="20" y1="18" y2="18"/>
           </svg>
-          פילטרים נוספים
+          More Filters
           {activeCount > 0 && <span className="more-btn-badge">{activeCount}</span>}
         </button>
 
@@ -562,10 +559,10 @@ export default function Home({ onSearch }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
-          חפשי
+          Search
         </button>
         {!mealType && (
-          <p className="search-hint">בחרי סוג ארוחה להמשך</p>
+          <p className="search-hint">Select a meal type to continue</p>
         )}
       </div>
 

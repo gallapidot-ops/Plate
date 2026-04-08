@@ -12,15 +12,15 @@ import './App.css'
 
 const NAV = [
   {
-    id: 'home', label: 'חיפוש',
+    id: 'home', label: 'Search',
     icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
   },
   {
-    id: 'add', label: 'הוסיפי', accent: true,
+    id: 'add', label: 'Add', accent: true,
     icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>,
   },
   {
-    id: 'profile', label: 'פרופיל',
+    id: 'profile', label: 'Profile',
     icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
   },
 ]
@@ -99,7 +99,7 @@ export default function App() {
 
       {/* ── Bottom nav ── */}
       {!selectedPlace && !showSwipe && (
-        <nav className="bottom-nav" dir="rtl">
+        <nav className="bottom-nav">
           {NAV.map(item => (
             <button
               key={item.id}

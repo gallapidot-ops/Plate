@@ -11,10 +11,10 @@ import './Profile.css'
 
 /* ── Experience config ── */
 const EXP_LIST = [
-  { id: 'quick_light',     label: 'מהיר וקליל', Icon: Zap             },
-  { id: 'catchup',         label: 'להיפגש',     Icon: MessageCircle   },
-  { id: 'shared_table',    label: 'שולחן משותף', Icon: UtensilsCrossed },
-  { id: 'full_experience', label: 'חוויה מלאה',  Icon: Sparkles        },
+  { id: 'quick_light',     label: 'Quick & Light',      Icon: Zap             },
+  { id: 'catchup',         label: 'Catch-up / Hangout', Icon: MessageCircle   },
+  { id: 'shared_table',    label: 'Shared Table',        Icon: UtensilsCrossed },
+  { id: 'full_experience', label: 'Full Experience',     Icon: Sparkles        },
 ]
 
 /* ── Chart palette ── */
@@ -32,11 +32,11 @@ function getInitials(name = '') {
 }
 
 /* ── Join date formatter ── */
-const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 function formatJoinDate(iso) {
   if (!iso) return ''
   const d = new Date(iso)
-  return `${HEB_MONTHS[d.getMonth()]} ${d.getFullYear()}`
+  return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
 const MOCK_FOLLOWERS = [
@@ -54,12 +54,12 @@ const MOCK_FOLLOWING = [
 
 /* ── Category order (fixed, with bakery+deli merged) ── */
 const CAT_ORDER = [
-  { key: 'brunch',     keys: ['brunch'],          label: 'ברנץ׳'          },
-  { key: 'lunch',      keys: ['lunch'],            label: 'צהריים'         },
-  { key: 'dinner',     keys: ['dinner'],           label: 'ארוחת ערב'     },
-  { key: 'cafe',       keys: ['cafe'],             label: 'קפה'            },
-  { key: 'bakery_deli',keys: ['bakery', 'deli'],   label: 'מאפייה ומעדניה' },
-  { key: 'happy_hour', keys: ['happy_hour'],       label: 'האפי אור'      },
+  { key: 'brunch',     keys: ['brunch'],         label: 'Brunch'        },
+  { key: 'lunch',      keys: ['lunch'],           label: 'Lunch'         },
+  { key: 'dinner',     keys: ['dinner'],          label: 'Dinner'        },
+  { key: 'cafe',       keys: ['cafe'],            label: 'Café'          },
+  { key: 'bakery_deli',keys: ['bakery', 'deli'],  label: 'Bakery & Deli' },
+  { key: 'happy_hour', keys: ['happy_hour'],      label: 'Happy Hour'    },
 ]
 
 function buildCatData(places) {
@@ -116,7 +116,7 @@ function ListDrawer({ title, sub, places, onClose, onOpenPlace }) {
   return (
     <>
       <div className="pf-drawer-backdrop" onClick={onClose} />
-      <div className="pf-drawer" dir="rtl">
+      <div className="pf-drawer">
         <div className="pf-drawer-handle" />
         <div className="pf-drawer-header">
           <div className="pf-drawer-header-info">
@@ -145,9 +145,9 @@ function ListDrawer({ title, sub, places, onClose, onOpenPlace }) {
 
 /* ── Settings sheet ── */
 const PRIVACY_OPTIONS = [
-  { id: 'public',     label: 'ציבורי',     sub: 'כולם רואים את המקומות שלך' },
-  { id: 'followers',  label: 'עוקבים בלבד', sub: 'רק אנשים שאישרת' },
-  { id: 'private',    label: 'פרטי',       sub: 'רק את' },
+  { id: 'public',    label: 'Public',         sub: 'Everyone can see your places' },
+  { id: 'followers', label: 'Followers only', sub: 'Only people you approve'      },
+  { id: 'private',   label: 'Private',        sub: 'Just you'                     },
 ]
 
 function SettingsSheet({ profile, onClose }) {
@@ -161,11 +161,11 @@ function SettingsSheet({ profile, onClose }) {
   return (
     <>
       <div className="pf-drawer-backdrop" onClick={onClose} />
-      <div className="pf-drawer pf-settings" dir="rtl">
+      <div className="pf-drawer pf-settings">
         <div className="pf-drawer-handle" />
         <div className="pf-drawer-header">
-          <span className="pf-drawer-title">הגדרות</span>
-          <button className="pf-drawer-close" onClick={onClose} aria-label="סגרי">
+          <span className="pf-drawer-title">Settings</span>
+          <button className="pf-drawer-close" onClick={onClose} aria-label="Close">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
@@ -179,8 +179,8 @@ function SettingsSheet({ profile, onClose }) {
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
             <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">עריכת פרופיל</span>
-              <span className="pf-settings-row-sub">שם, שם משתמש, תמונה</span>
+              <span className="pf-settings-row-label">Edit Profile</span>
+              <span className="pf-settings-row-sub">Name, username, photo</span>
             </div>
             <svg className="pf-settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6"/>
@@ -188,7 +188,7 @@ function SettingsSheet({ profile, onClose }) {
           </button>
 
           <div className="pf-settings-group">
-            <span className="pf-settings-group-label">פרטיות</span>
+            <span className="pf-settings-group-label">Privacy</span>
             {PRIVACY_OPTIONS.map(opt => (
               <button
                 key={opt.id}
@@ -213,7 +213,7 @@ function SettingsSheet({ profile, onClose }) {
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
             </svg>
             <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">עיר בית</span>
+              <span className="pf-settings-row-label">Home City</span>
               <span className="pf-settings-row-sub">{profile?.home_city ?? '—'}</span>
             </div>
             <svg className="pf-settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -228,7 +228,7 @@ function SettingsSheet({ profile, onClose }) {
               <line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
             <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">יציאה</span>
+              <span className="pf-settings-row-label">Sign Out</span>
             </div>
           </button>
         </div>
@@ -242,7 +242,7 @@ function FollowListDrawer({ title, users, onClose }) {
   return (
     <>
       <div className="pf-drawer-backdrop" onClick={onClose} />
-      <div className="pf-drawer" dir="rtl">
+      <div className="pf-drawer">
         <div className="pf-drawer-handle" />
         <div className="pf-drawer-header">
           <span className="pf-drawer-title">{title}</span>
@@ -270,7 +270,7 @@ function FollowListDrawer({ title, users, onClose }) {
 
 /* ── Wishlist card ── */
 function WishlistCard({ item, onOpenPlace, onRemove }) {
-  const addedByUser = item.added_from && item.added_from !== 'גילוי'
+  const addedByUser = item.added_from && item.added_from !== 'Discovery'
   return (
     <div className="pf-wish-card">
       <button className="pf-wish-card-main" onClick={() => onOpenPlace?.(item)}>
@@ -279,18 +279,18 @@ function WishlistCard({ item, onOpenPlace, onRemove }) {
           <div className="pf-wish-top">
             <span className="pf-wish-name">{item.name}</span>
             {item.priority === 'high' && (
-              <span className="pf-wish-priority pf-wish-priority--high">⭐ חייבת</span>
+              <span className="pf-wish-priority pf-wish-priority--high">⭐ Must-go</span>
             )}
           </div>
           {item.added_note && (
             <span className="pf-wish-note">"{item.added_note}"</span>
           )}
           <span className="pf-wish-meta">
-            {addedByUser ? `מומלץ ע"י ${item.added_from}` : 'גילוי'}
+            {addedByUser ? `Recommended by ${item.added_from}` : 'Discovery'}
           </span>
         </div>
       </button>
-      <button className="pf-wish-remove" onClick={() => onRemove?.(item.id)} aria-label="הסר מ-Wishlist">
+      <button className="pf-wish-remove" onClick={() => onRemove?.(item.id)} aria-label="Remove from Wishlist">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 6 6 18M6 6l12 12"/>
         </svg>
@@ -387,7 +387,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
   const bgColor     = avatarColor(currentProfile?.username ?? displayName)
 
   return (
-    <div className="pf-screen" dir="rtl">
+    <div className="pf-screen">
 
       {/* ════ Header ════ */}
       <div className="pf-header">
@@ -407,18 +407,18 @@ export default function Profile({ onOpenPlace, currentProfile }) {
             {username && <span className="pf-username" dir="ltr">{username}</span>}
           </div>
           <div className="pf-meta-row">
-            <span className="pf-meta-item">{places.length} מקומות</span>
+            <span className="pf-meta-item">{places.length} places</span>
             <span className="pf-meta-dot">·</span>
             <button className="pf-meta-btn" onClick={() => setFollowDrawer('followers')}>
-              {followCounts.followers} עוקבים
+              {followCounts.followers} followers
             </button>
             <span className="pf-meta-dot">·</span>
             <button className="pf-meta-btn" onClick={() => setFollowDrawer('following')}>
-              {followCounts.following} עוקב אחרי
+              {followCounts.following} following
             </button>
             {joinDate && <>
               <span className="pf-meta-dot">·</span>
-              <span className="pf-meta-item pf-meta-joined">חברה מ{joinDate}</span>
+              <span className="pf-meta-item pf-meta-joined">Member since {joinDate}</span>
             </>}
           </div>
         </div>
@@ -436,7 +436,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           className={`pf-tab ${profileTab === 'main' ? 'pf-tab--active' : ''}`}
           onClick={() => setProfileTab('main')}
         >
-          המקומות שלי
+          My Places
         </button>
         <button
           className={`pf-tab ${profileTab === 'wishlist' ? 'pf-tab--active' : ''}`}
@@ -452,11 +452,11 @@ export default function Profile({ onOpenPlace, currentProfile }) {
         <div className="pf-wishlist">
           {dataLoading ? (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px 20px', fontFamily: 'var(--font-sans)', fontSize: 14 }}>
-              טוענת...
+              Loading...
             </p>
           ) : wishlist.length === 0 ? (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px 20px', fontFamily: 'var(--font-sans)', fontSize: 14 }}>
-              אין מקומות ב-Wishlist עדיין
+              No places in your Wishlist yet
             </p>
           ) : wishlist.map(item => (
             <WishlistCard key={item.id} item={item} onOpenPlace={onOpenPlace} onRemove={handleRemoveWishlist} />
@@ -469,7 +469,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
         <>
           {dataLoading && (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px 20px', fontFamily: 'var(--font-sans)', fontSize: 14 }}>
-              טוענת מקומות...
+              Loading places...
             </p>
           )}
 
@@ -492,7 +492,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
               })}
               {expFilter && (
                 <button className="pf-exp-chip-clear" onClick={() => setExpFilter(null)}>
-                  ✕ הכל
+                  ✕ All
                 </button>
               )}
             </div>
@@ -501,7 +501,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           {/* ── Category highlights ── */}
           {catData.length > 0 && (
             <section className="pf-section">
-              <p className="pf-section-label">קטגוריות</p>
+              <p className="pf-section-label">Categories</p>
               <div className="pf-bubbles-scroll">
                 {catData.map(cat => (
                   <button
@@ -522,7 +522,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
 
           {/* ── Cities ── */}
           <section className="pf-section">
-            <p className="pf-section-label">ערים</p>
+            <p className="pf-section-label">Cities</p>
             <div className="pf-cities-scroll">
               {cityData.map(cd => (
                 <button
@@ -545,7 +545,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           {/* ── Recent visits ── */}
           {filteredRecent.length > 0 && (
             <section className="pf-section">
-              <p className="pf-section-label">ביקורים אחרונים</p>
+              <p className="pf-section-label">Recent Visits</p>
               <div className="pf-recent-scroll">
                 {filteredRecent.map(p => (
                   <button key={p.id} className="pf-visit-card" onClick={() => onOpenPlace?.(p)}>
@@ -566,7 +566,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           {/* ── Charts ── */}
           <section className="pf-section pf-section--chart pf-section--last">
             <button className="pf-charts-toggle" onClick={() => setShowCharts(v => !v)}>
-              <span className="pf-section-label" style={{ margin: 0 }}>סטטיסטיקות</span>
+              <span className="pf-section-label" style={{ margin: 0 }}>Stats</span>
               <svg
                 width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
@@ -578,7 +578,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
 
             {showCharts && catData.length > 0 && (
               <div className="pf-charts-content">
-                <p className="pf-chart-sub-label">ציון ממוצע לפי קטגוריה</p>
+                <p className="pf-chart-sub-label">Average Score by Category</p>
                 {(() => {
                   const sorted = [...catData].sort((a, b) => b.avg - a.avg)
                   return (
@@ -601,7 +601,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
                           />
                           <Tooltip
                             cursor={{ fill: 'rgba(139,58,98,0.05)' }}
-                            formatter={v => [`${v}/25`, 'ציון ממוצע']}
+                            formatter={v => [`${v}/25`, 'Avg score']}
                             contentStyle={{ fontFamily: 'Inter, sans-serif', fontSize: 12, borderRadius: 8, border: '1px solid rgba(139,58,98,0.15)' }}
                             labelStyle={{ fontWeight: 600 }}
                           />
@@ -621,7 +621,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
                   )
                 })()}
 
-                <p className="pf-chart-sub-label" style={{ marginTop: 24 }}>התפלגות ביקורים</p>
+                <p className="pf-chart-sub-label" style={{ marginTop: 24 }}>Visit Distribution</p>
                 <div className="pf-donut-wrap">
                   <ResponsiveContainer width="100%" height={220}>
                     <PieChart>
@@ -640,7 +640,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
                         {catData.map(entry => <Cell key={entry.key} fill={entry.color} stroke="none" />)}
                       </Pie>
                       <Tooltip
-                        formatter={(v, name) => [`${v} מקומות`, name]}
+                        formatter={(v, name) => [`${v} places`, name]}
                         contentStyle={{ fontFamily: 'Inter, sans-serif', fontSize: 12, borderRadius: 8, border: '1px solid rgba(139,58,98,0.15)' }}
                       />
                       <Legend
@@ -663,7 +663,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           {activeCat && (
             <ListDrawer
               title={activeCat.name}
-              sub={`${activeCat.count} מקומות · ציון ממוצע ${activeCat.avg}/25`}
+              sub={`${activeCat.count} places · avg score ${activeCat.avg}/25`}
               places={activeCat.places}
               onClose={() => setActiveCatKey(null)}
               onOpenPlace={onOpenPlace}
@@ -674,7 +674,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
           {activeCity && (
             <ListDrawer
               title={activeCity.city}
-              sub={`${activeCity.count} ${activeCity.count === 1 ? 'מקום' : 'מקומות'}${activeCity.isHome ? ' · עיר בית' : ' · טיול'}`}
+              sub={`${activeCity.count} ${activeCity.count === 1 ? 'place' : 'places'}${activeCity.isHome ? ' · home city' : ' · trip'}`}
               places={activeCity.places}
               onClose={() => setActiveCityKey(null)}
               onOpenPlace={onOpenPlace}
@@ -689,14 +689,14 @@ export default function Profile({ onOpenPlace, currentProfile }) {
       {/* ════ Follow list drawer ════ */}
       {followDrawer === 'followers' && (
         <FollowListDrawer
-          title={`עוקבים (${followCounts.followers})`}
+          title={`Followers (${followCounts.followers})`}
           users={MOCK_FOLLOWERS}
           onClose={() => setFollowDrawer(null)}
         />
       )}
       {followDrawer === 'following' && (
         <FollowListDrawer
-          title={`עוקב אחרי (${followCounts.following})`}
+          title={`Following (${followCounts.following})`}
           users={MOCK_FOLLOWING}
           onClose={() => setFollowDrawer(null)}
         />
