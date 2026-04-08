@@ -661,6 +661,16 @@
 .home-people-follow-btn--following {
   background: var(--color-accent);
   color: #fff;
+  border-color: var(--color-accent);
+}
+
+/* Requested — pressed + in accent blue */
+.home-people-follow-btn--requested {
+  background: rgba(61,79,124,0.12);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: inset 2px 2px 5px rgba(61,79,124,0.18), inset -1px -1px 3px rgba(255,255,255,0.7);
+  font-weight: 600;
 }
 
 /* ════════════════════════════════════════

@@ -237,13 +237,14 @@ function PeopleTab({ onViewUser }) {
     if (acting.has(user.id)) return '…'
     const state = followStates[user.id] ?? 'none'
     if (state === 'following') return '✓'
-    if (state === 'requested') return '⌛'
     return '+'
   }
 
   function followBtnClass(user) {
     const state = followStates[user.id] ?? 'none'
-    return `home-people-follow-btn${state === 'following' ? ' home-people-follow-btn--following' : ''}`
+    if (state === 'following')  return 'home-people-follow-btn home-people-follow-btn--following'
+    if (state === 'requested')  return 'home-people-follow-btn home-people-follow-btn--requested'
+    return 'home-people-follow-btn'
   }
 
   return (
