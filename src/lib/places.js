@@ -22,10 +22,6 @@ export async function autocomplete(query) {
     body: JSON.stringify({
       input:        query,
       languageCode: 'he',
-      regionCode:   'IL',
-      includedPrimaryTypes: [
-        'restaurant', 'cafe', 'bakery', 'bar', 'food',
-      ],
     }),
   })
 
