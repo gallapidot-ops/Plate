@@ -64,9 +64,9 @@
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding: 10px 20px 16px;
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  padding: 10px 24px 16px 20px;
+  scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
 .meal-strip::-webkit-scrollbar { display: none; }
@@ -137,9 +137,9 @@
   display: flex;
   gap: 12px;
   overflow-x: auto;
-  padding: 6px 24px 12px;
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  padding: 6px 24px 12px 24px;
+  scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
 .exp-strip::-webkit-scrollbar { display: none; }
