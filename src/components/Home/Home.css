@@ -11,27 +11,34 @@
 /* ── Header — logo, never scrolls ── */
 .home-header {
   flex-shrink: 0;
-  padding: 20px 24px 8px;
+  padding: 18px 24px 10px;
   display: flex;
   justify-content: center;
 }
 
 /* ════════════════════════════════════════
-   PLATE LOGO (bare — on page background)
+   PLATE LOGO — horizontal layout
+   Left: bars + baseline  |  Right: PLATE + tagline
 ════════════════════════════════════════ */
 .plate-logo-bare {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  gap: 14px;
 }
 
-/* ── SVG bars — rendered smaller on Home screen ── */
+/* Left column: bars stacked above baseline */
+.plate-logo-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .plate-bars-svg {
   display: block;
   overflow: visible;
-  /* Scale down the SVG: 65% of splash size (93×105 → ~60×68) */
-  width: 60px;
-  height: 68px;
+  width: 46px;   /* 93 × (46/93) → preserves viewBox aspect */
+  height: 52px;  /* 105 × (46/93) ≈ 52 */
 }
 
 .plate-bar {
@@ -51,29 +58,34 @@
   to   { transform: scaleY(1); }
 }
 
-/* ── Baseline ──
-   8px gap below bars (margin-top), 4px gap above wordmark (margin-bottom).
-   Width matches the rendered SVG width (60px). */
+/* Baseline: sits 8px below bars, full width of bars SVG */
 .plate-baseline {
-  width: 60px;
+  width: 100%;   /* stretches to .plate-logo-mark width = SVG width */
   height: 1.5px;
   background: #3D4F7C;
   opacity: 0;
   margin-top: 8px;
-  margin-bottom: 4px;
   animation: plate-fade-up 0.4s ease-out 0.70s forwards;
+}
+
+/* Right column: wordmark stacked above tagline */
+.plate-logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 /* ── Wordmark ── */
 .plate-wordmark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 400;
   letter-spacing: 7px;
   color: #3D4F7C;
   text-indent: 7px;
+  line-height: 1;
   opacity: 0;
-  margin-bottom: 4px;
   animation: plate-fade-up 0.5s ease-out 0.85s forwards;
 }
 
@@ -115,7 +127,70 @@
   flex-direction: column;
 }
 
-/* ── Meal section label ── */
+/* ── Core Experience editorial label + tooltip ── */
+.exp-label-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.exp-label-editorial {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: var(--color-text-secondary);
+}
+
+.exp-info-dot {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 10px;
+  color: var(--color-accent);
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.exp-info-dot:hover { opacity: 1; }
+
+.exp-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border-radius: 12px;
+  padding: 12px 14px 12px 14px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  font-weight: 300;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.10), -3px -3px 8px rgba(255,255,255,0.9);
+  max-width: 260px;
+  padding-right: 28px;
+}
+
+.exp-tooltip-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+
+/* ── Meal section label (kept for badge only) ── */
 .meal-section-label {
   display: flex;
   align-items: center;
@@ -144,7 +219,7 @@
   gap: 10px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 24px 10px 20px;
+  padding: 6px 24px 10px 20px; /* right 24px ensures last card is fully visible */
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -217,7 +292,7 @@
   gap: 10px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 24px 10px 24px;
+  padding: 6px 24px 10px 24px; /* right 24px ensures last card is fully visible */
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
