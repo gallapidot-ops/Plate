@@ -4,14 +4,12 @@ import { addPlaceToWishlist } from '../../lib/db'
 import './Home.css'
 
 const MEAL_TYPES = [
-  { id: 'cafe',       label: 'Café',        Icon: Coffee          },
-  { id: 'bakery',     label: 'Bakery',      Icon: Croissant       },
-  { id: 'deli',       label: 'Deli',        Icon: UtensilsCrossed },
-  { id: 'brunch',     label: 'Brunch',      Icon: Sunrise         },
-  { id: 'lunch',      label: 'Lunch',       Icon: Sun             },
-  { id: 'happy_hour', label: 'Happy Hour',  Icon: Wine            },
-  { id: 'dinner',     label: 'Dinner',      Icon: Moon            },
-  { id: 'drinks',     label: 'Drinks',      Icon: GlassWater      },
+  { id: 'cafe',        label: 'Café',          Icon: Coffee          },
+  { id: 'brunch',      label: 'Brunch',         Icon: Sunrise         },
+  { id: 'lunch',       label: 'Lunch',          Icon: Sun             },
+  { id: 'dinner',      label: 'Dinner',         Icon: Moon            },
+  { id: 'bakery_deli', label: 'Bakery & Deli',  Icon: Croissant       },
+  { id: 'drinks',      label: 'Drinks',         Icon: GlassWater      },
 ]
 
 const EXPERIENCES = [

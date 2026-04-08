@@ -6,8 +6,9 @@ export const MOCK_FRIENDS = [
 ]
 
 export const MEAL_TYPE_LABELS = {
-  cafe: 'קפה', bakery: 'מאפייה', deli: 'דלי', brunch: 'ברנץ׳',
-  lunch: 'צהריים', happy_hour: 'האפי אור', dinner: 'ארוחת ערב', drinks: 'שתייה',
+  cafe: 'Café', brunch: 'Brunch', lunch: 'Lunch', dinner: 'Dinner',
+  bakery_deli: 'Bakery & Deli', drinks: 'Drinks',
+  /* legacy */ bakery: 'Bakery', deli: 'Deli', happy_hour: 'Happy Hour',
 }
 
 export const MOCK_FEED = [

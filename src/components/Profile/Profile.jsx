@@ -42,12 +42,12 @@ function formatJoinDate(iso) {
 
 /* ── Category order (fixed, with bakery+deli merged) ── */
 const CAT_ORDER = [
-  { key: 'brunch',     keys: ['brunch'],         label: 'Brunch'        },
-  { key: 'lunch',      keys: ['lunch'],           label: 'Lunch'         },
-  { key: 'dinner',     keys: ['dinner'],          label: 'Dinner'        },
-  { key: 'cafe',       keys: ['cafe'],            label: 'Café'          },
-  { key: 'bakery_deli',keys: ['bakery', 'deli'],  label: 'Bakery & Deli' },
-  { key: 'happy_hour', keys: ['happy_hour'],      label: 'Happy Hour'    },
+  { key: 'cafe',       keys: ['cafe'],                     label: 'Café'          },
+  { key: 'brunch',     keys: ['brunch'],                   label: 'Brunch'        },
+  { key: 'lunch',      keys: ['lunch'],                    label: 'Lunch'         },
+  { key: 'dinner',     keys: ['dinner'],                   label: 'Dinner'        },
+  { key: 'bakery_deli',keys: ['bakery', 'deli', 'bakery_deli'], label: 'Bakery & Deli' },
+  { key: 'drinks',     keys: ['drinks'],                   label: 'Drinks'        },
 ]
 
 function buildCatData(places) {

@@ -2,8 +2,9 @@ import { getDisplayScore } from '../../data/scoring'
 import './PlaceCard.css'
 
 const MEAL_TYPE_LABELS = {
-  cafe: 'Café', bakery: 'Bakery', deli: 'Deli', brunch: 'Brunch',
-  lunch: 'Lunch', happy_hour: 'Happy Hour', dinner: 'Dinner', drinks: 'Drinks',
+  cafe: 'Café', brunch: 'Brunch', lunch: 'Lunch', dinner: 'Dinner',
+  bakery_deli: 'Bakery & Deli', drinks: 'Drinks',
+  /* legacy */ bakery: 'Bakery', deli: 'Deli', happy_hour: 'Happy Hour',
 }
 
 /**

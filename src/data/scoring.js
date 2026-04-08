@@ -1,12 +1,14 @@
 export const MEAL_TYPES = [
-  { id: 'cafe',       label: 'Café'       },
-  { id: 'bakery',     label: 'Bakery'     },
-  { id: 'deli',       label: 'Deli'       },
-  { id: 'brunch',     label: 'Brunch'     },
-  { id: 'lunch',      label: 'Lunch'      },
-  { id: 'happy_hour', label: 'Happy Hour' },
-  { id: 'dinner',     label: 'Dinner'     },
-  { id: 'drinks',     label: 'Drinks'     },
+  { id: 'cafe',        label: 'Café'          },
+  { id: 'brunch',      label: 'Brunch'        },
+  { id: 'lunch',       label: 'Lunch'         },
+  { id: 'dinner',      label: 'Dinner'        },
+  { id: 'bakery_deli', label: 'Bakery & Deli' },
+  { id: 'drinks',      label: 'Drinks'        },
+  /* Legacy ids kept for backward-compat with existing saved data */
+  { id: 'bakery',      label: 'Bakery'        },
+  { id: 'deli',        label: 'Deli'          },
+  { id: 'happy_hour',  label: 'Happy Hour'    },
 ]
 
 export const EXPERIENCE_TYPES = [

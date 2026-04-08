@@ -18,14 +18,12 @@ const EXPERIENCE_LIST = [
 
 /* ── Meal types in display order ─────────────────────────────────── */
 const MEAL_TYPES_ORDERED = [
-  { id: 'brunch',     label: 'Brunch'     },
-  { id: 'lunch',      label: 'Lunch'      },
-  { id: 'dinner',     label: 'Dinner'     },
-  { id: 'cafe',       label: 'Café'       },
-  { id: 'bakery',     label: 'Bakery'     },
-  { id: 'deli',       label: 'Deli'       },
-  { id: 'happy_hour', label: 'Happy Hour' },
-  { id: 'drinks',     label: 'Drinks'     },
+  { id: 'cafe',        label: 'Café'          },
+  { id: 'brunch',      label: 'Brunch'        },
+  { id: 'lunch',       label: 'Lunch'         },
+  { id: 'dinner',      label: 'Dinner'        },
+  { id: 'bakery_deli', label: 'Bakery & Deli' },
+  { id: 'drinks',      label: 'Drinks'        },
 ]
 
 /* ── Rating categories ────────────────────────────────────────────── */
