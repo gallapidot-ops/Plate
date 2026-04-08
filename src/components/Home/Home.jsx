@@ -194,7 +194,7 @@ function HourglassIcon() {
   )
 }
 
-function PeopleTab({ onViewUser, currentUserId }) {
+function PeopleTab({ onViewUser, currentUserId, onGuestAction }) {
   const [query,        setQuery]        = useState('')
   const [results,      setResults]      = useState([])
   const [searching,    setSearching]    = useState(false)
@@ -247,6 +247,7 @@ function PeopleTab({ onViewUser, currentUserId }) {
 
   async function handleFollow(e, user) {
     e.stopPropagation()
+    if (onGuestAction) { onGuestAction(); return }
     if (acting.has(user.id)) return
     setActing(s => new Set(s).add(user.id))
     const state = followStates[user.id] ?? 'none'
@@ -370,8 +371,8 @@ const EXP_LABELS = {
   full_experience: 'Full Experience',
 }
 
-function ResultsPanel({ mealType, location, filters, onBack }) {
-  const [activeTab,       setActiveTab]       = useState('mine')
+function ResultsPanel({ mealType, location, filters, onBack, onGuestAction }) {
+  const [activeTab,       setActiveTab]       = useState(onGuestAction ? 'explore' : 'mine')
   const [results,         setResults]         = useState([])
   const [loading,         setLoading]         = useState(true)
   const [savedToWishlist, setSavedToWishlist] = useState(new Set())
@@ -407,6 +408,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   }, [activeTab, mealType, location, filters])
 
   async function handleBookmark(place) {
+    if (onGuestAction) { onGuestAction(); return }
     if (savedToWishlist.has(place.id) || savingWishlist.has(place.id)) return
     setSavingWishlist(prev => new Set(prev).add(place.id))
     try {
@@ -436,9 +438,9 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
         </div>
       </div>
 
-      {/* 3-way selector */}
+      {/* 3-way selector — guests only see Explore */}
       <div className="home-results-tabs">
-        {RESULTS_TABS.map(tab => (
+        {RESULTS_TABS.filter(t => !onGuestAction || t.id === 'explore').map(tab => (
           <button
             key={tab.id}
             className={`home-results-tab${activeTab === tab.id ? ' home-results-tab--active' : ''}`}
@@ -504,7 +506,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   )
 }
 
-export default function Home({ onSearch, onViewUser, currentUserId }) {
+export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -539,6 +541,7 @@ export default function Home({ onSearch, onViewUser, currentUserId }) {
         location={location}
         filters={filters}
         onBack={() => setShowResults(false)}
+        onGuestAction={onGuestAction}
       />
     )
   }
@@ -558,7 +561,7 @@ export default function Home({ onSearch, onViewUser, currentUserId }) {
       </div>
 
       {/* People tab */}
-      {tab === 'people' && <PeopleTab onViewUser={onViewUser} currentUserId={currentUserId} />}
+      {tab === 'people' && <PeopleTab onViewUser={onViewUser} currentUserId={currentUserId} onGuestAction={onGuestAction} />}
 
       {/* Places tab — middle content + pinned CTA */}
       {tab === 'places' && (

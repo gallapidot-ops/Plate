@@ -16,7 +16,7 @@ function translateError(msg) {
   return msg || 'Something went wrong, please try again'
 }
 
-export default function Auth() {
+export default function Auth({ onGuestMode }) {
   const [mode,     setMode]     = useState('signin') // 'signin' | 'signup'
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -134,6 +134,15 @@ export default function Auth() {
             {mode === 'signin' ? 'Sign Up' : 'Sign In'}
           </button>
         </p>
+
+        {/* Guest entry point */}
+        {onGuestMode && (
+          <div className="auth-guest-sep">
+            <button className="auth-guest-btn" onClick={onGuestMode} type="button">
+              Continue as Guest
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

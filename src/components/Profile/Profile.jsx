@@ -312,7 +312,7 @@ function WishlistCard({ item, onOpenPlace, onRemove, onVisit }) {
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null }) {
+export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null, onGuestAction = null }) {
   const isViewMode = !!viewedProfile
   const displayProfile = isViewMode ? viewedProfile : currentProfile
 
@@ -376,6 +376,7 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
 
   /* ── Follow actions (view mode) ── */
   async function handleFollow() {
+    if (onGuestAction) { onGuestAction(); return }
     if (acting) return
     setActing(true)
     try {

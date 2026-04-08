@@ -12,6 +12,7 @@ import UserProfile        from './components/UserProfile/UserProfile'
 import Swipe              from './components/Swipe/Swipe'
 import PlacePage          from './components/PlacePage/PlacePage'
 import AppHeader          from './components/AppHeader/AppHeader'
+import GuestSheet         from './components/GuestSheet/GuestSheet'
 import './App.css'
 
 const NAV = [
@@ -67,9 +68,37 @@ function SplashOverlay({ onDone }) {
   )
 }
 
+/* ── Guest profile screen ── */
+function GuestProfileScreen({ onSignUp, onSignIn }) {
+  return (
+    <div className="guest-profile-screen">
+      <div className="guest-profile-inner">
+        <div className="guest-profile-avatar">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+        <h2 className="guest-profile-title">Your Plate</h2>
+        <p className="guest-profile-sub">
+          Create a free account to save places, rate your visits, and discover what friends love.
+        </p>
+        <button className="btn-primary guest-profile-btn" onClick={onSignUp}>
+          Create Account
+        </button>
+        <button className="btn-ghost guest-profile-btn" onClick={onSignIn}>
+          Sign In
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [authUser,       setAuthUser]       = useState(undefined)
   const [profile,        setProfile]        = useState(null)
+  const [isGuest,        setIsGuest]        = useState(false)
+  const [showGuestSheet, setShowGuestSheet] = useState(false)
   const [screen,         setScreen]         = useState('home')
   const [selectedPlace,  setSelectedPlace]  = useState(null)
   const [showSwipe,      setShowSwipe]      = useState(false)
@@ -188,8 +217,20 @@ export default function App() {
     if (authUser === undefined) {
       return <div style={{ height: '100svh', background: 'var(--color-bg)' }} />
     }
-    if (!authUser) return <Auth />
-    if (!profile)  return <ProfileSetup user={authUser} onCreated={setProfile} />
+
+    // Not logged in and not in guest mode → Auth screen
+    if (!authUser && !isGuest) {
+      return <Auth onGuestMode={() => { setIsGuest(true); setScreen('home') }} />
+    }
+
+    // Logged in but no profile yet → setup
+    if (authUser && !profile) {
+      return <ProfileSetup user={authUser} onCreated={setProfile} />
+    }
+
+    // Shared rendering helpers (used by both authenticated + guest)
+    const guestAction  = isGuest ? () => setShowGuestSheet(true) : null
+    const exitGuest    = () => { setIsGuest(false); setShowGuestSheet(false) }
 
     const showUserOverlay = viewingUserId && !selectedPlace && !showSwipe
     const hideNav         = selectedPlace || showSwipe || showUserOverlay
@@ -197,7 +238,7 @@ export default function App() {
     return (
       <div className="app-shell">
         {/* Swipe overlay */}
-        {showSwipe && (
+        {!isGuest && showSwipe && (
           <div className="place-page-overlay">
             <Swipe onBack={() => setShowSwipe(false)} />
           </div>
@@ -209,7 +250,7 @@ export default function App() {
             <PlacePage
               place={selectedPlace}
               onBack={() => setSelectedPlace(null)}
-              onEdit={handleEditPlace}
+              onEdit={isGuest ? undefined : handleEditPlace}
             />
           </div>
         )}
@@ -219,26 +260,51 @@ export default function App() {
           <div className="place-page-overlay">
             <UserProfile
               userId={viewingUserId}
-              currentUserId={authUser.id}
+              currentUserId={isGuest ? null : authUser?.id}
               onBack={() => setViewingUserId(null)}
               onOpenPlace={setSelectedPlace}
+              onGuestAction={guestAction}
             />
           </div>
         )}
 
         {!hideNav && (
           <AppHeader
-            onOpenInbox={() => setScreen('notifications')}
-            notifCount={notifCount}
+            onOpenInbox={isGuest ? undefined : () => setScreen('notifications')}
+            notifCount={isGuest ? 0 : notifCount}
             onGoHome={() => setScreen('home')}
           />
         )}
 
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
-          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} currentUserId={authUser?.id} />}
-          {screen === 'add'           && <AddPlace key={addPrefill ? JSON.stringify({p: addPrefill.placeId ?? addPrefill.place?.name, e: addPrefill.editMode}) : 'new'} onSaved={handleAddSaved} prefill={addPrefill} />}
-          {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
-          {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} onWishlistVisit={handleWishlistVisit} />}
+          {screen === 'home' && (
+            <Home
+              onSearch={() => {}}
+              onViewUser={setViewingUserId}
+              currentUserId={isGuest ? null : authUser?.id}
+              onGuestAction={guestAction}
+            />
+          )}
+          {screen === 'add' && !isGuest && (
+            <AddPlace
+              key={addPrefill ? JSON.stringify({p: addPrefill.placeId ?? addPrefill.place?.name, e: addPrefill.editMode}) : 'new'}
+              onSaved={handleAddSaved}
+              prefill={addPrefill}
+            />
+          )}
+          {screen === 'notifications' && !isGuest && (
+            <Notifications onNotifCountChange={handleNotifCountChange} />
+          )}
+          {screen === 'profile' && !isGuest && (
+            <Profile
+              onOpenPlace={setSelectedPlace}
+              currentProfile={profile}
+              onWishlistVisit={handleWishlistVisit}
+            />
+          )}
+          {screen === 'profile' && isGuest && (
+            <GuestProfileScreen onSignUp={exitGuest} onSignIn={exitGuest} />
+          )}
         </div>
 
         {!hideNav && (
@@ -251,11 +317,15 @@ export default function App() {
                   item.accent        ? 'bottom-nav-item--accent' : '',
                   screen === item.id ? 'bottom-nav-item--active' : '',
                 ].filter(Boolean).join(' ')}
-                onClick={() => { setScreen(item.id); if (item.id !== 'add') setAddPrefill(null) }}
+                onClick={() => {
+                  if (isGuest && item.id === 'add') { setShowGuestSheet(true); return }
+                  setScreen(item.id)
+                  if (item.id !== 'add') setAddPrefill(null)
+                }}
               >
                 <span style={{ position: 'relative', display: 'inline-flex' }}>
                   {item.icon}
-                  {item.id === 'notifications' && notifCount > 0 && (
+                  {!isGuest && item.id === 'notifications' && notifCount > 0 && (
                     <span className="nav-badge">{notifCount > 9 ? '9+' : notifCount}</span>
                   )}
                 </span>
@@ -263,6 +333,14 @@ export default function App() {
               </button>
             ))}
           </nav>
+        )}
+
+        {/* Guest sheet — shown when guest taps a restricted action */}
+        {isGuest && showGuestSheet && (
+          <GuestSheet
+            onSignUp={exitGuest}
+            onDismiss={() => setShowGuestSheet(false)}
+          />
         )}
       </div>
     )

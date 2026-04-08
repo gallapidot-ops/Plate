@@ -29,7 +29,7 @@ function LockIcon() {
   )
 }
 
-export default function UserProfile({ userId, currentUserId, onBack, onOpenPlace }) {
+export default function UserProfile({ userId, currentUserId, onBack, onOpenPlace, onGuestAction }) {
   const [user,         setUser]         = useState(null)
   const [followStatus, setFollowStatus] = useState('none') // 'none' | 'following' | 'requested'
   const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 })
@@ -58,6 +58,7 @@ export default function UserProfile({ userId, currentUserId, onBack, onOpenPlace
     || (user?.privacy_level === 'followers' && followStatus === 'following')
 
   async function handleFollow() {
+    if (onGuestAction) { onGuestAction(); return }
     if (acting) return
     setActing(true)
     try {
@@ -121,6 +122,7 @@ export default function UserProfile({ userId, currentUserId, onBack, onOpenPlace
         viewedProfile={user}
         onBack={onBack}
         onOpenPlace={onOpenPlace}
+        onGuestAction={onGuestAction}
       />
     )
   }

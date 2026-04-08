@@ -177,6 +177,34 @@
   text-underline-offset: 2px;
 }
 
+/* ── Guest entry ── */
+.auth-guest-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.auth-guest-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 50px;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+
+.auth-guest-btn:hover {
+  color: var(--color-text-primary);
+  background: rgba(61, 79, 124, 0.05);
+}
+
 /* ── Success ── */
 .auth-success-icon {
   width: 68px;
