@@ -4,7 +4,11 @@ import {
   PieChart, Pie, Legend,
 } from 'recharts'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
-import { getMyPlaces, getWishlist, removeFromWishlist, getFollowCounts } from '../../lib/db'
+import {
+  getMyPlaces, getPlacesByUser, getWishlist, removeFromWishlist,
+  getFollowCounts, getFollowStatus, followUser, unfollowUser,
+  sendFollowRequest, cancelFollowRequest,
+} from '../../lib/db'
 import { signOut } from '../../lib/auth'
 import PlaceCard from '../PlaceCard/PlaceCard'
 import './Profile.css'
@@ -288,7 +292,10 @@ function WishlistCard({ item, onOpenPlace, onRemove }) {
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace, currentProfile }) {
+export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null }) {
+  const isViewMode = !!viewedProfile
+  const displayProfile = isViewMode ? viewedProfile : currentProfile
+
   const [profileTab,     setProfileTab]     = useState('main')
   const [expFilter,      setExpFilter]      = useState(null)
   const [activeCatKey,   setActiveCatKey]   = useState(null)
@@ -296,6 +303,10 @@ export default function Profile({ onOpenPlace, currentProfile }) {
   const [showSettings,   setShowSettings]   = useState(false)
   const [showCharts,     setShowCharts]     = useState(false)
   const [followDrawer,   setFollowDrawer]   = useState(null)
+
+  /* ── Follow state (view mode only) ── */
+  const [followStatus, setFollowStatus] = useState('none')
+  const [acting,       setActing]       = useState(false)
 
   /* ── Live data from Supabase ── */
   const [places,       setPlaces]       = useState([])
@@ -306,22 +317,32 @@ export default function Profile({ onOpenPlace, currentProfile }) {
   useEffect(() => {
     let cancelled = false
     async function load() {
-      console.log('[Profile] currentProfile prop:', currentProfile)
       try {
-        const userId = currentProfile?.id
-        console.log('[Profile] loading data for userId:', userId)
-        const [ps, wl, fc] = await Promise.all([
-          getMyPlaces(),
-          getWishlist(),
-          userId ? getFollowCounts(userId) : Promise.resolve({ followers: 0, following: 0 }),
-        ])
-        console.log('[Profile] places from DB:', ps)
-        console.log('[Profile] wishlist from DB:', wl)
-        console.log('[Profile] follow counts from DB:', fc)
-        if (!cancelled) {
-          setPlaces(ps)
-          setWishlist(wl)
-          setFollowCounts(fc)
+        const targetId = displayProfile?.id
+        if (isViewMode) {
+          // Viewing another user's profile
+          const [ps, fc, fs] = await Promise.all([
+            targetId ? getPlacesByUser(targetId) : Promise.resolve([]),
+            targetId ? getFollowCounts(targetId) : Promise.resolve({ followers: 0, following: 0 }),
+            targetId ? getFollowStatus(targetId) : Promise.resolve('none'),
+          ])
+          if (!cancelled) {
+            setPlaces(ps)
+            setFollowCounts(fc)
+            setFollowStatus(fs)
+          }
+        } else {
+          // Own profile
+          const [ps, wl, fc] = await Promise.all([
+            getMyPlaces(),
+            getWishlist(),
+            targetId ? getFollowCounts(targetId) : Promise.resolve({ followers: 0, following: 0 }),
+          ])
+          if (!cancelled) {
+            setPlaces(ps)
+            setWishlist(wl)
+            setFollowCounts(fc)
+          }
         }
       } catch (e) {
         console.error('[Profile] load error:', e)
@@ -331,7 +352,41 @@ export default function Profile({ onOpenPlace, currentProfile }) {
     }
     load()
     return () => { cancelled = true }
-  }, [currentProfile?.id])
+  }, [displayProfile?.id, isViewMode])
+
+  /* ── Follow actions (view mode) ── */
+  async function handleFollow() {
+    if (acting) return
+    setActing(true)
+    try {
+      if (followStatus === 'following') {
+        await unfollowUser(viewedProfile.id)
+        setFollowStatus('none')
+        setFollowCounts(c => ({ ...c, followers: Math.max(0, c.followers - 1) }))
+      } else if (followStatus === 'requested') {
+        await cancelFollowRequest(viewedProfile.id)
+        setFollowStatus('none')
+      } else if (viewedProfile?.privacy_level === 'public') {
+        await followUser(viewedProfile.id)
+        setFollowStatus('following')
+        setFollowCounts(c => ({ ...c, followers: c.followers + 1 }))
+      } else {
+        await sendFollowRequest(viewedProfile.id)
+        setFollowStatus('requested')
+      }
+    } catch (e) {
+      console.error('[Profile] follow action:', e)
+    } finally {
+      setActing(false)
+    }
+  }
+
+  function followLabel() {
+    if (acting)                        return '…'
+    if (followStatus === 'following')  return '✓ Following'
+    if (followStatus === 'requested')  return 'Requested'
+    return '+ Follow'
+  }
 
   async function handleRemoveWishlist(placeId) {
     try {
@@ -354,7 +409,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
     : places
 
   const catData    = buildCatData(filteredPlaces)
-  const cityData   = buildCityData(places, currentProfile?.home_city)
+  const cityData   = buildCityData(places, displayProfile?.home_city)
   const activeCat  = catData.find(c => c.key === activeCatKey) ?? null
   const activeCity = cityData.find(c => c.city === activeCityKey) ?? null
 
@@ -367,18 +422,29 @@ export default function Profile({ onOpenPlace, currentProfile }) {
     setActiveCatKey(null)
   }
 
-  const displayName = currentProfile?.name || currentProfile?.username || '—'
-  const username    = currentProfile?.username ? `@${currentProfile.username.replace(/^@/, '')}` : ''
-  const joinDate    = formatJoinDate(currentProfile?.created_at)
-  const avatarUrl   = currentProfile?.avatar_url
+  const displayName = displayProfile?.name || displayProfile?.username || '—'
+  const username    = displayProfile?.username ? `@${displayProfile.username.replace(/^@/, '')}` : ''
+  const joinDate    = formatJoinDate(displayProfile?.created_at)
+  const avatarUrl   = displayProfile?.avatar_url
   const initials    = getInitials(displayName)
-  const bgColor     = avatarColor(currentProfile?.username ?? displayName)
+  const bgColor     = avatarColor(displayProfile?.username ?? displayName)
 
   return (
     <div className="pf-screen">
 
       {/* ════ Header ════ */}
-      <div className="pf-header">
+      {/* Back button row (view mode only) */}
+      {isViewMode && onBack && (
+        <div className="pf-back-row">
+          <button className="pf-back-btn" onClick={onBack} aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </button>
+        </div>
+      )}
+
+      <div className={`pf-header${isViewMode ? ' pf-header--view' : ''}`}>
         {avatarUrl ? (
           <img src={avatarUrl} alt={displayName} className="pf-avatar" />
         ) : (
@@ -410,33 +476,48 @@ export default function Profile({ onOpenPlace, currentProfile }) {
             </>}
           </div>
         </div>
-        <button className="pf-gear-btn" onClick={() => setShowSettings(true)} aria-label="הגדרות">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-        </button>
+
+        {/* Gear (own profile) or Follow button (view mode) */}
+        {isViewMode ? (
+          <button
+            className={`pf-view-follow-btn${followStatus === 'following' ? ' pf-view-follow-btn--following' : followStatus === 'requested' ? ' pf-view-follow-btn--requested' : ''}`}
+            onClick={handleFollow}
+            disabled={acting}
+            aria-label="Follow"
+          >
+            {followLabel()}
+          </button>
+        ) : (
+          <button className="pf-gear-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* ════ Main / Wishlist tabs ════ */}
-      <div className="pf-tabs">
-        <button
-          className={`pf-tab ${profileTab === 'main' ? 'pf-tab--active' : ''}`}
-          onClick={() => setProfileTab('main')}
-        >
-          My Places
-        </button>
-        <button
-          className={`pf-tab ${profileTab === 'wishlist' ? 'pf-tab--active' : ''}`}
-          onClick={() => setProfileTab('wishlist')}
-        >
-          Wishlist
-          <span className="pf-tab-badge">{wishlist.length}</span>
-        </button>
-      </div>
+      {!isViewMode && (
+        <div className="pf-tabs">
+          <button
+            className={`pf-tab ${profileTab === 'main' ? 'pf-tab--active' : ''}`}
+            onClick={() => setProfileTab('main')}
+          >
+            My Places
+          </button>
+          <button
+            className={`pf-tab ${profileTab === 'wishlist' ? 'pf-tab--active' : ''}`}
+            onClick={() => setProfileTab('wishlist')}
+          >
+            Wishlist
+            <span className="pf-tab-badge">{wishlist.length}</span>
+          </button>
+        </div>
+      )}
 
       {/* ════ WISHLIST TAB ════ */}
-      {profileTab === 'wishlist' && (
+      {!isViewMode && profileTab === 'wishlist' && (
         <div className="pf-wishlist">
           {dataLoading ? (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px 20px', fontFamily: 'var(--font-sans)', fontSize: 14 }}>
@@ -453,7 +534,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
       )}
 
       {/* ════ MAIN TAB ════ */}
-      {profileTab === 'main' && (
+      {(isViewMode || profileTab === 'main') && (
         <>
           {dataLoading && (
             <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '40px 20px', fontFamily: 'var(--font-sans)', fontSize: 14 }}>
@@ -672,7 +753,7 @@ export default function Profile({ onOpenPlace, currentProfile }) {
       )}
 
       {/* ════ Settings ════ */}
-      {showSettings && <SettingsSheet profile={currentProfile} onClose={() => setShowSettings(false)} />}
+      {!isViewMode && showSettings && <SettingsSheet profile={currentProfile} onClose={() => setShowSettings(false)} />}
 
       {/* ════ Follow list drawer ════ */}
       {followDrawer === 'followers' && (

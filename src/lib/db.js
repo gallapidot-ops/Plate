@@ -420,6 +420,36 @@ export async function declineFollowRequest(requestId) {
   if (error) throw new Error(error.message)
 }
 
+/** Fetch all places logged by a specific user (same shape as getMyPlaces). */
+export async function getPlacesByUser(userId) {
+  const { data, error } = await supabase
+    .from('places')
+    .select(`
+      *,
+      place_ratings (
+        id, meal_type, experience_type, computed_score,
+        taste, spread, aesthetic, service, tags, price
+      )
+    `)
+    .eq('created_by', userId)
+    .order('last_visited', { ascending: false, nullsFirst: false })
+
+  if (error) { console.error('[db] getPlacesByUser:', error.message); return [] }
+
+  return (data ?? []).map(p => ({
+    ...p,
+    meal_types:      (p.place_ratings ?? []).map(r => r.meal_type).filter(Boolean),
+    computed_score:  p.place_ratings?.[0]?.computed_score ?? 0,
+    experience_type: p.place_ratings?.[0]?.experience_type ?? null,
+    ratings: Object.fromEntries(
+      (p.place_ratings ?? []).map(r => [
+        r.meal_type,
+        { taste: r.taste, spread: r.spread, aesthetic: r.aesthetic, service: r.service },
+      ])
+    ),
+  }))
+}
+
 /** Number of places a user has logged. */
 export async function getPlaceCountByUser(userId) {
   const { count, error } = await supabase

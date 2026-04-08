@@ -11,6 +11,7 @@ import Notifications      from './components/Notifications/Notifications'
 import UserProfile        from './components/UserProfile/UserProfile'
 import Swipe              from './components/Swipe/Swipe'
 import PlacePage          from './components/PlacePage/PlacePage'
+import AppHeader          from './components/AppHeader/AppHeader'
 import './App.css'
 
 const NAV = [
@@ -145,12 +146,20 @@ export default function App() {
               userId={viewingUserId}
               currentUserId={authUser.id}
               onBack={() => setViewingUserId(null)}
+              onOpenPlace={setSelectedPlace}
             />
           </div>
         )}
 
+        {!hideNav && (
+          <AppHeader
+            onOpenInbox={() => setScreen('notifications')}
+            notifCount={notifCount}
+          />
+        )}
+
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
-          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} onOpenInbox={() => setScreen('notifications')} notifCount={notifCount} />}
+          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} />}
           {screen === 'add'           && <AddPlace onSaved={() => setScreen('home')} />}
           {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
           {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}

@@ -1,0 +1,111 @@
+/* ════════════════════════════════════════
+   APP HEADER — logo left, DM icon right
+   Appears on all main nav screens
+════════════════════════════════════════ */
+.app-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 10px 24px;
+  background: var(--color-bg);
+  border-bottom: 1px solid rgba(61,79,124,0.06);
+}
+
+/* ── Horizontal logo ── */
+.ah-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+}
+
+.ah-logo-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.ah-bars-svg {
+  display: block;
+  overflow: visible;
+  width: 26px;
+  height: 30px;
+}
+
+.ah-baseline {
+  width: 100%;
+  height: 1px;
+  background: #3D4F7C;
+  margin-top: 4px;
+}
+
+.ah-logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+}
+
+.ah-wordmark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 5px;
+  color: #3D4F7C;
+  text-indent: 5px;
+  line-height: 1;
+}
+
+.ah-tagline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 7.5px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: #8A7A85;
+  text-indent: 1px;
+}
+
+/* ── DM / inbox button ── */
+.app-header-dm-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-accent);
+  box-shadow: var(--shadow);
+  flex-shrink: 0;
+  transition: box-shadow 0.15s;
+  touch-action: manipulation;
+}
+
+.app-header-dm-btn:hover {
+  box-shadow: var(--shadow-inset);
+}
+
+/* ── Badge — terracotta #C4714A ── */
+.app-header-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50px;
+  background: #C4714A;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+  pointer-events: none;
+}

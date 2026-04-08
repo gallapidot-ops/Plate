@@ -50,27 +50,6 @@ const RESERVATIONS = [
   { id: 'required', label: 'Reservation required'     },
 ]
 
-function PlateLogo() {
-  return (
-    <div className="plate-logo-bare">
-      {/* Left: bars + baseline */}
-      <div className="plate-logo-mark">
-        <svg className="plate-bars-svg" width="93" height="105" viewBox="0 0 93 105" fill="none">
-          <rect className="plate-bar plate-bar--1" x="0"  y="55" width="18" height="50"  rx="9" fill="#3D4F7C" fillOpacity="0.40" />
-          <rect className="plate-bar plate-bar--2" x="25" y="25" width="18" height="80"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
-          <rect className="plate-bar plate-bar--3" x="50" y="0"  width="18" height="105" rx="9" fill="#3D4F7C" fillOpacity="1.00" />
-          <rect className="plate-bar plate-bar--4" x="75" y="35" width="18" height="70"  rx="9" fill="#3D4F7C" fillOpacity="0.65" />
-        </svg>
-        <div className="plate-baseline" />
-      </div>
-      {/* Right: wordmark + tagline */}
-      <div className="plate-logo-text">
-        <div className="plate-wordmark">PLATE</div>
-        <div className="plate-tagline">discover · rate · share</div>
-      </div>
-    </div>
-  )
-}
 
 function MealCard({ item, active, onClick }) {
   const { Icon } = item
@@ -485,7 +464,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   )
 }
 
-export default function Home({ onSearch, onViewUser, onOpenInbox, notifCount = 0 }) {
+export default function Home({ onSearch, onViewUser }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -526,23 +505,6 @@ export default function Home({ onSearch, onViewUser, onOpenInbox, notifCount = 0
 
   return (
     <div className="home">
-      {/* Header: logo left, DM/inbox right */}
-      <div className="home-header">
-        <PlateLogo />
-        <button
-          className="home-dm-btn"
-          onClick={onOpenInbox}
-          aria-label="Messages & notifications"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-          {notifCount > 0 && (
-            <span className="home-dm-badge">{notifCount > 9 ? '9+' : notifCount}</span>
-          )}
-        </button>
-      </div>
-
       {/* Sub-tabs */}
       <div className="home-subtabs">
         <button

@@ -1,7 +1,7 @@
 .app-shell {
   display: flex;
   flex-direction: column;
-  min-height: 100svh;
+  height: 100svh;
   max-width: 480px;
   margin: 0 auto;
   background: var(--color-bg);
@@ -9,6 +9,7 @@
 
 .app-content {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding-bottom: 68px;
 }

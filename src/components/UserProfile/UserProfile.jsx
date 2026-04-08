@@ -4,6 +4,7 @@ import {
   getFollowStatus, getFollowCounts, getPlaceCountByUser,
   followUser, unfollowUser, sendFollowRequest, cancelFollowRequest,
 } from '../../lib/db'
+import Profile from '../Profile/Profile'
 import './UserProfile.css'
 
 function formatJoinDate(dateStr) {
@@ -28,7 +29,7 @@ function LockIcon() {
   )
 }
 
-export default function UserProfile({ userId, currentUserId, onBack }) {
+export default function UserProfile({ userId, currentUserId, onBack, onOpenPlace }) {
   const [user,         setUser]         = useState(null)
   const [followStatus, setFollowStatus] = useState('none') // 'none' | 'following' | 'requested'
   const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 })
@@ -113,6 +114,18 @@ export default function UserProfile({ userId, currentUserId, onBack }) {
     )
   }
 
+  /* ── Full profile — accessible (public or approved follower) ── */
+  if (canSee) {
+    return (
+      <Profile
+        viewedProfile={user}
+        onBack={onBack}
+        onOpenPlace={onOpenPlace}
+      />
+    )
+  }
+
+  /* ── Locked profile view ── */
   return (
     <div className="user-profile">
       {/* Back */}
@@ -144,65 +157,32 @@ export default function UserProfile({ userId, currentUserId, onBack }) {
         </div>
       </div>
 
-      {/* ── Full profile view ── */}
-      {canSee ? (
-        <>
-          <div className="user-profile-stats">
-            <div className="user-profile-stat">
-              <span className="user-profile-stat-val">{followCounts.followers}</span>
-              <span className="user-profile-stat-label">Followers</span>
-            </div>
-            <div className="user-profile-stat">
-              <span className="user-profile-stat-val">{followCounts.following}</span>
-              <span className="user-profile-stat-label">Following</span>
-            </div>
-            <div className="user-profile-stat">
-              <span className="user-profile-stat-val">{placeCount}</span>
-              <span className="user-profile-stat-label">Places</span>
-            </div>
+      <div className="user-profile-locked">
+        <div className="user-profile-lock-icon"><LockIcon /></div>
+
+        <p className="user-profile-lock-title">
+          {user.privacy_level === 'private'
+            ? 'This profile is private'
+            : 'Follow to see this profile'}
+        </p>
+        <p className="user-profile-lock-sub">
+          {user.privacy_level === 'private'
+            ? 'Only approved followers can see their activity and places.'
+            : 'Their places and activity are visible to followers only.'}
+        </p>
+
+        {!isOwn && (
+          <div className="user-profile-actions">
+            <button
+              className={`user-profile-follow-btn${followStatus === 'requested' ? ' user-profile-follow-btn--following' : ''}`}
+              onClick={handleFollow}
+              disabled={acting}
+            >
+              {followLabel()}
+            </button>
           </div>
-
-          {!isOwn && (
-            <div className="user-profile-actions">
-              <button
-                className={`user-profile-follow-btn${followStatus === 'following' ? ' user-profile-follow-btn--following' : ''}`}
-                onClick={handleFollow}
-                disabled={acting}
-              >
-                {followLabel()}
-              </button>
-            </div>
-          )}
-        </>
-      ) : (
-        /* ── Locked profile view ── */
-        <div className="user-profile-locked">
-          <div className="user-profile-lock-icon"><LockIcon /></div>
-
-          <p className="user-profile-lock-title">
-            {user.privacy_level === 'private'
-              ? 'This profile is private'
-              : 'Follow to see this profile'}
-          </p>
-          <p className="user-profile-lock-sub">
-            {user.privacy_level === 'private'
-              ? 'Only approved followers can see their activity and places.'
-              : 'Their places and activity are visible to followers only.'}
-          </p>
-
-          {!isOwn && (
-            <div className="user-profile-actions">
-              <button
-                className={`user-profile-follow-btn${followStatus === 'requested' ? ' user-profile-follow-btn--following' : ''}`}
-                onClick={handleFollow}
-                disabled={acting}
-              >
-                {followLabel()}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
