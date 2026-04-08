@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from '../../lib/supabase'
 import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater } from 'lucide-react'
 import { addPlaceToWishlist, searchPlaces, searchUsers, followUser, unfollowUser, sendFollowRequest, cancelFollowRequest } from '../../lib/db'
 import './Home.css'
@@ -182,7 +183,18 @@ function LockIconSmall() {
 }
 
 /* ── People tab ── */
-function PeopleTab({ onViewUser }) {
+/* ── Hourglass SVG — pending follow request ── */
+function HourglassIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 22h14M5 2h14"/>
+      <path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12 7.59 16.41A2 2 0 0 0 7 17.83V22"/>
+      <path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/>
+    </svg>
+  )
+}
+
+function PeopleTab({ onViewUser, currentUserId }) {
   const [query,        setQuery]        = useState('')
   const [results,      setResults]      = useState([])
   const [searching,    setSearching]    = useState(false)
@@ -206,6 +218,32 @@ function PeopleTab({ onViewUser }) {
     })
     return () => { cancelled = true }
   }, [query])
+
+  // Real-time: when someone accepts our follow request a row is
+  // inserted into follows with follower_id = us. Flip that user's
+  // local state from 'requested' → 'following' immediately.
+  useEffect(() => {
+    if (!currentUserId) return
+    const channel = supabase
+      .channel(`follows-accepted-${currentUserId}`)
+      .on(
+        'postgres_changes',
+        {
+          event:  'INSERT',
+          schema: 'public',
+          table:  'follows',
+          filter: `follower_id=eq.${currentUserId}`,
+        },
+        (payload) => {
+          const acceptedId = payload.new?.following_id
+          if (acceptedId) {
+            setFollowStates(s => ({ ...s, [acceptedId]: 'following' }))
+          }
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [currentUserId])
 
   async function handleFollow(e, user) {
     e.stopPropagation()
@@ -233,17 +271,18 @@ function PeopleTab({ onViewUser }) {
     }
   }
 
-  function followBtnLabel(user) {
+  function followBtnContent(user) {
     if (acting.has(user.id)) return '…'
     const state = followStates[user.id] ?? 'none'
     if (state === 'following') return '✓'
+    if (state === 'requested') return <HourglassIcon />
     return '+'
   }
 
   function followBtnClass(user) {
     const state = followStates[user.id] ?? 'none'
-    if (state === 'following')  return 'home-people-follow-btn home-people-follow-btn--following'
-    if (state === 'requested')  return 'home-people-follow-btn home-people-follow-btn--requested'
+    if (state === 'following') return 'home-people-follow-btn home-people-follow-btn--following'
+    if (state === 'requested') return 'home-people-follow-btn home-people-follow-btn--requested'
     return 'home-people-follow-btn'
   }
 
@@ -308,7 +347,7 @@ function PeopleTab({ onViewUser }) {
               disabled={acting.has(user.id)}
               title={user.privacy_level === 'public' ? 'Follow' : 'Send follow request'}
             >
-              {followBtnLabel(user)}
+              {followBtnContent(user)}
             </button>
           </div>
         ))}
@@ -465,7 +504,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   )
 }
 
-export default function Home({ onSearch, onViewUser }) {
+export default function Home({ onSearch, onViewUser, currentUserId }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -519,7 +558,7 @@ export default function Home({ onSearch, onViewUser }) {
       </div>
 
       {/* People tab */}
-      {tab === 'people' && <PeopleTab onViewUser={onViewUser} />}
+      {tab === 'people' && <PeopleTab onViewUser={onViewUser} currentUserId={currentUserId} />}
 
       {/* Places tab — middle content + pinned CTA */}
       {tab === 'places' && (

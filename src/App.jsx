@@ -184,7 +184,7 @@ export default function App() {
         )}
 
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
-          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} />}
+          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} currentUserId={authUser?.id} />}
           {screen === 'add'           && <AddPlace onSaved={() => setScreen('home')} />}
           {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
           {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
