@@ -108,6 +108,31 @@ export default function App() {
     return () => subscription.unsubscribe()
   }, [])
 
+  // Real-time: watch for new follow requests addressed to this user
+  useEffect(() => {
+    if (!authUser?.id) return
+
+    const channel = supabase
+      .channel(`follow-requests-${authUser.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event:  'INSERT',
+          schema: 'public',
+          table:  'follow_requests',
+          filter: `to_user_id=eq.${authUser.id}`,
+        },
+        (payload) => {
+          if (payload.new?.status === 'pending') {
+            setNotifCount(c => c + 1)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [authUser?.id])
+
   // Called by Notifications when count changes (accept/decline removes items)
   const handleNotifCountChange = useCallback((count) => {
     setNotifCount(count)
