@@ -650,11 +650,10 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
               <p className="pf-recent-empty">No visits match the selected filters</p>
             ) : (
               <div className="pf-recent-list">
-                {filteredRecent.map((p, i) => (
+                {filteredRecent.map(p => (
                   <button
                     key={p.id}
                     className="pf-visit-card"
-                    style={{ '--card-tint': `var(--card-tint-${i % 5})` }}
                     onClick={() => onOpenPlace?.(p)}
                   >
                     <span className="pf-visit-name">{p.name}</span>
