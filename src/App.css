@@ -61,21 +61,31 @@
 }
 
 /* ════════════════════════════════════════
-   SPLASH SCREEN
+   SPLASH OVERLAY (fixed, once per session)
 ════════════════════════════════════════ */
-.splash-screen {
+.splash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100svh;
-  background: var(--color-bg);
+  background: #F7F4EF;
+  opacity: 1;
+  transition: opacity 0.6s ease;
+  pointer-events: all;
+}
+
+.splash-overlay--fading {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .splash-logo-card {
   width: fit-content;
   background: #EFECE6;
   border-radius: 24px;
-  padding: 36px 52px;
+  padding: 40px 56px;
   box-shadow: 8px 8px 16px rgba(0,0,0,0.09), -6px -6px 14px rgba(255,255,255,0.95);
 }
 
