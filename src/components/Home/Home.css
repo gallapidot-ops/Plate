@@ -68,18 +68,19 @@
   animation: plate-fade-up 0.4s ease-out 0.70s forwards;
 }
 
-/* Right column: wordmark stacked above tagline */
+/* Right column: wordmark + tagline anchored to the bottom of the bars */
 .plate-logo-text {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 4px;
+  justify-content: flex-end; /* pushes text down toward baseline of bars */
+  gap: 5px;
+  padding-bottom: 2px;       /* tiny lift off the very bottom edge */
 }
 
 /* ── Wordmark ── */
 .plate-wordmark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 22px;
+  font-size: 27px;
   font-weight: 400;
   letter-spacing: 7px;
   color: #3D4F7C;
@@ -94,9 +95,9 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 8px;
   font-weight: 400;
-  letter-spacing: 2.5px;
+  letter-spacing: 1.2px;     /* tighter than before (was 2.5px) */
   color: #8A7A85;
-  text-indent: 2.5px;
+  text-indent: 1.2px;
   opacity: 0;
   animation: plate-fade-up 0.5s ease-out 1.10s forwards;
 }
