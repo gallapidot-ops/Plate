@@ -698,11 +698,13 @@ export default function AddPlace({ onSaved, prefill = null }) {
   async function handleSaveAnimDone() {
     try {
       await savePromiseRef.current
+      setSaving(false)
+      setDone(true)
     } catch (e) {
       console.error('[AddPlace] save failed:', e)
+      setSaving(false)
+      alert(`Save failed: ${e.message}`)
     }
-    setSaving(false)
-    setDone(true)
   }
 
   async function handleWishlistSave() {

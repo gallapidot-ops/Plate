@@ -24,6 +24,9 @@ export async function savePlace(placeData) {
   const userId          = await getUserId()
   const primaryMealType = meal_types?.[0] ?? null
 
+  console.log('[savePlace] userId:', userId)
+  console.log('[savePlace] meal_types:', meal_types, '| computed_score:', computed_score)
+
   const placeRow = {
     name,
     address:         address         ?? null,
@@ -42,13 +45,20 @@ export async function savePlace(placeData) {
   // city column requires migration 008 — only include when present
   if (city != null) placeRow.city = city
 
+  console.log('[savePlace] inserting place row:', placeRow)
+
   const { data: place, error: placeErr } = await supabase
     .from('places')
     .insert(placeRow)
     .select()
     .single()
 
-  if (placeErr) throw new Error(`places insert: ${placeErr.message}`)
+  if (placeErr) {
+    console.error('[savePlace] places insert error:', placeErr)
+    throw new Error(`places insert: ${placeErr.message}`)
+  }
+
+  console.log('[savePlace] place inserted, id:', place.id)
 
   const ratingRows = (meal_types ?? []).filter(Boolean).map(mt => ({
     place_id:        place.id,
@@ -64,11 +74,17 @@ export async function savePlace(placeData) {
     tags:            mt === primaryMealType ? (tags ?? []) : [],
   }))
 
+  console.log('[savePlace] inserting rating rows:', ratingRows)
+
   if (ratingRows.length > 0) {
     const { error: ratingErr } = await supabase.from('place_ratings').insert(ratingRows)
-    if (ratingErr) throw new Error(`place_ratings insert: ${ratingErr.message}`)
+    if (ratingErr) {
+      console.error('[savePlace] place_ratings insert error:', ratingErr)
+      throw new Error(`place_ratings insert: ${ratingErr.message}`)
+    }
   }
 
+  console.log('[savePlace] done ✓')
   return place
 }
 
