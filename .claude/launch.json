@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "plate",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/glapidot/Desktop/bclub/plate/node_modules/.bin/vite", "--config", "/Users/glapidot/Desktop/bclub/plate/vite.config.js"],
       "port": 5173
     }
   ]

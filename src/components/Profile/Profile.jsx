@@ -4,8 +4,8 @@ import {
   PieChart, Pie, Legend,
 } from 'recharts'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
-import { HOME_CITY } from '../../data/mockSavedPlaces'
-import { getMyPlaces, getWishlist, removeFromWishlist } from '../../lib/db'
+import { getMyPlaces, getWishlist, removeFromWishlist, getFollowCounts } from '../../lib/db'
+import { signOut } from '../../lib/auth'
 import PlaceCard from '../PlaceCard/PlaceCard'
 import './Profile.css'
 
@@ -20,14 +20,23 @@ const EXP_LIST = [
 /* ── Chart palette ── */
 const C = ['#8B3A62','#A85580','#C98AAD','#D4A5BF','#5C2740','#E4C3D4','#7B2D54','#F0D6E5']
 
-const ME = {
-  name: 'גל לפידות',
-  username: '@gal',
-  avatar: 'https://i.pravatar.cc/150?img=47',
-  joined: 'אפריל 2026',
-  places: 12,
-  followers: 34,
-  following: 8,
+/* ── Avatar helpers ── */
+const AVATAR_COLORS = ['#8B3A62','#2D6A8B','#3A8B62','#8B6B2D','#5E3A8B','#2D8B7A','#8B4A2D','#4A6B8B']
+function avatarColor(str = '') {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0
+  return AVATAR_COLORS[h % AVATAR_COLORS.length]
+}
+function getInitials(name = '') {
+  return name.trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase() || '?'
+}
+
+/* ── Join date formatter ── */
+const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר']
+function formatJoinDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return `${HEB_MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
 const MOCK_FOLLOWERS = [
@@ -72,17 +81,17 @@ function buildCatData(places) {
 }
 
 /* ── City data helper ── */
-function buildCityData(places) {
+function buildCityData(places, homeCity = '') {
   const cityMap = {}
   places.forEach(p => {
-    const city = p.city || HOME_CITY
+    const city = p.city || homeCity || 'לא ידוע'
     if (!cityMap[city]) cityMap[city] = []
     cityMap[city].push(p)
   })
   return Object.entries(cityMap).map(([city, ps]) => ({
     city,
     count: ps.length,
-    isHome: city === HOME_CITY,
+    isHome: homeCity ? city === homeCity : false,
     places: [...ps].sort((a, b) => new Date(b.last_visited) - new Date(a.last_visited)),
   })).sort((a, b) => (b.isHome ? 1 : 0) - (a.isHome ? 1 : 0) || b.count - a.count)
 }
@@ -141,8 +150,13 @@ const PRIVACY_OPTIONS = [
   { id: 'private',    label: 'פרטי',       sub: 'רק את' },
 ]
 
-function SettingsSheet({ onClose }) {
-  const [privacy, setPrivacy] = useState('public')
+function SettingsSheet({ profile, onClose }) {
+  const [privacy, setPrivacy] = useState(profile?.privacy_level ?? 'public')
+
+  async function handleSignOut() {
+    await signOut()
+    onClose()
+  }
 
   return (
     <>
@@ -200,14 +214,14 @@ function SettingsSheet({ onClose }) {
             </svg>
             <div className="pf-settings-row-info">
               <span className="pf-settings-row-label">עיר בית</span>
-              <span className="pf-settings-row-sub">{HOME_CITY}</span>
+              <span className="pf-settings-row-sub">{profile?.home_city ?? '—'}</span>
             </div>
             <svg className="pf-settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 18l-6-6 6-6"/>
             </svg>
           </button>
 
-          <button className="pf-settings-row pf-settings-row--danger">
+          <button className="pf-settings-row pf-settings-row--danger" onClick={handleSignOut}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/>
@@ -286,7 +300,7 @@ function WishlistCard({ item, onOpenPlace, onRemove }) {
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace }) {
+export default function Profile({ onOpenPlace, currentProfile }) {
   const [profileTab,     setProfileTab]     = useState('main')
   const [expFilter,      setExpFilter]      = useState(null)
   const [activeCatKey,   setActiveCatKey]   = useState(null)
@@ -296,25 +310,40 @@ export default function Profile({ onOpenPlace }) {
   const [followDrawer,   setFollowDrawer]   = useState(null)
 
   /* ── Live data from Supabase ── */
-  const [places,      setPlaces]      = useState([])
-  const [wishlist,    setWishlist]    = useState([])
-  const [dataLoading, setDataLoading] = useState(true)
+  const [places,       setPlaces]       = useState([])
+  const [wishlist,     setWishlist]     = useState([])
+  const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 })
+  const [dataLoading,  setDataLoading]  = useState(true)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
+      console.log('[Profile] currentProfile prop:', currentProfile)
       try {
-        const [ps, wl] = await Promise.all([getMyPlaces(), getWishlist()])
-        if (!cancelled) { setPlaces(ps); setWishlist(wl) }
+        const userId = currentProfile?.id
+        console.log('[Profile] loading data for userId:', userId)
+        const [ps, wl, fc] = await Promise.all([
+          getMyPlaces(),
+          getWishlist(),
+          userId ? getFollowCounts(userId) : Promise.resolve({ followers: 0, following: 0 }),
+        ])
+        console.log('[Profile] places from DB:', ps)
+        console.log('[Profile] wishlist from DB:', wl)
+        console.log('[Profile] follow counts from DB:', fc)
+        if (!cancelled) {
+          setPlaces(ps)
+          setWishlist(wl)
+          setFollowCounts(fc)
+        }
       } catch (e) {
-        console.warn('[Profile] load error:', e)
+        console.error('[Profile] load error:', e)
       } finally {
         if (!cancelled) setDataLoading(false)
       }
     }
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [currentProfile?.id])
 
   async function handleRemoveWishlist(placeId) {
     try {
@@ -337,7 +366,7 @@ export default function Profile({ onOpenPlace }) {
     : places
 
   const catData    = buildCatData(filteredPlaces)
-  const cityData   = buildCityData(places)
+  const cityData   = buildCityData(places, currentProfile?.home_city)
   const activeCat  = catData.find(c => c.key === activeCatKey) ?? null
   const activeCity = cityData.find(c => c.city === activeCityKey) ?? null
 
@@ -350,29 +379,47 @@ export default function Profile({ onOpenPlace }) {
     setActiveCatKey(null)
   }
 
+  const displayName = currentProfile?.name || currentProfile?.username || '—'
+  const username    = currentProfile?.username ? `@${currentProfile.username.replace(/^@/, '')}` : ''
+  const joinDate    = formatJoinDate(currentProfile?.created_at)
+  const avatarUrl   = currentProfile?.avatar_url
+  const initials    = getInitials(displayName)
+  const bgColor     = avatarColor(currentProfile?.username ?? displayName)
+
   return (
     <div className="pf-screen" dir="rtl">
 
       {/* ════ Header ════ */}
       <div className="pf-header">
-        <img src={ME.avatar} alt={ME.name} className="pf-avatar" />
+        {avatarUrl ? (
+          <img src={avatarUrl} alt={displayName} className="pf-avatar" />
+        ) : (
+          <div
+            className="pf-avatar pf-avatar--initials"
+            style={{ background: bgColor }}
+          >
+            {initials}
+          </div>
+        )}
         <div className="pf-header-info">
           <div className="pf-name-row">
-            <h1 className="pf-name">{ME.name}</h1>
-            <span className="pf-username" dir="ltr">{ME.username}</span>
+            <h1 className="pf-name">{displayName}</h1>
+            {username && <span className="pf-username" dir="ltr">{username}</span>}
           </div>
           <div className="pf-meta-row">
             <span className="pf-meta-item">{places.length} מקומות</span>
             <span className="pf-meta-dot">·</span>
             <button className="pf-meta-btn" onClick={() => setFollowDrawer('followers')}>
-              {ME.followers} עוקבים
+              {followCounts.followers} עוקבים
             </button>
             <span className="pf-meta-dot">·</span>
             <button className="pf-meta-btn" onClick={() => setFollowDrawer('following')}>
-              {ME.following} עוקב אחרי
+              {followCounts.following} עוקב אחרי
             </button>
-            <span className="pf-meta-dot">·</span>
-            <span className="pf-meta-item pf-meta-joined">חבר מ{ME.joined}</span>
+            {joinDate && <>
+              <span className="pf-meta-dot">·</span>
+              <span className="pf-meta-item pf-meta-joined">חברה מ{joinDate}</span>
+            </>}
           </div>
         </div>
         <button className="pf-gear-btn" onClick={() => setShowSettings(true)} aria-label="הגדרות">
@@ -637,19 +684,19 @@ export default function Profile({ onOpenPlace }) {
       )}
 
       {/* ════ Settings ════ */}
-      {showSettings && <SettingsSheet onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsSheet profile={currentProfile} onClose={() => setShowSettings(false)} />}
 
       {/* ════ Follow list drawer ════ */}
       {followDrawer === 'followers' && (
         <FollowListDrawer
-          title={`עוקבים (${ME.followers})`}
+          title={`עוקבים (${followCounts.followers})`}
           users={MOCK_FOLLOWERS}
           onClose={() => setFollowDrawer(null)}
         />
       )}
       {followDrawer === 'following' && (
         <FollowListDrawer
-          title={`עוקב אחרי (${ME.following})`}
+          title={`עוקב אחרי (${followCounts.following})`}
           users={MOCK_FOLLOWING}
           onClose={() => setFollowDrawer(null)}
         />

@@ -173,6 +173,14 @@ export async function addPlaceToWishlist(placeData, opts = {}) {
   return placeId
 }
 
+export async function getFollowCounts(userId) {
+  const [{ count: followers }, { count: following }] = await Promise.all([
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', userId),
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id',  userId),
+  ])
+  return { followers: followers ?? 0, following: following ?? 0 }
+}
+
 export async function removeFromWishlist(placeId) {
   const userId = await getUserId()
 

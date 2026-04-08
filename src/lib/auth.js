@@ -46,8 +46,12 @@ export async function isUsernameAvailable(username) {
 }
 
 export async function createProfile({ id, email, username, home_city, privacy_level, avatar_url }) {
+  // Verify the session is active and the id matches the logged-in user
+  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const resolvedId = authUser?.id ?? id
+
   const { error } = await supabase.from('users').insert({
-    id,
+    id:            resolvedId,
     name:          username,
     email:         email ?? null,
     username,
@@ -56,7 +60,7 @@ export async function createProfile({ id, email, username, home_city, privacy_le
     avatar_url:    avatar_url    ?? null,
   })
   if (error) throw new Error(error.message)
-  return { id, name: username, email, username, home_city, privacy_level, avatar_url }
+  return { id: resolvedId, name: username, email, username, home_city, privacy_level, avatar_url }
 }
 
 /* ── Avatar storage ─────────────────────────────────────────────── */
