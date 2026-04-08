@@ -30,7 +30,7 @@
   gap: 12px;
   padding: 14px 20px;
   border-bottom: 1px solid var(--color-border-light);
-  background: #fff;
+  background: var(--color-surface);
   cursor: pointer;
   text-align: right;
   width: 100%;
@@ -177,7 +177,7 @@
 }
 
 .chat-bubble--them {
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-dark);
   border-bottom-right-radius: 4px;
   box-shadow: 0 1px 3px rgba(46,15,32,0.06);
@@ -201,7 +201,7 @@
   align-items: center;
   gap: 10px;
   padding: 11px 14px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-border-light);
   border-radius: 12px;
   max-width: 200px;
@@ -255,7 +255,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px 24px;
-  background: #fff;
+  background: var(--color-surface);
   border-top: 1px solid var(--color-border-light);
 }
 

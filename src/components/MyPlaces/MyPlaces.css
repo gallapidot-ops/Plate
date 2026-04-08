@@ -103,7 +103,7 @@
 }
 
 /* ── Card list ── */
-.mp-card-list { background: #fff; }
+.mp-card-list { background: var(--color-surface); }
 
 /* ── Discover banner ── */
 .mp-discover-banner {
@@ -163,7 +163,7 @@
 /* ── Wishlist items ── */
 .mp-wish-item {
   border-bottom: 1px solid var(--color-border-light);
-  background: #fff;
+  background: var(--color-surface);
 }
 
 .mp-wish-item:last-child { border-bottom: none; }

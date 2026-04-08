@@ -102,7 +102,7 @@
 
 /* ── Card list ── */
 .saved-card-list {
-  background: #fff;
+  background: var(--color-surface);
 }
 
 /* ── Wishlist item ── */

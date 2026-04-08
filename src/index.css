@@ -40,7 +40,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: var(--color-bg);
+  background: #E8527A;
   font-family: var(--font-sans);
   font-weight: 400;
   color: var(--color-text-primary);
@@ -50,6 +50,7 @@ body {
 
 #root {
   min-height: 100svh;
+  background: #E8527A;
 }
 
 h1, h2, h3, h4, h5, h6 {
