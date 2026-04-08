@@ -136,7 +136,7 @@
 
 .ps-input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(139,58,98,0.08);
+  box-shadow: 0 0 0 3px rgba(61,79,124,0.08);
 }
 
 .ps-input--ok             { border-color: #2e9c5b; }
@@ -187,7 +187,7 @@
   letter-spacing: 0.02em;
 }
 
-.ps-city-result-item:hover { background: rgba(139,58,98,0.07); }
+.ps-city-result-item:hover { background: rgba(61,79,124,0.07); }
 .ps-city-result-item svg   { color: var(--color-accent); flex-shrink: 0; }
 
 /* ── Privacy cards ── */
@@ -219,7 +219,7 @@
 
 .ps-privacy-card--active {
   border-color: var(--color-accent);
-  background: rgba(139,58,98,0.06);
+  background: rgba(61,79,124,0.06);
   box-shadow: var(--shadow-inset);
 }
 

@@ -126,7 +126,7 @@
 
 .auth-input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(139,58,98,0.08);
+  box-shadow: 0 0 0 3px rgba(61,79,124,0.08);
 }
 
 .auth-input::placeholder {
@@ -196,7 +196,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 18px;
-  box-shadow: 4px 4px 16px rgba(139,58,98,0.28), -2px -2px 8px rgba(255,255,255,0.8);
+  box-shadow: 4px 4px 16px rgba(61,79,124,0.28), -2px -2px 8px rgba(255,255,255,0.8);
 }
 
 .auth-success-title {

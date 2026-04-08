@@ -7,19 +7,19 @@
   /* Colors */
   --color-bg:              #F7F4EF;
   --color-surface:         #EFECE6;
-  --color-accent:          #8B3A62;
-  --color-accent-light:    #C98AAD;
+  --color-accent:          #3D4F7C;
+  --color-accent-light:    #6B7FA8;
   --color-text-primary:    #1A1017;
   --color-text-secondary:  #8A7A85;
-  --color-border:          rgba(139, 58, 98, 0.12);
+  --color-border:          rgba(61, 79, 124, 0.12);
 
   /* Derived / legacy aliases kept for backward compat */
   --color-dark:            #1A1017;
   --color-text:            #1A1017;
   --color-text-soft:       #8A7A85;
   --color-text-muted:      rgba(138, 122, 133, 0.75);
-  --color-accent-pale:     rgba(139, 58, 98, 0.08);
-  --color-border-light:    rgba(139, 58, 98, 0.10);
+  --color-accent-pale:     rgba(61, 79, 124, 0.08);
+  --color-border-light:    rgba(61, 79, 124, 0.10);
 
   /* Typography */
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -28,8 +28,8 @@
   /* Misc */
   --radius:    50px;
   --radius-md: 12px;
-  --shadow:    4px 4px 12px rgba(0,0,0,0.07), -2px -2px 6px rgba(255,255,255,0.85);
-  --shadow-inset: inset 2px 2px 6px rgba(0,0,0,0.07), inset -2px -2px 4px rgba(255,255,255,0.7);
+  --shadow:    6px 6px 12px rgba(0,0,0,0.08), -4px -4px 10px rgba(255,255,255,0.9);
+  --shadow-inset: inset 3px 3px 7px rgba(0,0,0,0.1), inset -2px -2px 5px rgba(255,255,255,0.8);
 }
 
 *, *::before, *::after {
@@ -139,7 +139,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .chip:hover {
   color: var(--color-accent);
-  background: rgba(139,58,98,0.08);
+  background: rgba(61,79,124,0.08);
 }
 
 .chip--active {
@@ -184,7 +184,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .field-input:focus {
   border-color: var(--color-accent);
-  box-shadow: 0 0 0 3px rgba(139,58,98,0.08);
+  box-shadow: 0 0 0 3px rgba(61,79,124,0.08);
 }
 
 .field-input::placeholder {

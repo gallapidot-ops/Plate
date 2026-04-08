@@ -68,16 +68,7 @@ function MealCard({ item, active, onClick }) {
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}
     >
-      <img src={item.img} alt={item.label} className="meal-card-img" />
-      <div className="meal-card-overlay" />
-      <div className="meal-card-content">
-        <span className="meal-card-en">{item.label}</span>
-      </div>
-      {active && <div className="meal-card-check">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6 9 17l-5-5"/>
-        </svg>
-      </div>}
+      <span className="meal-card-label">{item.label}</span>
     </div>
   )
 }
