@@ -189,33 +189,8 @@ function Drawer({ open, onClose, filters, setFilters }) {
   )
 }
 
-/* ─────────────────────────────────────────
-   Mock users for People tab
-───────────────────────────────────────── */
-const MOCK_USERS = [
-  { id: 'u1', username: '@noa.cohen',  name: 'נועה כהן',    avatar: 'https://i.pravatar.cc/150?img=5',  places: 12, following: false },
-  { id: 'u2', username: '@tamar.levi', name: 'תמר לוי',     avatar: 'https://i.pravatar.cc/150?img=9',  places: 8,  following: true  },
-  { id: 'u3', username: '@dana.m',     name: 'דנה מזרחי',   avatar: 'https://i.pravatar.cc/150?img=20', places: 21, following: false },
-  { id: 'u4', username: '@yael.bar',   name: 'יעל בר-לב',   avatar: 'https://i.pravatar.cc/150?img=33', places: 5,  following: true  },
-  { id: 'u5', username: '@rina.s',     name: 'רינה שמר',    avatar: 'https://i.pravatar.cc/150?img=44', places: 17, following: false },
-]
-
 function PeopleTab() {
-  const [query,   setQuery]   = useState('')
-  const [follows, setFollows] = useState(
-    Object.fromEntries(MOCK_USERS.map(u => [u.id, u.following]))
-  )
-
-  const results = query.trim()
-    ? MOCK_USERS.filter(u =>
-        u.username.toLowerCase().includes(query.toLowerCase()) ||
-        u.name.includes(query)
-      )
-    : MOCK_USERS
-
-  function toggleFollow(id) {
-    setFollows(f => ({ ...f, [id]: !f[id] }))
-  }
+  const [query, setQuery] = useState('')
 
   return (
     <div className="home-people">
@@ -230,7 +205,7 @@ function PeopleTab() {
           onChange={e => setQuery(e.target.value)}
         />
         {query && (
-          <button className="home-people-clear" onClick={() => setQuery('')} aria-label="נקה">
+          <button className="home-people-clear" onClick={() => setQuery('')} aria-label="Clear">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
@@ -239,24 +214,7 @@ function PeopleTab() {
       </div>
 
       <div className="home-people-list">
-        {results.length === 0 ? (
-          <p className="home-people-empty">No users found</p>
-        ) : results.map(user => (
-          <div key={user.id} className="home-people-card">
-            <img src={user.avatar} alt={user.name} className="home-people-avatar" />
-            <div className="home-people-info">
-              <span className="home-people-name">{user.name}</span>
-              <span className="home-people-meta" dir="ltr">{user.username}</span>
-              <span className="home-people-places">{user.places} places</span>
-            </div>
-            <button
-              className={`home-people-follow-btn ${follows[user.id] ? 'home-people-follow-btn--following' : ''}`}
-              onClick={() => toggleFollow(user.id)}
-            >
-              {follows[user.id] ? 'Following' : 'Follow'}
-            </button>
-          </div>
-        ))}
+        <p className="home-people-empty">No users found</p>
       </div>
     </div>
   )

@@ -39,18 +39,6 @@ function formatJoinDate(iso) {
   return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
-const MOCK_FOLLOWERS = [
-  { id: 'f1', username: '@noa.cohen',  name: 'נועה כהן',   avatar: 'https://i.pravatar.cc/150?img=5'  },
-  { id: 'f2', username: '@tamar.levi', name: 'תמר לוי',    avatar: 'https://i.pravatar.cc/150?img=9'  },
-  { id: 'f3', username: '@dana.m',     name: 'דנה מזרחי',  avatar: 'https://i.pravatar.cc/150?img=20' },
-  { id: 'f4', username: '@yael.bar',   name: 'יעל בר-לב',  avatar: 'https://i.pravatar.cc/150?img=33' },
-]
-
-const MOCK_FOLLOWING = [
-  { id: 'g1', username: '@rina.s',     name: 'רינה שמר',   avatar: 'https://i.pravatar.cc/150?img=44' },
-  { id: 'g2', username: '@dana.m',     name: 'דנה מזרחי',  avatar: 'https://i.pravatar.cc/150?img=20' },
-  { id: 'g3', username: '@noa.cohen',  name: 'נועה כהן',   avatar: 'https://i.pravatar.cc/150?img=5'  },
-]
 
 /* ── Category order (fixed, with bakery+deli merged) ── */
 const CAT_ORDER = [
@@ -690,14 +678,14 @@ export default function Profile({ onOpenPlace, currentProfile }) {
       {followDrawer === 'followers' && (
         <FollowListDrawer
           title={`Followers (${followCounts.followers})`}
-          users={MOCK_FOLLOWERS}
+          users={[]}
           onClose={() => setFollowDrawer(null)}
         />
       )}
       {followDrawer === 'following' && (
         <FollowListDrawer
           title={`Following (${followCounts.following})`}
-          users={MOCK_FOLLOWING}
+          users={[]}
           onClose={() => setFollowDrawer(null)}
         />
       )}
