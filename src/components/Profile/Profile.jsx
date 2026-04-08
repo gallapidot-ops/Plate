@@ -43,6 +43,13 @@ function formatJoinDate(iso) {
   return `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
+/* ── Visit date formatter ── */
+function formatVisitDate(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 
 /* ── Category order (fixed, with bakery+deli merged) ── */
 const CAT_ORDER = [
@@ -413,13 +420,31 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
   const activeCat  = catData.find(c => c.key === activeCatKey) ?? null
   const activeCity = cityData.find(c => c.city === activeCityKey) ?? null
 
-  const filteredRecent = [...filteredPlaces]
-    .sort((a, b) => new Date(b.last_visited) - new Date(a.last_visited))
-    .slice(0, 5)
+  const filteredRecent = (() => {
+    let result = [...filteredPlaces]
+    if (activeCatKey) {
+      const cat = CAT_ORDER.find(c => c.key === activeCatKey)
+      if (cat) result = result.filter(p => cat.keys.some(k => p.meal_types.includes(k)))
+    }
+    if (activeCityKey) {
+      result = result.filter(p => {
+        const city = p.city || displayProfile?.home_city || ''
+        return city === activeCityKey
+      })
+    }
+    return result.sort((a, b) => new Date(b.last_visited) - new Date(a.last_visited))
+  })()
+
+  const hasActiveFilter = !!(expFilter || activeCatKey || activeCityKey)
 
   function toggleExpFilter(id) {
     setExpFilter(prev => prev === id ? null : id)
+  }
+
+  function clearAllFilters() {
+    setExpFilter(null)
     setActiveCatKey(null)
+    setActiveCityKey(null)
   }
 
   const displayName = displayProfile?.name || displayProfile?.username || '—'
@@ -612,25 +637,41 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
           </section>
 
           {/* ── Recent visits ── */}
-          {filteredRecent.length > 0 && (
-            <section className="pf-section">
-              <p className="pf-section-label">Recent Visits</p>
-              <div className="pf-recent-scroll">
-                {filteredRecent.map(p => (
-                  <button key={p.id} className="pf-visit-card" onClick={() => onOpenPlace?.(p)}>
-                    <img src={p.photo_url} alt={p.name} className="pf-visit-img" />
-                    <div className="pf-visit-info">
-                      <span className="pf-visit-name">{p.name}</span>
+          <section className="pf-section">
+            <div className="pf-recent-header">
+              <p className="pf-section-label" style={{ margin: 0 }}>Recent Visits</p>
+              {hasActiveFilter && (
+                <button className="pf-recent-clear" onClick={clearAllFilters}>
+                  ✕ Clear filters
+                </button>
+              )}
+            </div>
+            {filteredRecent.length === 0 ? (
+              <p className="pf-recent-empty">No visits match the selected filters</p>
+            ) : (
+              <div className="pf-recent-list">
+                {filteredRecent.map((p, i) => (
+                  <button
+                    key={p.id}
+                    className="pf-visit-card"
+                    style={{ '--card-tint': `var(--card-tint-${i % 5})` }}
+                    onClick={() => onOpenPlace?.(p)}
+                  >
+                    <span className="pf-visit-name">{p.name}</span>
+                    <div className="pf-visit-meta-row">
                       <span className="pf-visit-score">
                         <span className="pf-visit-score-val">{p.computed_score}</span>
                         <span className="pf-visit-score-max">/25</span>
                       </span>
+                      {p.last_visited && (
+                        <span className="pf-visit-date">{formatVisitDate(p.last_visited)}</span>
+                      )}
                     </div>
                   </button>
                 ))}
               </div>
-            </section>
-          )}
+            )}
+          </section>
 
           {/* ── Charts ── */}
           <section className="pf-section pf-section--chart pf-section--last">
@@ -728,27 +769,6 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             )}
           </section>
 
-          {/* ── Category drawer ── */}
-          {activeCat && (
-            <ListDrawer
-              title={activeCat.name}
-              sub={`${activeCat.count} places · avg score ${activeCat.avg}/25`}
-              places={activeCat.places}
-              onClose={() => setActiveCatKey(null)}
-              onOpenPlace={onOpenPlace}
-            />
-          )}
-
-          {/* ── City drawer ── */}
-          {activeCity && (
-            <ListDrawer
-              title={activeCity.city}
-              sub={`${activeCity.count} ${activeCity.count === 1 ? 'place' : 'places'}${activeCity.isHome ? ' · home city' : ' · trip'}`}
-              places={activeCity.places}
-              onClose={() => setActiveCityKey(null)}
-              onOpenPlace={onOpenPlace}
-            />
-          )}
         </>
       )}
 
