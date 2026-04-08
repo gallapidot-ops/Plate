@@ -59,12 +59,20 @@ function PracticalRow({ icon, label, value, href }) {
 
 /* ── Share sheet ── */
 function ShareSheet({ place, onClose }) {
-  const [sent, setSent] = useState(null)
+  const [sent,   setSent]   = useState(null)
+  const [copied, setCopied] = useState(false)
 
   function handleSend(conv) {
     const friend = MOCK_FRIENDS.find(f => f.id === conv.with)
     setSent(friend?.name ?? 'החברה')
     setTimeout(onClose, 1600)
+  }
+
+  function handleCopyLink() {
+    const url = `${window.location.origin}/place/${place.id || encodeURIComponent(place.name)}`
+    navigator.clipboard?.writeText(url).catch(() => {})
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -124,12 +132,23 @@ function ShareSheet({ place, onClose }) {
             </div>
 
             <div className="pp-sheet-footer">
-              <button className="pp-sheet-new-chat">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  <path d="M12 8v4M10 10h4"/>
-                </svg>
-                New conversation
+              <button className="pp-sheet-copy-btn" onClick={handleCopyLink}>
+                {copied ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                    Link copied!
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                    Copy link
+                  </>
+                )}
               </button>
             </div>
           </>

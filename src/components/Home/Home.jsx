@@ -109,7 +109,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
   return (
     <>
       <div className="drawer-backdrop" onClick={onClose} />
-      <div className="drawer" dir="rtl">
+      <div className="drawer">
         <div className="drawer-handle" />
 
         <div className="drawer-scroll">
@@ -485,7 +485,7 @@ function ResultsPanel({ mealType, location, filters, onBack }) {
   )
 }
 
-export default function Home({ onSearch, onViewUser }) {
+export default function Home({ onSearch, onViewUser, onOpenInbox, notifCount = 0 }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -526,9 +526,21 @@ export default function Home({ onSearch, onViewUser }) {
 
   return (
     <div className="home">
-      {/* Logo — fixed at top, never scrolls */}
+      {/* Header: logo left, DM/inbox right */}
       <div className="home-header">
         <PlateLogo />
+        <button
+          className="home-dm-btn"
+          onClick={onOpenInbox}
+          aria-label="Messages & notifications"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          {notifCount > 0 && (
+            <span className="home-dm-badge">{notifCount > 9 ? '9+' : notifCount}</span>
+          )}
+        </button>
       </div>
 
       {/* Sub-tabs */}

@@ -507,6 +507,19 @@ function SaveAnimation({ place, photo, score, onDone }) {
 
 /* ── Done screen ──────────────────────────────────────────────────── */
 function DoneScreen({ place, score, onHome }) {
+  const [copied, setCopied] = useState(false)
+
+  function handleShare() {
+    const url = `${window.location.origin}/place/${encodeURIComponent(place?.name || '')}`
+    if (navigator.share) {
+      navigator.share({ title: place?.name, url }).catch(() => {})
+    } else {
+      navigator.clipboard?.writeText(url).catch(() => {})
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
   return (
     <div className="ap-done" dir="rtl">
       <div className="ap-done-inner">
@@ -527,6 +540,16 @@ function DoneScreen({ place, score, onHome }) {
         {/* Labels */}
         <p className="ap-done-status">Saved!</p>
         <p className="ap-done-name">{place?.name}</p>
+
+        {/* Share */}
+        <button className="ap-done-share-btn" onClick={handleShare}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+          {copied ? 'Link copied!' : 'Share'}
+        </button>
 
         {/* CTA */}
         <button className="ap-done-btn" onClick={onHome}>

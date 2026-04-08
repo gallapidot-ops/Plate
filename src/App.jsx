@@ -23,10 +23,6 @@ const NAV = [
     icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>,
   },
   {
-    id: 'notifications', label: 'Alerts',
-    icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
-  },
-  {
     id: 'profile', label: 'Profile',
     icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>,
   },
@@ -50,16 +46,17 @@ function SplashLogoContent() {
 }
 
 function SplashOverlay({ onDone }) {
-  const [phase, setPhase] = useState('hold')
+  const [fading, setFading] = useState(false)
 
   useEffect(() => {
-    const morphTimer = setTimeout(() => setPhase('morph'), 1550)
-    const doneTimer  = setTimeout(() => onDone(), 1550 + 1000)
-    return () => { clearTimeout(morphTimer); clearTimeout(doneTimer) }
+    // Start fading after logo animation completes (~1.6s); fade takes 0.5s
+    const t1 = setTimeout(() => setFading(true), 1700)
+    const t2 = setTimeout(() => onDone(),         2300)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [onDone])
 
   return (
-    <div className={`splash-overlay splash-overlay--${phase}`}>
+    <div className={`splash-overlay${fading ? ' splash-overlay--fade' : ''}`}>
       <div className="splash-logo-card">
         <div className="splash-logo-inner">
           <SplashLogoContent />
@@ -153,7 +150,7 @@ export default function App() {
         )}
 
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
-          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} />}
+          {screen === 'home'          && <Home onSearch={() => {}} onViewUser={setViewingUserId} onOpenInbox={() => setScreen('notifications')} notifCount={notifCount} />}
           {screen === 'add'           && <AddPlace onSaved={() => setScreen('home')} />}
           {screen === 'notifications' && <Notifications onNotifCountChange={handleNotifCountChange} />}
           {screen === 'profile'       && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
