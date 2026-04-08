@@ -755,6 +755,160 @@
   padding: 10px 0 18px;
 }
 
+/* ── Settings form (edit profile) ── */
+.pf-settings-form {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 22px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pf-set-avatar-row {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 2px;
+}
+
+.pf-set-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.pf-set-avatar-initials {
+  font-size: 26px;
+  font-weight: 500;
+  color: #fff;
+  font-family: var(--font-sans);
+  line-height: 1;
+}
+
+.pf-set-avatar-edit-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-surface);
+}
+
+.pf-set-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-set-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.pf-set-input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  font-size: 15px;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.18s;
+  -webkit-appearance: none;
+}
+
+.pf-set-input:focus { border-color: var(--color-accent); }
+.pf-set-input--error { border-color: #C0392B; }
+
+.pf-set-hint { font-size: 11px; font-family: var(--font-sans); }
+.pf-set-hint--error { color: #C0392B; }
+
+.pf-set-city-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-top: 4px;
+  padding: 6px 0;
+  list-style: none;
+}
+
+.pf-set-city-dropdown li {
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.pf-set-city-dropdown li:hover { background: var(--color-bg); }
+
+.pf-set-privacy-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pf-set-privacy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-bg);
+  cursor: pointer;
+  text-align: right;
+  transition: border-color 0.15s;
+}
+
+.pf-set-privacy-row--active { border-color: var(--color-accent); background: rgba(61,79,124,0.04); }
+
+.pf-set-privacy-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+.pf-set-privacy-sub {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  margin-top: 2px;
+}
+
+.pf-set-error {
+  font-size: 13px;
+  color: #C0392B;
+  font-family: var(--font-sans);
+  text-align: center;
+  margin: 0;
+}
+
 .pf-settings-row {
   width: 100%;
   display: flex;

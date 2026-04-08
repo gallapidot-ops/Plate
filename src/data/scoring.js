@@ -150,12 +150,25 @@ export const PRICE_OPTIONS = [
 ]
 
 export const TAGS = [
-  { id: 'kosher',         label: 'Kosher'         },
-  { id: 'romantic',       label: 'Romantic'       },
-  { id: 'work_friendly',  label: 'Work-Friendly'  },
-  { id: 'outdoor',        label: 'Outdoor'        },
-  { id: 'vegan',          label: 'Vegan'          },
-  { id: 'group_friendly', label: 'Group Friendly' },
+  { id: 'kosher',        label: 'Kosher'               },
+  { id: 'open_shabbat',  label: 'Open on Shabbat'      },
+  { id: 'vegan',         label: 'Vegan-Friendly'        },
+  { id: 'outdoor',       label: 'Outdoor Seating'       },
+  { id: 'rooftop',       label: 'Rooftop'               },
+  { id: 'sea_view',      label: 'Sea View'              },
+  { id: 'work_friendly', label: 'Work-Friendly'         },
+  { id: 'romantic',      label: 'Good for Dates'        },
+  { id: 'group_friendly',label: 'Good for Groups'       },
+  { id: 'kids',          label: 'Good for Kids'         },
+  { id: 'pet_friendly',  label: 'Pet Friendly'          },
+  { id: 'parking',       label: 'Parking'               },
+  { id: 'late_night',    label: 'Late Night'            },
+  { id: 'live_music',    label: 'Live Music'            },
+  { id: 'quiet',         label: 'Quiet'                 },
+  { id: 'hidden_gem',    label: 'Hidden Gem'            },
+  { id: 'celebration',   label: 'Celebration'           },
+  { id: 'reservation',   label: 'Reservation Required'  },
+  { id: 'long_sit',      label: 'Long Sit'              },
 ]
 
 export function computeScore(rating, mealType) {

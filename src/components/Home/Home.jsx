@@ -371,7 +371,7 @@ const EXP_LABELS = {
   full_experience: 'Full Experience',
 }
 
-function ResultsPanel({ mealType, location, filters, onBack, onGuestAction }) {
+function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOpenPlace }) {
   const [activeTab,       setActiveTab]       = useState(onGuestAction ? 'explore' : 'mine')
   const [results,         setResults]         = useState([])
   const [loading,         setLoading]         = useState(true)
@@ -462,7 +462,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction }) {
           const isSaved  = savedToWishlist.has(place.id)
           const isSaving = savingWishlist.has(place.id)
           return (
-            <div key={place.id} className="home-result-card">
+            <div key={place.id} className="home-result-card" onClick={() => onOpenPlace?.(place)} style={{ cursor: onOpenPlace ? 'pointer' : 'default' }}>
               {place.photo_url && (
                 <img src={place.photo_url} alt={place.name} className="home-result-img" />
               )}
@@ -481,7 +481,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction }) {
               )}
               <button
                 className={`home-result-bookmark${isSaved ? ' home-result-bookmark--saved' : ''}`}
-                onClick={() => handleBookmark(place)}
+                onClick={e => { e.stopPropagation(); handleBookmark(place) }}
                 disabled={isSaving || isSaved}
                 aria-label={isSaved ? 'Saved to Wishlist' : 'Add to Wishlist'}
               >
@@ -506,7 +506,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction }) {
   )
 }
 
-export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction }) {
+export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction, onOpenPlace }) {
   const [tab,         setTab]         = useState('places')
   const [mealType,    setMealType]    = useState(null)
   const [location,    setLocation]    = useState('')
@@ -542,6 +542,7 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
         filters={filters}
         onBack={() => setShowResults(false)}
         onGuestAction={onGuestAction}
+        onOpenPlace={onOpenPlace}
       />
     )
   }

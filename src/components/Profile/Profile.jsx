@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
   PieChart, Pie, Legend,
@@ -9,7 +9,8 @@ import {
   getFollowCounts, getFollowStatus, followUser, unfollowUser,
   sendFollowRequest, cancelFollowRequest,
 } from '../../lib/db'
-import { signOut } from '../../lib/auth'
+import { signOut, updateProfile, uploadAvatar, isUsernameAvailable } from '../../lib/auth'
+import { autocompleteCity } from '../../lib/places'
 import PlaceCard from '../PlaceCard/PlaceCard'
 import './Profile.css'
 
@@ -144,18 +145,96 @@ function ListDrawer({ title, sub, places, onClose, onOpenPlace }) {
 
 /* ── Settings sheet ── */
 const PRIVACY_OPTIONS = [
-  { id: 'public',    label: 'Public',         sub: 'Everyone can see your places' },
-  { id: 'followers', label: 'Followers only', sub: 'Only people you approve'      },
-  { id: 'private',   label: 'Private',        sub: 'Just you'                     },
+  { id: 'public',    label: 'Public',          sub: 'Everyone can see your places'       },
+  { id: 'followers', label: 'Followers only',  sub: 'Only people you approve can see'    },
+  { id: 'private',   label: 'Private',         sub: 'Only you can see your places'       },
 ]
+const USERNAME_RE = /^[a-zA-Z0-9_]+$/
 
-function SettingsSheet({ profile, onClose }) {
-  const [privacy, setPrivacy] = useState(profile?.privacy_level ?? 'public')
+function SettingsSheet({ profile, onClose, onSaved }) {
+  const [username,       setUsername]       = useState(profile?.username   ?? '')
+  const [usernameStatus, setUsernameStatus] = useState('ok')
+  const [city,           setCity]           = useState(profile?.home_city  ?? '')
+  const [cityResults,    setCityResults]    = useState([])
+  const [cityOpen,       setCityOpen]       = useState(false)
+  const [privacy,        setPrivacy]        = useState(profile?.privacy_level ?? 'public')
+  const [avatarPreview,  setAvatarPreview]  = useState(profile?.avatar_url ?? null)
+  const [avatarFile,     setAvatarFile]     = useState(null)
+  const [saving,         setSaving]         = useState(false)
+  const [error,          setError]          = useState(null)
+  const fileRef     = useRef()
+  const usernameRef = useRef()
+  const cityRef     = useRef()
 
-  async function handleSignOut() {
-    await signOut()
-    onClose()
+  /* username validation */
+  const handleUsernameChange = useCallback((e) => {
+    const val = e.target.value.trim()
+    setUsername(val)
+    clearTimeout(usernameRef.current)
+    if (!val)                      { setUsernameStatus('empty');   return }
+    if (val.length < 3)            { setUsernameStatus('short');   return }
+    if (!USERNAME_RE.test(val))    { setUsernameStatus('invalid'); return }
+    if (val === profile?.username) { setUsernameStatus('ok');      return }
+    setUsernameStatus('checking')
+    usernameRef.current = setTimeout(async () => {
+      const avail = await isUsernameAvailable(val)
+      setUsernameStatus(avail ? 'ok' : 'taken')
+    }, 500)
+  }, [profile?.username])
+
+  /* city autocomplete */
+  const handleCityInput = useCallback((e) => {
+    const val = e.target.value
+    setCity(val)
+    clearTimeout(cityRef.current)
+    if (val.length < 2) { setCityResults([]); setCityOpen(false); return }
+    cityRef.current = setTimeout(async () => {
+      const res = await autocompleteCity(val)
+      setCityResults(res)
+      setCityOpen(res.length > 0)
+    }, 350)
+  }, [])
+
+  function handleAvatarChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarFile(file)
+    setAvatarPreview(URL.createObjectURL(file))
   }
+
+  async function handleSave() {
+    if (saving) return
+    if (!['ok'].includes(usernameStatus)) return
+    setSaving(true); setError(null)
+    try {
+      let avatar_url = undefined
+      if (avatarFile) {
+        try { avatar_url = await uploadAvatar(profile.id, avatarFile) }
+        catch { /* non-fatal */ }
+      }
+      await updateProfile({
+        id:            profile.id,
+        username,
+        home_city:     city || null,
+        privacy_level: privacy,
+        avatar_url,
+      })
+      onSaved({ ...profile, username, name: username, home_city: city || null, privacy_level: privacy, ...(avatar_url !== undefined ? { avatar_url } : {}) })
+      onClose()
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const usernameHint =
+    usernameStatus === 'checking' ? 'Checking…'          :
+    usernameStatus === 'taken'    ? 'Username taken'     :
+    usernameStatus === 'short'    ? 'Min 3 characters'   :
+    usernameStatus === 'invalid'  ? 'Letters, numbers, _ only' : null
+
+  const canSave = usernameStatus === 'ok' && !saving
 
   return (
     <>
@@ -171,56 +250,92 @@ function SettingsSheet({ profile, onClose }) {
           </button>
         </div>
 
-        <div className="pf-settings-list">
-          <button className="pf-settings-row">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">Edit Profile</span>
-              <span className="pf-settings-row-sub">Name, username, photo</span>
-            </div>
-            <svg className="pf-settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6"/>
-            </svg>
-          </button>
+        <div className="pf-settings-form">
 
-          <div className="pf-settings-group">
-            <span className="pf-settings-group-label">Privacy</span>
-            {PRIVACY_OPTIONS.map(opt => (
-              <button
-                key={opt.id}
-                className={`pf-settings-privacy-row ${privacy === opt.id ? 'pf-settings-privacy-row--active' : ''}`}
-                onClick={() => setPrivacy(opt.id)}
-              >
-                <div className="pf-settings-row-info">
-                  <span className="pf-settings-row-label">{opt.label}</span>
-                  <span className="pf-settings-row-sub">{opt.sub}</span>
-                </div>
-                {privacy === opt.id && (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6 9 17l-5-5"/>
-                  </svg>
-                )}
-              </button>
-            ))}
+          {/* Avatar */}
+          <div className="pf-set-avatar-row">
+            <div
+              className="pf-set-avatar"
+              style={avatarPreview ? { backgroundImage: `url(${avatarPreview})`, backgroundSize: 'cover', backgroundPosition: 'center' } : { background: avatarColor(username) }}
+              onClick={() => fileRef.current?.click()}
+            >
+              {!avatarPreview && <span className="pf-set-avatar-initials">{getInitials(username)}</span>}
+              <div className="pf-set-avatar-edit-badge">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </div>
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleAvatarChange} />
           </div>
 
-          <button className="pf-settings-row">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">Home City</span>
-              <span className="pf-settings-row-sub">{profile?.home_city ?? '—'}</span>
+          {/* Username */}
+          <div className="pf-set-field">
+            <label className="pf-set-label">Username</label>
+            <input
+              className={`pf-set-input${usernameStatus === 'taken' || usernameStatus === 'invalid' || usernameStatus === 'short' ? ' pf-set-input--error' : ''}`}
+              value={username}
+              onChange={handleUsernameChange}
+              placeholder="username"
+              dir="ltr"
+              maxLength={20}
+            />
+            {usernameHint && <span className="pf-set-hint pf-set-hint--error">{usernameHint}</span>}
+          </div>
+
+          {/* Home City */}
+          <div className="pf-set-field" style={{ position: 'relative' }}>
+            <label className="pf-set-label">Home City</label>
+            <input
+              className="pf-set-input"
+              value={city}
+              onChange={handleCityInput}
+              onBlur={() => setTimeout(() => setCityOpen(false), 150)}
+              placeholder="Tel Aviv, Jerusalem…"
+            />
+            {cityOpen && cityResults.length > 0 && (
+              <ul className="pf-set-city-dropdown">
+                {cityResults.map(c => (
+                  <li key={c.placeId} onMouseDown={() => { setCity(c.name); setCityOpen(false) }}>
+                    {c.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Privacy */}
+          <div className="pf-set-field">
+            <label className="pf-set-label">Privacy</label>
+            <div className="pf-set-privacy-group">
+              {PRIVACY_OPTIONS.map(opt => (
+                <button
+                  key={opt.id}
+                  className={`pf-set-privacy-row${privacy === opt.id ? ' pf-set-privacy-row--active' : ''}`}
+                  onClick={() => setPrivacy(opt.id)}
+                >
+                  <div>
+                    <div className="pf-set-privacy-label">{opt.label}</div>
+                    <div className="pf-set-privacy-sub">{opt.sub}</div>
+                  </div>
+                  {privacy === opt.id && (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                  )}
+                </button>
+              ))}
             </div>
-            <svg className="pf-settings-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6"/>
-            </svg>
+          </div>
+
+          {error && <p className="pf-set-error">{error}</p>}
+
+          <button className="btn-primary" style={{ width: '100%' }} onClick={handleSave} disabled={!canSave}>
+            {saving ? 'Saving…' : 'Save Changes'}
           </button>
 
-          <button className="pf-settings-row pf-settings-row--danger" onClick={handleSignOut}>
+          <button className="pf-settings-row pf-settings-row--danger" style={{ marginTop: 16 }} onClick={() => signOut()}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/>
@@ -312,7 +427,7 @@ function WishlistCard({ item, onOpenPlace, onRemove, onVisit }) {
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null, onGuestAction = null, refreshKey = 0 }) {
+export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null, onGuestAction = null, refreshKey = 0, onProfileUpdated = null }) {
   const isViewMode = !!viewedProfile
   const displayProfile = isViewMode ? viewedProfile : currentProfile
 
@@ -793,7 +908,13 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
       )}
 
       {/* ════ Settings ════ */}
-      {!isViewMode && showSettings && <SettingsSheet profile={currentProfile} onClose={() => setShowSettings(false)} />}
+      {!isViewMode && showSettings && (
+        <SettingsSheet
+          profile={currentProfile}
+          onClose={() => setShowSettings(false)}
+          onSaved={updated => { onProfileUpdated?.(updated); setShowSettings(false) }}
+        />
+      )}
 
       {/* ════ Follow list drawer ════ */}
       {followDrawer === 'followers' && (

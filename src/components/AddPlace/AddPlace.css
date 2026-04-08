@@ -489,6 +489,24 @@
   font-size: 12px;
 }
 
+.ap-custom-tag-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.18s;
+  -webkit-appearance: none;
+}
+
+.ap-custom-tag-input:focus { border-color: var(--color-accent); }
+.ap-custom-tag-input::placeholder { color: var(--color-text-secondary); opacity: 0.6; }
+
 /* Compact row */
 .ap-compact-row {
   display: flex;

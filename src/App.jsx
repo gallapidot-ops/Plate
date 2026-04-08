@@ -298,6 +298,7 @@ export default function App() {
               onViewUser={setViewingUserId}
               currentUserId={isGuest ? null : authUser?.id}
               onGuestAction={guestAction}
+              onOpenPlace={setSelectedPlace}
             />
           )}
           {screen === 'add' && !isGuest && (
@@ -316,6 +317,7 @@ export default function App() {
               currentProfile={profile}
               onWishlistVisit={handleWishlistVisit}
               refreshKey={profileRefreshKey}
+              onProfileUpdated={setProfile}
             />
           )}
           {screen === 'profile' && isGuest && (

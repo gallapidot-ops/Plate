@@ -63,6 +63,19 @@ export async function createProfile({ id, email, username, home_city, privacy_le
   return { id: resolvedId, name: username, email, username, home_city, privacy_level, avatar_url }
 }
 
+export async function updateProfile({ id, username, home_city, privacy_level, avatar_url }) {
+  const updates = {
+    name:          username,
+    username,
+    home_city:     home_city     ?? null,
+    privacy_level: privacy_level ?? 'public',
+  }
+  if (avatar_url !== undefined) updates.avatar_url = avatar_url
+
+  const { error } = await supabase.from('users').update(updates).eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
 /* ── Avatar storage ─────────────────────────────────────────────── */
 
 export async function uploadAvatar(userId, file) {

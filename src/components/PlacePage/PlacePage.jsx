@@ -330,7 +330,7 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
                       key={cat.key}
                       label={cat.label}
                       optionLabel={cat.optionLabel}
-                      value={cat.value}
+                      value={cat.score}
                       max={cat.max}
                     />
                   ))}

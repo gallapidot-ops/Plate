@@ -414,7 +414,7 @@ function StepVisit({ date, onDate, isRegular, onIsRegular, with_, onWith, price,
             <button
               key={p.id}
               className={`ap-chip ap-chip--sm ap-chip--price${price === p.id ? ' ap-chip--on' : ''}`}
-              onClick={() => onPrice(prev => prev === p.id ? null : p.id)}
+              onClick={() => onPrice(price === p.id ? null : p.id)}
             >
               {p.label}
             </button>
@@ -476,8 +476,20 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
     if (!allRated && phase !== 'idle') setPhase('idle')
   }, [allRated]) // eslint-disable-line
 
-  function toggleTag(id) {
-    onTags(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  const [customTagInput, setCustomTagInput] = useState('')
+
+  // Tags are stored as label strings (e.g. "Kosher", "Rooftop")
+  function toggleTag(label) {
+    onTags(prev => prev.includes(label) ? prev.filter(x => x !== label) : [...prev, label])
+  }
+
+  function handleCustomTagKey(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const val = customTagInput.trim()
+      if (val && !tags.includes(val)) onTags(prev => [...prev, val])
+      setCustomTagInput('')
+    }
   }
 
   return (
@@ -537,13 +549,30 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
               {TAGS.map(tag => (
                 <button
                   key={tag.id}
-                  className={`ap-chip ap-chip--sm${tags.includes(tag.id) ? ' ap-chip--on' : ''}`}
-                  onClick={() => toggleTag(tag.id)}
+                  className={`ap-chip ap-chip--sm${tags.includes(tag.label) ? ' ap-chip--on' : ''}`}
+                  onClick={() => toggleTag(tag.label)}
                 >
                   {tag.label}
                 </button>
               ))}
+              {/* Custom tags added by user */}
+              {tags.filter(t => !TAGS.some(st => st.label === t) && !['₪','₪₪','₪₪₪','₪₪₪₪'].includes(t)).map(t => (
+                <button
+                  key={t}
+                  className="ap-chip ap-chip--sm ap-chip--on"
+                  onClick={() => onTags(prev => prev.filter(x => x !== t))}
+                >
+                  {t} ×
+                </button>
+              ))}
             </div>
+            <input
+              className="ap-custom-tag-input"
+              placeholder="Add custom tag, press Enter"
+              value={customTagInput}
+              onChange={e => setCustomTagInput(e.target.value)}
+              onKeyDown={handleCustomTagKey}
+            />
           </div>
           <button className="ap-save-btn btn-primary" onClick={onSave}>Save to Plate</button>
         </div>
@@ -670,6 +699,17 @@ export default function AddPlace({ onSaved, prefill = null }) {
   function updateRating(key, val) { setRating(prev => ({ ...prev, [key]: val })) }
   const score = computeScore(rating, mealType)
 
+  // Keep price tag in sync: auto-add/replace ₪ tag when price changes
+  const PRICE_TAGS = ['₪', '₪₪', '₪₪₪', '₪₪₪₪']
+  const PRICE_TAG_MAP = { '1': '₪', '2': '₪₪', '3': '₪₪₪', '4': '₪₪₪₪' }
+  function handlePriceChange(newPrice) {
+    setPrice(newPrice)
+    setTags(prev => {
+      const withoutPrice = prev.filter(t => !PRICE_TAGS.includes(t))
+      return newPrice ? [...withoutPrice, PRICE_TAG_MAP[newPrice]] : withoutPrice
+    })
+  }
+
   // Called when user taps "שמרי ב-Plate" – kick off save immediately,
   // then show the animation while the network request is in-flight.
   function handleStartSave() {
@@ -782,7 +822,7 @@ export default function AddPlace({ onSaved, prefill = null }) {
             date={date}           onDate={setDate}
             isRegular={isRegular} onIsRegular={setIsRegular}
             with_={with_}         onWith={setWith}
-            price={price}         onPrice={setPrice}
+            price={price}         onPrice={handlePriceChange}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
           />
