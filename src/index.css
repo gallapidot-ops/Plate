@@ -1,32 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400&display=swap');
 
 /* ─────────────────────────────────────────
    Global design tokens
 ───────────────────────────────────────── */
 :root {
   /* Colors */
-  --color-bg:            #F5F2EE;
-  --color-accent:        #8B3A62;
-  --color-accent-light:  #C98AAD;
-  --color-surface:       #F5E8EF;
-  --color-dark:          #2E0F20;
+  --color-bg:              #F7F4EF;
+  --color-surface:         #EFECE6;
+  --color-accent:          #8B3A62;
+  --color-accent-light:    #C98AAD;
+  --color-text-primary:    #1A1017;
+  --color-text-secondary:  #8A7A85;
+  --color-border:          rgba(139, 58, 98, 0.12);
 
-  /* Derived / utility */
-  --color-accent-pale:   rgba(139, 58, 98, 0.10);
-  --color-border:        rgba(139, 58, 98, 0.18);
-  --color-border-light:  rgba(46, 15, 32, 0.10);
-  --color-text:          #2E0F20;
-  --color-text-soft:     rgba(46, 15, 32, 0.55);
-  --color-text-muted:    rgba(46, 15, 32, 0.38);
+  /* Derived / legacy aliases kept for backward compat */
+  --color-dark:            #1A1017;
+  --color-text:            #1A1017;
+  --color-text-soft:       #8A7A85;
+  --color-text-muted:      rgba(138, 122, 133, 0.75);
+  --color-accent-pale:     rgba(139, 58, 98, 0.08);
+  --color-border-light:    rgba(139, 58, 98, 0.10);
 
   /* Typography */
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans:  'Inter', system-ui, sans-serif;
 
   /* Misc */
-  --radius:    3px;
-  --radius-md: 8px;
-  --shadow:    0 1px 4px rgba(46,15,32,0.07), 0 4px 16px rgba(46,15,32,0.05);
+  --radius:    50px;
+  --radius-md: 12px;
+  --shadow:    4px 4px 12px rgba(0,0,0,0.07), -2px -2px 6px rgba(255,255,255,0.85);
+  --shadow-inset: inset 2px 2px 6px rgba(0,0,0,0.07), inset -2px -2px 4px rgba(255,255,255,0.7);
 }
 
 *, *::before, *::after {
@@ -38,10 +41,157 @@ body {
   padding: 0;
   background: var(--color-bg);
   font-family: var(--font-sans);
-  color: var(--color-text);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
   -webkit-font-smoothing: antialiased;
 }
 
 #root {
   min-height: 100svh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+/* ── Global utility classes ── */
+
+/* Primary button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.12s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-light);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-inset);
+}
+
+.btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Ghost / secondary button */
+.btn-ghost,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 50px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.btn-ghost:hover,
+.btn-secondary:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent-light);
+}
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: none;
+  border-radius: 50px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1;
+}
+
+.chip:hover {
+  color: var(--color-accent);
+  background: rgba(139,58,98,0.08);
+}
+
+.chip--active {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.chip--sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Field label */
+.field-label {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  font-weight: 400;
+  font-family: var(--font-sans);
+}
+
+/* Field input */
+.field-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  font-size: 15px;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  -webkit-appearance: none;
+}
+
+.field-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(139,58,98,0.08);
+}
+
+.field-input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.field-group {
+  margin-bottom: 24px;
 }

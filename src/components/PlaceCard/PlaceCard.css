@@ -1,29 +1,33 @@
 .pc-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   width: 100%;
-  padding: 12px 16px;
-  background: #fff;
+  padding: 16px 20px;
+  background: var(--color-surface);
   border: none;
-  border-bottom: 1px solid var(--color-border-light);
+  border-radius: 20px;
   cursor: pointer;
   text-align: right;
   font-family: var(--font-sans);
-  min-height: 72px;
-  transition: background 0.15s;
+  min-height: 80px;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
 }
 
 .pc-row:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .pc-row:hover {
-  background: var(--color-surface);
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 16px rgba(0,0,0,0.09), -2px -2px 8px rgba(255,255,255,0.9);
 }
 
 .pc-row:active {
-  background: var(--color-accent-pale);
+  box-shadow: var(--shadow-inset);
+  transform: translateY(0);
 }
 
 /* ── Thumbnail ── */
@@ -32,9 +36,9 @@
 }
 
 .pc-thumb {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   object-fit: cover;
   display: block;
 }
@@ -45,6 +49,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-accent-light);
+  border-radius: 12px;
 }
 
 /* ── Body ── */
@@ -53,7 +58,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .pc-meta {
@@ -74,7 +79,7 @@
   font-family: var(--font-serif);
   font-size: 16px;
   font-weight: 500;
-  color: var(--color-dark);
+  color: var(--color-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -90,7 +95,7 @@
 
 .pc-score-val {
   font-family: var(--font-serif);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--color-accent);
   line-height: 1;
@@ -98,31 +103,32 @@
 
 .pc-score-max {
   font-size: 10px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .pc-sub {
   font-size: 11px;
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
   line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .pc-tags {
   display: flex;
   flex-wrap: nowrap;
-  gap: 4px;
+  gap: 5px;
   overflow: hidden;
 }
 
 .pc-tag {
   font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 8px;
-  background: var(--color-surface);
+  padding: 3px 10px;
+  border-radius: 50px;
+  background: rgba(139,58,98,0.07);
   color: var(--color-accent);
-  border: 1px solid rgba(139,58,98,0.13);
   white-space: nowrap;
   flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
 
 /* ── Right slot ── */
@@ -133,6 +139,6 @@
 /* ── Chevron ── */
 .pc-chevron {
   flex-shrink: 0;
-  color: var(--color-text-muted);
-  opacity: 0.5;
+  color: var(--color-text-secondary);
+  opacity: 0.4;
 }
