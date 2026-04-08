@@ -11,20 +11,20 @@
 /* ── Header — logo, never scrolls ── */
 .home-header {
   flex-shrink: 0;
-  padding: 18px 24px 10px;
+  padding: 14px 24px 10px;
   display: flex;
   justify-content: center;
 }
 
 /* ════════════════════════════════════════
-   PLATE LOGO — horizontal layout
+   PLATE LOGO — compact nav strip
    Left: bars + baseline  |  Right: PLATE + tagline
 ════════════════════════════════════════ */
 .plate-logo-bare {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 14px;
+  gap: 9px;
 }
 
 /* Left column: bars stacked above baseline */
@@ -37,8 +37,8 @@
 .plate-bars-svg {
   display: block;
   overflow: visible;
-  width: 46px;   /* 93 × (46/93) → preserves viewBox aspect */
-  height: 52px;  /* 105 × (46/93) ≈ 52 */
+  width: 26px;
+  height: 30px;
 }
 
 .plate-bar {
@@ -58,33 +58,32 @@
   to   { transform: scaleY(1); }
 }
 
-/* Baseline: sits 8px below bars, full width of bars SVG */
+/* Baseline: sits below bars, full width of bars SVG */
 .plate-baseline {
-  width: 100%;   /* stretches to .plate-logo-mark width = SVG width */
-  height: 1.5px;
+  width: 100%;
+  height: 1px;
   background: #3D4F7C;
   opacity: 0;
-  margin-top: 8px;
+  margin-top: 4px;
   animation: plate-fade-up 0.4s ease-out 0.70s forwards;
 }
 
-/* Right column: wordmark + tagline anchored to the bottom of the bars */
+/* Right column: wordmark + tagline */
 .plate-logo-text {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* pushes text down toward baseline of bars */
-  gap: 5px;
-  padding-bottom: 2px;       /* tiny lift off the very bottom edge */
+  justify-content: center;
+  gap: 1px;
 }
 
 /* ── Wordmark ── */
 .plate-wordmark {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 27px;
+  font-size: 15px;
   font-weight: 400;
-  letter-spacing: 7px;
+  letter-spacing: 5px;
   color: #3D4F7C;
-  text-indent: 7px;
+  text-indent: 5px;
   line-height: 1;
   opacity: 0;
   animation: plate-fade-up 0.5s ease-out 0.85s forwards;
@@ -93,11 +92,11 @@
 /* ── Tagline ── */
 .plate-tagline {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 400;
-  letter-spacing: 1.2px;     /* tighter than before (was 2.5px) */
+  letter-spacing: 1px;
   color: #8A7A85;
-  text-indent: 1.2px;
+  text-indent: 1px;
   opacity: 0;
   animation: plate-fade-up 0.5s ease-out 1.10s forwards;
 }
@@ -133,14 +132,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   position: relative;
 }
 
 .exp-label-editorial {
   font-family: 'Playfair Display', serif;
   font-style: italic;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   letter-spacing: 2px;
   color: var(--color-text-secondary);
@@ -212,7 +211,7 @@
 /* ── Meal type strip ── */
 .meal-strip-wrap {
   position: relative;
-  margin: 0 -20px;
+  margin: 0 -24px 20px;
 }
 
 .meal-strip {
@@ -220,7 +219,7 @@
   gap: 10px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 6px 24px 10px 20px; /* right 24px ensures last card is fully visible */
+  padding: 6px 24px 10px 24px;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
@@ -353,7 +352,7 @@
 
 /* ── Sections ── */
 .home-section {
-  padding: 0 24px 12px;
+  padding: 8px 24px 16px;
 }
 
 /* ── Location ── */

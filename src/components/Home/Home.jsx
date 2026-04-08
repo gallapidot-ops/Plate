@@ -436,12 +436,12 @@ export default function Home({ onSearch }) {
             {/* Core Experience */}
             <div className="home-section">
               <div className="exp-label-row">
-                <span className="exp-label-editorial">Core Experience</span>
                 <button
                   className="exp-info-dot"
                   onClick={() => setExpTooltip(t => !t)}
                   aria-label="What is Core Experience?"
                 >●</button>
+                <span className="exp-label-editorial">Core Experience</span>
                 {expTooltip && (
                   <div className="exp-tooltip" role="tooltip">
                     The mood and purpose of your visit — not just what you eat, but how you want to feel.
