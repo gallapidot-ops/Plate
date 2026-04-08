@@ -48,24 +48,21 @@
 }
 
 .ah-wordmark {
-  font-family: var(--font-logo);
+  font-family: 'Nunito', sans-serif;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 900;
   letter-spacing: 4px;
   color: var(--color-surface);
   text-indent: 4px;
   line-height: 1;
-  transform: scaleX(0.92);
-  display: inline-block;
-  transform-origin: left center;
 }
 
 .ah-tagline {
   font-family: 'Nunito', sans-serif;
-  font-size: 7.5px;
+  font-size: 7px;
   font-weight: 700;
   letter-spacing: 1.5px;
-  color: rgba(245, 239, 226, 0.6);
+  color: rgba(245, 239, 226, 0.55);
   text-indent: 1px;
 }
 

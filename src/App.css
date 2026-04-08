@@ -180,24 +180,22 @@
 }
 
 .splash-wordmark {
-  font-family: var(--font-logo);
+  font-family: 'Nunito', sans-serif;
   font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 8px;
+  font-weight: 900;
+  letter-spacing: 4px;
   color: #1A1A2E;
-  text-indent: 8px;
+  text-indent: 4px;
   line-height: 1;
-  transform: scaleX(0.91);
-  display: inline-block;
   opacity: 0;
   animation: splash-fade-up 0.5s ease-out 0.85s forwards;
 }
 
 .splash-tagline {
-  font-family: 'Nunito', -apple-system, sans-serif;
-  font-size: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   color: var(--color-accent);
   text-indent: 3px;
   opacity: 0;
