@@ -52,6 +52,22 @@ const RESERVATIONS = [
   { id: 'required', label: 'Reservation required'     },
 ]
 
+function PlateLogo() {
+  return (
+    <div className="plate-logo">
+      <div className="plate-logo-bars">
+        <div className="plate-bar plate-bar--1" />
+        <div className="plate-bar plate-bar--2" />
+        <div className="plate-bar plate-bar--3" />
+        <div className="plate-bar plate-bar--4" />
+      </div>
+      <div className="plate-logo-baseline" />
+      <div className="plate-logo-wordmark">PLATE</div>
+      <div className="plate-logo-tagline">discover · rate · share</div>
+    </div>
+  )
+}
+
 function MealCard({ item, active, onClick }) {
   const { Icon } = item
   return (
@@ -373,10 +389,7 @@ export default function Home({ onSearch }) {
     <div className="home">
       {/* Header */}
       <div className="home-header">
-        <h1 className="home-title">
-          <span className="home-title-plate">Plate</span>
-        </h1>
-        <p className="home-subtitle">Where are we going today?</p>
+        <PlateLogo />
       </div>
 
       {/* Sub-tabs */}
