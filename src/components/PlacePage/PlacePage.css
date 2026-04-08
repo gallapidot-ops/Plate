@@ -81,6 +81,8 @@
 
 .pp-hero-btn--fav-active:hover { background: var(--color-accent-light); }
 
+.pp-hero-btn--delete:hover { background: rgba(192,57,43,0.18); color: #C0392B; }
+
 /* ── Hero info (bottom of hero) ── */
 .pp-hero-info {
   position: absolute;

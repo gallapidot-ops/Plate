@@ -7,7 +7,7 @@ import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
 import {
   getMyPlaces, getPlacesByUser, getWishlist, removeFromWishlist,
   getFollowCounts, getFollowStatus, followUser, unfollowUser,
-  sendFollowRequest, cancelFollowRequest, deletePlace,
+  sendFollowRequest, cancelFollowRequest,
 } from '../../lib/db'
 import { signOut } from '../../lib/auth'
 import PlaceCard from '../PlaceCard/PlaceCard'
@@ -312,7 +312,7 @@ function WishlistCard({ item, onOpenPlace, onRemove, onVisit }) {
 }
 
 /* ── Main ── */
-export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null, onGuestAction = null }) {
+export default function Profile({ onOpenPlace, currentProfile, viewedProfile = null, onBack = null, onWishlistVisit = null, onGuestAction = null, refreshKey = 0 }) {
   const isViewMode = !!viewedProfile
   const displayProfile = isViewMode ? viewedProfile : currentProfile
 
@@ -372,7 +372,7 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
     }
     load()
     return () => { cancelled = true }
-  }, [displayProfile?.id, isViewMode])
+  }, [displayProfile?.id, isViewMode, refreshKey])
 
   /* ── Follow actions (view mode) ── */
   async function handleFollow() {
@@ -415,20 +415,6 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
       setWishlist(prev => prev.filter(item => item.id !== placeId))
     } catch (e) {
       console.error('[Profile] removeFromWishlist:', e)
-    }
-  }
-
-  async function handleDeletePlace(e, placeId) {
-    e.stopPropagation()
-    if (!window.confirm('Delete this place from your list?')) return
-    setPlaces(prev => prev.filter(p => p.id !== placeId))
-    try {
-      await deletePlace(placeId)
-    } catch (err) {
-      console.error('[Profile] deletePlace:', err)
-      // Reload to restore correct state on failure
-      const fresh = await getMyPlaces()
-      setPlaces(fresh)
     }
   }
 
@@ -676,47 +662,32 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             ) : (
               <div className="pf-recent-list">
                 {filteredRecent.map(p => (
-                  <div key={p.id} className="pf-visit-row">
-                    <button
-                      className="pf-visit-card"
-                      onClick={() => onOpenPlace?.(p)}
-                    >
-                      <span className="pf-visit-name">
-                        {p.name}
-                        {p.is_regular && (
-                          <svg className="pf-visit-regular-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
-                            <path d="M17 1l4 4-4 4"/>
-                            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                            <path d="M7 23l-4-4 4-4"/>
-                            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                          </svg>
-                        )}
-                      </span>
-                      <div className="pf-visit-meta-row">
-                        <span className="pf-visit-score">
-                          <span className="pf-visit-score-val">{p.computed_score}</span>
-                          <span className="pf-visit-score-max">/25</span>
-                        </span>
-                        {p.last_visited && (
-                          <span className="pf-visit-date">{formatVisitDate(p.last_visited)}</span>
-                        )}
-                      </div>
-                    </button>
-                    {!isViewMode && (
-                      <button
-                        className="pf-visit-delete"
-                        onClick={e => handleDeletePlace(e, p.id)}
-                        aria-label="Delete place"
-                      >
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6"/>
-                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                          <path d="M10 11v6M14 11v6"/>
-                          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  <button
+                    key={p.id}
+                    className="pf-visit-card"
+                    onClick={() => onOpenPlace?.(p)}
+                  >
+                    <span className="pf-visit-name">
+                      {p.name}
+                      {p.is_regular && (
+                        <svg className="pf-visit-regular-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
+                          <path d="M17 1l4 4-4 4"/>
+                          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                          <path d="M7 23l-4-4 4-4"/>
+                          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                         </svg>
-                      </button>
-                    )}
-                  </div>
+                      )}
+                    </span>
+                    <div className="pf-visit-meta-row">
+                      <span className="pf-visit-score">
+                        <span className="pf-visit-score-val">{p.computed_score}</span>
+                        <span className="pf-visit-score-max">/25</span>
+                      </span>
+                      {p.last_visited && (
+                        <span className="pf-visit-date">{formatVisitDate(p.last_visited)}</span>
+                      )}
+                    </div>
+                  </button>
                 ))}
               </div>
             )}

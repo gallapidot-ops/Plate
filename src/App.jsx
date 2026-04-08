@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase }       from './lib/supabase'
 import { getProfile }     from './lib/auth'
-import { getPendingRequestCount, removeFromWishlist } from './lib/db'
+import { getPendingRequestCount, removeFromWishlist, deletePlace } from './lib/db'
 import Auth               from './components/Auth/Auth'
 import ProfileSetup       from './components/ProfileSetup/ProfileSetup'
 import Home               from './components/Home/Home'
@@ -104,7 +104,8 @@ export default function App() {
   const [showSwipe,      setShowSwipe]      = useState(false)
   const [viewingUserId,  setViewingUserId]  = useState(null) // UserProfile overlay
   const [notifCount,     setNotifCount]     = useState(0)
-  const [addPrefill,     setAddPrefill]     = useState(null) // prefill data for AddPlace
+  const [addPrefill,        setAddPrefill]        = useState(null) // prefill data for AddPlace
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0)
   const [showSplash,     setShowSplash]     = useState(
     () => !sessionStorage.getItem('plate_splash_shown')
   )
@@ -172,6 +173,19 @@ export default function App() {
   function handleWishlistVisit(wishlistItem) {
     setAddPrefill({ place: wishlistItem, wishlistPlaceId: wishlistItem.id })
     setScreen('add')
+  }
+
+  // Delete a place from PlacePage
+  async function handleDeletePlace(placeId) {
+    if (!window.confirm('Delete this place from your list?')) return
+    setSelectedPlace(null)
+    try {
+      await deletePlace(placeId)
+      setProfileRefreshKey(k => k + 1)
+    } catch (e) {
+      console.error('[App] deletePlace:', e)
+      alert(`Could not delete: ${e.message}`)
+    }
   }
 
   // Edit an existing saved place
@@ -251,6 +265,7 @@ export default function App() {
               place={selectedPlace}
               onBack={() => setSelectedPlace(null)}
               onEdit={isGuest ? undefined : handleEditPlace}
+              onDelete={isGuest ? undefined : handleDeletePlace}
             />
           </div>
         )}
@@ -300,6 +315,7 @@ export default function App() {
               onOpenPlace={setSelectedPlace}
               currentProfile={profile}
               onWishlistVisit={handleWishlistVisit}
+              refreshKey={profileRefreshKey}
             />
           )}
           {screen === 'profile' && isGuest && (
