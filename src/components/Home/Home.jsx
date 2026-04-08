@@ -1,31 +1,24 @@
 import { useState, useRef } from 'react'
-import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
+import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, Wine, GlassWater, UtensilsCrossed } from 'lucide-react'
 import { addPlaceToWishlist } from '../../lib/db'
 import './Home.css'
 
-const EXPERIENCE_CARDS = [
-  { id: 'quick_light',     label: 'Quick & Light',      Icon: Zap             },
-  { id: 'catchup',         label: 'Catch-up / Hangout', Icon: MessageCircle   },
-  { id: 'shared_table',    label: 'Shared Table',        Icon: UtensilsCrossed },
-  { id: 'full_experience', label: 'Full Experience',     Icon: Sparkles        },
-]
-
 const MEAL_TYPES = [
-  { id: 'cafe',       label: 'Café',       img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80' },
-  { id: 'bakery',     label: 'Bakery',     img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&q=80' },
-  { id: 'deli',       label: 'Deli',       img: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80' },
-  { id: 'brunch',     label: 'Brunch',     img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80' },
-  { id: 'lunch',      label: 'Lunch',      img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80' },
-  { id: 'happy_hour', label: 'Happy Hour', img: 'https://images.unsplash.com/photo-1575023782549-62ca0d244b39?w=800&q=80' },
-  { id: 'dinner',     label: 'Dinner',     img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80' },
-  { id: 'drinks',     label: 'Drinks',     img: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=800&q=80' },
+  { id: 'cafe',       label: 'Café',        Icon: Coffee          },
+  { id: 'bakery',     label: 'Bakery',      Icon: Croissant       },
+  { id: 'deli',       label: 'Deli',        Icon: UtensilsCrossed },
+  { id: 'brunch',     label: 'Brunch',      Icon: Sunrise         },
+  { id: 'lunch',      label: 'Lunch',       Icon: Sun             },
+  { id: 'happy_hour', label: 'Happy Hour',  Icon: Wine            },
+  { id: 'dinner',     label: 'Dinner',      Icon: Moon            },
+  { id: 'drinks',     label: 'Drinks',      Icon: GlassWater      },
 ]
 
 const EXPERIENCES = [
-  { id: 'quick_light',     label: 'Quick & Light'      },
-  { id: 'catchup',         label: 'Catch-up / Hangout' },
-  { id: 'shared_table',    label: 'Shared Table'        },
-  { id: 'full_experience', label: 'Full Experience'     },
+  { id: 'quick_light',     label: 'Quick & Light',      Icon: Zap           },
+  { id: 'catchup',         label: 'Catch-up / Hangout', Icon: MessageCircle },
+  { id: 'shared_table',    label: 'Shared Table',        Icon: Users         },
+  { id: 'full_experience', label: 'Full Experience',     Icon: Star          },
 ]
 
 const TAGS = [
@@ -60,6 +53,7 @@ const RESERVATIONS = [
 ]
 
 function MealCard({ item, active, onClick }) {
+  const { Icon } = item
   return (
     <div
       className={`meal-card ${active ? 'meal-card--active' : ''}`}
@@ -68,6 +62,7 @@ function MealCard({ item, active, onClick }) {
       tabIndex={0}
       onKeyDown={e => e.key === 'Enter' && onClick()}
     >
+      <Icon size={20} strokeWidth={1.5} className="meal-card-icon" />
       <span className="meal-card-label">{item.label}</span>
     </div>
   )
@@ -434,7 +429,7 @@ export default function Home({ onSearch }) {
         <label className="field-label">Core Experience</label>
         <div className="exp-strip-wrap">
           <div className="exp-strip">
-            {EXPERIENCES.map(({ id, label }) => (
+            {EXPERIENCES.map(({ id, label, Icon }) => (
               <div
                 key={id}
                 className={`exp-card${filters.experience === id ? ' exp-card--active' : ''}`}
@@ -443,6 +438,7 @@ export default function Home({ onSearch }) {
                 onClick={() => setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
                 onKeyDown={e => e.key === 'Enter' && setFilters(f => ({ ...f, experience: f.experience === id ? null : id }))}
               >
+                <Icon size={20} strokeWidth={1.5} className="exp-card-icon" />
                 <span className="exp-card-label">{label}</span>
               </div>
             ))}
