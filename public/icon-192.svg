@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
   <rect width="192" height="192" rx="36" fill="#E8527A"/>
-  <circle cx="96" cy="96" r="82" stroke="#F5EFE2" stroke-width="10" fill="#1A1A2E"/>
+  <circle cx="96" cy="96" r="82" stroke="#F5EFE2" stroke-width="10" fill="#E8527A"/>
   <text x="96" y="91" text-anchor="middle" font-family="Nunito, Arial Black, sans-serif" font-weight="900" font-size="34" fill="#F5EFE2" letter-spacing="4">PLATE</text>
   <path d="M 66 110 Q 96 136 126 110" stroke="#F5EFE2" stroke-width="8" stroke-linecap="round" fill="none"/>
 </svg>
