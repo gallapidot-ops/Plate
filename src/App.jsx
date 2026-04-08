@@ -1,9 +1,13 @@
-import { useState } from 'react'
-import Home      from './components/Home/Home'
-import AddPlace  from './components/AddPlace/AddPlace'
-import Profile   from './components/Profile/Profile'
-import Swipe     from './components/Swipe/Swipe'
-import PlacePage from './components/PlacePage/PlacePage'
+import { useState, useEffect } from 'react'
+import { supabase }    from './lib/supabase'
+import { getProfile }  from './lib/auth'
+import Auth            from './components/Auth/Auth'
+import ProfileSetup    from './components/ProfileSetup/ProfileSetup'
+import Home            from './components/Home/Home'
+import AddPlace        from './components/AddPlace/AddPlace'
+import Profile         from './components/Profile/Profile'
+import Swipe           from './components/Swipe/Swipe'
+import PlacePage       from './components/PlacePage/PlacePage'
 import './App.css'
 
 const NAV = [
@@ -22,10 +26,53 @@ const NAV = [
 ]
 
 export default function App() {
-  const [screen,        setScreen]        = useState('home')
-  const [selectedPlace, setSelectedPlace] = useState(null)
-  const [showSwipe,     setShowSwipe]     = useState(false)
+  // undefined = still loading, null = not logged in, object = logged in
+  const [authUser,       setAuthUser]       = useState(undefined)
+  const [profile,        setProfile]        = useState(null)
+  const [screen,         setScreen]         = useState('home')
+  const [selectedPlace,  setSelectedPlace]  = useState(null)
+  const [showSwipe,      setShowSwipe]      = useState(false)
 
+  useEffect(() => {
+    // Check existing session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user ?? null
+      setAuthUser(user)
+      if (user) getProfile(user.id).then(p => setProfile(p))
+    })
+
+    // Listen for login / logout / token refresh
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user ?? null
+      setAuthUser(user)
+      if (user) getProfile(user.id).then(p => setProfile(p))
+      else      setProfile(null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  /* ── Loading splash ── */
+  if (authUser === undefined) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100svh', background: 'var(--color-bg)',
+        fontFamily: 'var(--font-serif)', fontSize: 42, fontStyle: 'italic',
+        fontWeight: 600, color: 'var(--color-accent)', letterSpacing: -1,
+      }}>
+        Plate
+      </div>
+    )
+  }
+
+  /* ── Not logged in ── */
+  if (!authUser) return <Auth />
+
+  /* ── Logged in but no profile yet ── */
+  if (!profile) return <ProfileSetup user={authUser} onCreated={setProfile} />
+
+  /* ── Main app ── */
   return (
     <div className="app-shell">
 
@@ -47,10 +94,10 @@ export default function App() {
       <div className="app-content">
         {screen === 'home'    && <Home onSearch={() => {}} />}
         {screen === 'add'     && <AddPlace onSaved={() => setScreen('home')} />}
-        {screen === 'profile' && <Profile onOpenPlace={setSelectedPlace} />}
+        {screen === 'profile' && <Profile onOpenPlace={setSelectedPlace} currentProfile={profile} />}
       </div>
 
-      {/* ── Bottom nav (hidden when overlay is open) ── */}
+      {/* ── Bottom nav ── */}
       {!selectedPlace && !showSwipe && (
         <nav className="bottom-nav" dir="rtl">
           {NAV.map(item => (

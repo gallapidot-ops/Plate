@@ -6,7 +6,6 @@
 const KEY      = import.meta.env.VITE_GOOGLE_PLACES_KEY
 const BASE     = 'https://places.googleapis.com/v1'
 
-console.log('[places] API key loaded:', KEY ? `${KEY.slice(0, 8)}...` : '❌ MISSING')
 
 /* ── Autocomplete ─────────────────────────────────────────────────────
    Returns [{ placeId, name, address, mainText, secondaryText }]
@@ -30,16 +29,12 @@ export async function autocomplete(query) {
     }),
   })
 
-  console.log('[places] autocomplete request sent for:', query)
-
   if (!res.ok) {
-    const errText = await res.text()
-    console.error('[places] autocomplete error:', res.status, errText)
+    console.error('[places] autocomplete error:', res.status, await res.text())
     return []
   }
 
   const json = await res.json()
-  console.log('[places] autocomplete raw response:', json)
 
   return (json.suggestions ?? []).map(s => {
     const p = s.placePrediction
@@ -51,6 +46,33 @@ export async function autocomplete(query) {
       secondaryText: p.structuredFormat?.secondaryText?.text ?? '',
     }
   })
+}
+
+/* ── City Autocomplete ────────────────────────────────────────────────
+   Returns [{ placeId, name }] — cities only
+─────────────────────────────────────────────────────────────────────── */
+export async function autocompleteCity(query) {
+  if (!query || query.length < 2) return []
+
+  const res = await fetch(`${BASE}/places:autocomplete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': KEY },
+    body: JSON.stringify({
+      input:               query,
+      languageCode:        'he',
+      includedPrimaryTypes: ['locality'],
+    }),
+  })
+
+  if (!res.ok) return []
+
+  const json = await res.json()
+  return (json.suggestions ?? []).map(s => ({
+    placeId: s.placePrediction.placeId,
+    name:    s.placePrediction.structuredFormat?.mainText?.text
+          ?? s.placePrediction.text?.text
+          ?? '',
+  }))
 }
 
 /* ── Place Details ────────────────────────────────────────────────────

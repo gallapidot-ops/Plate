@@ -1,3 +1,6 @@
+# Claude Code local settings
+.claude/settings.json
+
 # Environment variables (never commit API keys)
 .env
 .env.local

@@ -1,16 +1,17 @@
 import { supabase } from './supabase'
 
-/* ── Dev user (seeded in migration) ─────────────────────── */
-export const DEV_USER_ID = '00000000-0000-0000-0000-000000000001'
+/* ── Current user ID (falls back to dev seed if not logged in) ───── */
+const DEV_USER_ID = '00000000-0000-0000-0000-000000000001'
+
+async function getUserId() {
+  const { data: { user } } = await supabase.auth.getUser()
+  return user?.id ?? DEV_USER_ID
+}
 
 /* ═══════════════════════════════════════════════════════════
    PLACES
 ═══════════════════════════════════════════════════════════ */
 
-/**
- * Save a new place visit + ratings to Supabase.
- * Returns the saved place row, or throws on failure.
- */
 export async function savePlace(placeData) {
   const {
     name, address, photo_url,
@@ -20,35 +21,34 @@ export async function savePlace(placeData) {
     placeId, lat, lng, website,
   } = placeData
 
+  const userId          = await getUserId()
   const primaryMealType = meal_types?.[0] ?? null
 
-  // 1. Insert place row
   const { data: place, error: placeErr } = await supabase
     .from('places')
     .insert({
       name,
-      address:          address          ?? null,
-      photo_url:        photo_url        ?? null,
-      personal_note:    personal_note    ?? null,
-      is_regular:       !!is_regular,
+      address:         address         ?? null,
+      photo_url:       photo_url       ?? null,
+      personal_note:   personal_note   ?? null,
+      is_regular:      !!is_regular,
       last_visited: is_regular
         ? null
         : (last_visited || new Date().toISOString().split('T')[0]),
-      google_place_id:  placeId          ?? null,
-      lat:              lat              ?? null,
-      lng:              lng              ?? null,
-      website:          website          ?? null,
-      created_by: DEV_USER_ID,
+      google_place_id: placeId         ?? null,
+      lat:             lat             ?? null,
+      lng:             lng             ?? null,
+      website:         website         ?? null,
+      created_by:      userId,
     })
     .select()
     .single()
 
   if (placeErr) throw new Error(`places insert: ${placeErr.message}`)
 
-  // 2. Insert one rating row per meal type
   const ratingRows = (meal_types ?? []).filter(Boolean).map(mt => ({
     place_id:        place.id,
-    user_id:         DEV_USER_ID,
+    user_id:         userId,
     meal_type:       mt,
     experience_type: experience_type ?? null,
     taste:           ratings?.[mt]?.taste     ?? null,
@@ -61,21 +61,16 @@ export async function savePlace(placeData) {
   }))
 
   if (ratingRows.length > 0) {
-    const { error: ratingErr } = await supabase
-      .from('place_ratings')
-      .insert(ratingRows)
-
+    const { error: ratingErr } = await supabase.from('place_ratings').insert(ratingRows)
     if (ratingErr) throw new Error(`place_ratings insert: ${ratingErr.message}`)
   }
 
   return place
 }
 
-/**
- * Fetch the current user's saved places with their ratings.
- * Returns [] if nothing saved yet.
- */
 export async function getMyPlaces() {
+  const userId = await getUserId()
+
   const { data, error } = await supabase
     .from('places')
     .select(`
@@ -85,13 +80,10 @@ export async function getMyPlaces() {
         taste, spread, aesthetic, service, tags, price
       )
     `)
-    .eq('created_by', DEV_USER_ID)
+    .eq('created_by', userId)
     .order('last_visited', { ascending: false, nullsFirst: false })
 
-  if (error) {
-    console.error('[db] getMyPlaces:', error.message)
-    return []
-  }
+  if (error) { console.error('[db] getMyPlaces:', error.message); return [] }
 
   return (data ?? []).map(p => ({
     ...p,
@@ -111,24 +103,19 @@ export async function getMyPlaces() {
    WISHLIST
 ═══════════════════════════════════════════════════════════ */
 
-/**
- * Fetch the current user's wishlist.
- * Returns [] if empty.
- */
 export async function getWishlist() {
+  const userId = await getUserId()
+
   const { data, error } = await supabase
     .from('wishlists')
     .select(`
       added_from, added_note, priority, saved_at,
       places ( id, name, address, photo_url, meal_types_cache:place_ratings(meal_type) )
     `)
-    .eq('user_id', DEV_USER_ID)
+    .eq('user_id', userId)
     .order('saved_at', { ascending: false })
 
-  if (error) {
-    console.error('[db] getWishlist:', error.message)
-    return []
-  }
+  if (error) { console.error('[db] getWishlist:', error.message); return [] }
 
   return (data ?? []).map(w => ({
     ...w.places,
@@ -140,29 +127,23 @@ export async function getWishlist() {
   }))
 }
 
-/**
- * Add a place (by known place_id) to wishlist.
- */
 export async function addToWishlist(placeId, opts = {}) {
-  const { error } = await supabase
-    .from('wishlists')
-    .upsert({
-      user_id:    DEV_USER_ID,
-      place_id:   placeId,
-      added_from: opts.added_from ?? 'גילוי',
-      added_note: opts.added_note ?? null,
-      priority:   opts.priority   ?? 'medium',
-    })
+  const userId = await getUserId()
+
+  const { error } = await supabase.from('wishlists').upsert({
+    user_id:    userId,
+    place_id:   placeId,
+    added_from: opts.added_from ?? 'גילוי',
+    added_note: opts.added_note ?? null,
+    priority:   opts.priority   ?? 'medium',
+  })
 
   if (error) throw new Error(`addToWishlist: ${error.message}`)
 }
 
-/**
- * Save a place stub + add it to wishlist in one call.
- * Used when adding a search result that isn't in the DB yet.
- */
 export async function addPlaceToWishlist(placeData, opts = {}) {
-  // 1. Check if place already exists (by name + address)
+  const userId = await getUserId()
+
   const { data: existing } = await supabase
     .from('places')
     .select('id')
@@ -172,7 +153,6 @@ export async function addPlaceToWishlist(placeData, opts = {}) {
 
   let placeId = existing?.id
 
-  // 2. If not, insert a minimal place stub
   if (!placeId) {
     const { data: newPlace, error: insertErr } = await supabase
       .from('places')
@@ -180,7 +160,7 @@ export async function addPlaceToWishlist(placeData, opts = {}) {
         name:       placeData.name,
         address:    placeData.address   ?? null,
         photo_url:  placeData.photo_url ?? null,
-        created_by: DEV_USER_ID,
+        created_by: userId,
       })
       .select('id')
       .single()
@@ -189,19 +169,17 @@ export async function addPlaceToWishlist(placeData, opts = {}) {
     placeId = newPlace.id
   }
 
-  // 3. Add to wishlist
   await addToWishlist(placeId, opts)
   return placeId
 }
 
-/**
- * Remove a place from the current user's wishlist.
- */
 export async function removeFromWishlist(placeId) {
+  const userId = await getUserId()
+
   const { error } = await supabase
     .from('wishlists')
     .delete()
-    .eq('user_id',  DEV_USER_ID)
+    .eq('user_id',  userId)
     .eq('place_id', placeId)
 
   if (error) throw new Error(`removeFromWishlist: ${error.message}`)
