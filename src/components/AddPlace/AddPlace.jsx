@@ -4,7 +4,7 @@ import {
   TASTE_OPTIONS, SPREAD_OPTIONS, AESTHETIC_OPTIONS, SERVICE_OPTIONS,
   TAGS, computeScore,
 } from '../../data/scoring'
-import { savePlace } from '../../lib/db'
+import { savePlace, addPlaceToWishlist } from '../../lib/db'
 import { autocomplete, getPlaceDetails } from '../../lib/places'
 import './AddPlace.css'
 
@@ -112,10 +112,18 @@ function EQColumn({ catKey, label, options, mealType, selected, onChange }) {
   )
 }
 
+const PRIORITY_OPTS = [
+  { id: 'high',   label: '⭐ Must-go'      },
+  { id: 'medium', label: 'Nice to have'    },
+]
+
 /* ── Step 1: Place + Experience + Meal Type ───────────────────────── */
 function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
                      expType, onExpChange, mealType, onMealType,
-                     extraTypes, onExtraTypes, onNext }) {
+                     extraTypes, onExtraTypes,
+                     isWishlist, onIsWishlist,
+                     wishNote, onWishNote, priority, onPriority,
+                     onNext, onWishlistSave }) {
   const [query,     setQuery]     = useState(place?.name || '')
   const [results,   setResults]   = useState([])
   const [open,      setOpen]      = useState(false)
@@ -260,65 +268,135 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
           </div>
 
-          {/* Below-hero: experience + meal type (scrollable) */}
+          {/* Below-hero: wishlist toggle + content */}
           <div className="ap-below-hero">
-            {/* Core Experience */}
-            <div className="ap-field-group">
-              <label className="ap-label">Core Experience</label>
-              <div className="ap-exp-cards">
-                {EXPERIENCE_LIST.map(({ id, label, desc, Icon }) => (
-                  <button
-                    key={id}
-                    className={`ap-exp-card${expType === id ? ' ap-exp-card--active' : ''}`}
-                    onClick={() => onExpChange(id)}
-                  >
-                    <Icon size={16} strokeWidth={1.5} />
-                    <span className="ap-exp-card-label">{label}</span>
-                    <span className="ap-exp-card-desc">{desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
-            {/* Meal type */}
-            <div className="ap-field-group">
-              <label className="ap-label">What did you have?</label>
-              <div className="ap-chips">
-                {MEAL_TYPES_ORDERED.map(mt => (
-                  <button
-                    key={mt.id}
-                    className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
-                    onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}
-                  >
-                    {mt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* ── Wishlist toggle ── */}
+            <button
+              className={`ap-wishlist-toggle${isWishlist ? ' ap-wishlist-toggle--on' : ''}`}
+              onClick={() => onIsWishlist(v => !v)}
+              type="button"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>{isWishlist ? 'Save to Wishlist' : 'Add to Wishlist'}</span>
+              <span className={`ap-wishlist-pill${isWishlist ? ' ap-wishlist-pill--on' : ''}`}>
+                {isWishlist ? 'ON' : 'OFF'}
+              </span>
+            </button>
 
-            {/* Secondary meal types */}
-            {mealType && (
-              <div className="ap-field-group">
-                <label className="ap-label ap-label--sm">This place also serves:</label>
-                <div className="ap-chips ap-chips--sm">
-                  {MEAL_TYPES_ORDERED.filter(mt => mt.id !== mealType).map(mt => (
-                    <button
-                      key={mt.id}
-                      className={`ap-chip ap-chip--sm${extraTypes.includes(mt.id) ? ' ap-chip--on' : ''}`}
-                      onClick={() => toggleExtra(mt.id)}
-                    >
-                      {mt.label}
-                    </button>
-                  ))}
+            {isWishlist ? (
+              /* ── Wishlist mode ── */
+              <>
+                <div className="ap-field-group">
+                  <label className="ap-label">What type of meal?</label>
+                  <div className="ap-chips">
+                    {MEAL_TYPES_ORDERED.map(mt => (
+                      <button
+                        key={mt.id}
+                        className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
+                        onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}
+                      >
+                        {mt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
+
+                <div className="ap-field-group">
+                  <label className="ap-label ap-label--sm">Priority</label>
+                  <div className="ap-chips ap-chips--sm">
+                    {PRIORITY_OPTS.map(p => (
+                      <button
+                        key={p.id}
+                        className={`ap-chip ap-chip--sm${priority === p.id ? ' ap-chip--on' : ''}`}
+                        onClick={() => onPriority(prev => prev === p.id ? null : p.id)}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ap-field-group">
+                  <label className="ap-label ap-label--sm">Note <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
+                  <textarea
+                    className="ap-textarea"
+                    placeholder="Why do you want to try it?"
+                    value={wishNote}
+                    onChange={e => onWishNote(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+              </>
+            ) : (
+              /* ── Rate mode ── */
+              <>
+                <div className="ap-field-group">
+                  <label className="ap-label">Core Experience</label>
+                  <div className="ap-exp-cards">
+                    {EXPERIENCE_LIST.map(({ id, label, desc, Icon }) => (
+                      <button
+                        key={id}
+                        className={`ap-exp-card${expType === id ? ' ap-exp-card--active' : ''}`}
+                        onClick={() => onExpChange(id)}
+                      >
+                        <Icon size={16} strokeWidth={1.5} />
+                        <span className="ap-exp-card-label">{label}</span>
+                        <span className="ap-exp-card-desc">{desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="ap-field-group">
+                  <label className="ap-label">What did you have?</label>
+                  <div className="ap-chips">
+                    {MEAL_TYPES_ORDERED.map(mt => (
+                      <button
+                        key={mt.id}
+                        className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
+                        onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}
+                      >
+                        {mt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {mealType && (
+                  <div className="ap-field-group">
+                    <label className="ap-label ap-label--sm">This place also serves:</label>
+                    <div className="ap-chips ap-chips--sm">
+                      {MEAL_TYPES_ORDERED.filter(mt => mt.id !== mealType).map(mt => (
+                        <button
+                          key={mt.id}
+                          className={`ap-chip ap-chip--sm${extraTypes.includes(mt.id) ? ' ap-chip--on' : ''}`}
+                          onClick={() => toggleExtra(mt.id)}
+                        >
+                          {mt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </>
       )}
 
       <div className="ap-step-footer">
-        <button className="btn-primary" onClick={onNext} disabled={!place || !expType || !mealType}>Continue</button>
+        {isWishlist ? (
+          <button className="btn-primary" onClick={onWishlistSave} disabled={!place}>
+            Add to Wishlist
+          </button>
+        ) : (
+          <button className="btn-primary" onClick={onNext} disabled={!place || !expType || !mealType}>
+            Continue
+          </button>
+        )}
       </div>
     </div>
   )
@@ -506,7 +584,7 @@ function SaveAnimation({ place, photo, score, onDone }) {
 }
 
 /* ── Done screen ──────────────────────────────────────────────────── */
-function DoneScreen({ place, score, onHome }) {
+function DoneScreen({ place, score, isWishlist, onHome }) {
   const [copied, setCopied] = useState(false)
 
   function handleShare() {
@@ -531,14 +609,16 @@ function DoneScreen({ place, score, onHome }) {
           </svg>
         </div>
 
-        {/* Score */}
-        <div className="ap-done-score-wrap">
-          <span className="ap-done-score-val">{score}</span>
-          <span className="ap-done-score-denom">/25</span>
-        </div>
+        {/* Score — hidden for wishlist */}
+        {!isWishlist && (
+          <div className="ap-done-score-wrap">
+            <span className="ap-done-score-val">{score}</span>
+            <span className="ap-done-score-denom">/25</span>
+          </div>
+        )}
 
         {/* Labels */}
-        <p className="ap-done-status">Saved!</p>
+        <p className="ap-done-status">{isWishlist ? 'Added to Wishlist!' : 'Saved!'}</p>
         <p className="ap-done-name">{place?.name}</p>
 
         {/* Share */}
@@ -578,6 +658,10 @@ export default function AddPlace({ onSaved }) {
   const [saving,         setSaving]         = useState(false)
   const [done,           setDone]           = useState(false)
   const [savedData,      setSavedData]      = useState(null)
+  // Wishlist mode
+  const [isWishlist,     setIsWishlist]     = useState(false)
+  const [wishNote,       setWishNote]       = useState('')
+  const [priority,       setPriority]       = useState('medium')
   const savePromiseRef = useRef(null)
 
   function updateRating(key, val) { setRating(prev => ({ ...prev, [key]: val })) }
@@ -616,12 +700,33 @@ export default function AddPlace({ onSaved }) {
     setDone(true)
   }
 
+  async function handleWishlistSave() {
+    setSaving(true)
+    try {
+      await addPlaceToWishlist(
+        { name: place.name, address: place.address, photo_url: photo || place?.photo_url },
+        {
+          added_from:     'Added by me',
+          added_note:     wishNote || null,
+          priority:       priority ?? 'medium',
+          wish_meal_type: mealType ?? null,
+        }
+      )
+    } catch (e) {
+      console.error('[AddPlace] wishlist save failed:', e)
+    }
+    setSaving(false)
+    setSavedData({ ...place, isWishlist: true })
+    setDone(true)
+  }
+
   /* Done screen */
   if (done) {
     return (
       <DoneScreen
         place={place}
-        score={score}
+        score={savedData?.isWishlist ? null : score}
+        isWishlist={savedData?.isWishlist}
         onHome={() => onSaved?.(savedData)}
       />
     )
@@ -630,31 +735,37 @@ export default function AddPlace({ onSaved }) {
   return (
     <div className="ap-screen">
 
-      {/* Progress */}
-      <div className="ap-progress">
-        {[0, 1, 2].map(i => (
-          <button
-            key={i}
-            className={`ap-prog-step${i === step ? ' ap-prog-step--active' : ''}${i < step ? ' ap-prog-step--done' : ''}`}
-            onClick={() => i < step && setStep(i)}
-          >
-            {i < step
-              ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-              : i + 1}
-          </button>
-        ))}
-        <span className="ap-prog-frac">{step + 1} / 3</span>
-      </div>
+      {/* Progress — hidden in wishlist mode */}
+      {!isWishlist && (
+        <div className="ap-progress">
+          {[0, 1, 2].map(i => (
+            <button
+              key={i}
+              className={`ap-prog-step${i === step ? ' ap-prog-step--active' : ''}${i < step ? ' ap-prog-step--done' : ''}`}
+              onClick={() => i < step && setStep(i)}
+            >
+              {i < step
+                ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                : i + 1}
+            </button>
+          ))}
+          <span className="ap-prog-frac">{step + 1} / 3</span>
+        </div>
+      )}
 
       <div className="ap-body">
         {step === 0 && (
           <StepPlace
-            place={place}          onPlaceChange={setPlace}
-            photo={photo}          onPhotoChange={setPhoto}
+            place={place}            onPlaceChange={setPlace}
+            photo={photo}            onPhotoChange={setPhoto}
             expType={experienceType} onExpChange={setExperienceType}
-            mealType={mealType}    onMealType={setMealType}
-            extraTypes={extraTypes} onExtraTypes={setExtraTypes}
+            mealType={mealType}      onMealType={setMealType}
+            extraTypes={extraTypes}  onExtraTypes={setExtraTypes}
+            isWishlist={isWishlist}  onIsWishlist={setIsWishlist}
+            wishNote={wishNote}      onWishNote={setWishNote}
+            priority={priority}      onPriority={setPriority}
             onNext={() => setStep(1)}
+            onWishlistSave={handleWishlistSave}
           />
         )}
         {step === 1 && (

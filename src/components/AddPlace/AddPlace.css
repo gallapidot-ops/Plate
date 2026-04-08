@@ -319,6 +319,52 @@
   min-height: 0;
 }
 
+/* ── Wishlist toggle ── */
+.ap-wishlist-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  margin: 0 16px 20px;
+  padding: 14px 18px;
+  background: var(--color-surface);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  text-align: left;
+  transition: box-shadow 0.15s, color 0.15s;
+  touch-action: manipulation;
+}
+
+.ap-wishlist-toggle--on {
+  color: var(--color-accent);
+  box-shadow: var(--shadow-inset);
+}
+
+.ap-wishlist-toggle span:nth-child(2) {
+  flex: 1;
+}
+
+.ap-wishlist-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 50px;
+  background: rgba(61,79,124,0.08);
+  color: var(--color-text-secondary);
+}
+
+.ap-wishlist-pill--on {
+  background: var(--color-accent);
+  color: #fff;
+}
+
 /* Experience cards */
 .ap-exp-cards {
   display: flex;

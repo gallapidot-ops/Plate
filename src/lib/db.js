@@ -131,11 +131,12 @@ export async function addToWishlist(placeId, opts = {}) {
   const userId = await getUserId()
 
   const { error } = await supabase.from('wishlists').upsert({
-    user_id:    userId,
-    place_id:   placeId,
-    added_from: opts.added_from ?? 'גילוי',
-    added_note: opts.added_note ?? null,
-    priority:   opts.priority   ?? 'medium',
+    user_id:         userId,
+    place_id:        placeId,
+    added_from:      opts.added_from      ?? 'Discovery',
+    added_note:      opts.added_note      ?? null,
+    priority:        opts.priority        ?? 'medium',
+    wish_meal_type:  opts.wish_meal_type  ?? null,
   })
 
   if (error) throw new Error(`addToWishlist: ${error.message}`)
