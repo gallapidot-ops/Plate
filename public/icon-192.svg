@@ -1,17 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <defs>
-    <filter id="s">
-      <feDropShadow dx="4" dy="4" stdDeviation="6" flood-color="rgba(0,0,0,0.09)"/>
-      <feDropShadow dx="-3" dy="-3" stdDeviation="5" flood-color="rgba(255,255,255,0.95)"/>
-    </filter>
-  </defs>
-  <rect x="8" y="8" width="176" height="176" rx="38" fill="#EFECE6" filter="url(#s)"/>
-  <!-- Bars centred, bottom at y=128 -->
-  <!-- scale 0.774: width=14, rx=7, gap≈14; total width=4×14+3×14=98, x start=(192-98)/2=47 -->
-  <rect x="47"  y="89"  width="14" height="39" rx="7" fill="#3D4F7C" fill-opacity="0.40"/>
-  <rect x="75"  y="66"  width="14" height="62" rx="7" fill="#3D4F7C" fill-opacity="0.65"/>
-  <rect x="103" y="47"  width="14" height="81" rx="7" fill="#3D4F7C" fill-opacity="1.00"/>
-  <rect x="131" y="74"  width="14" height="54" rx="7" fill="#3D4F7C" fill-opacity="0.65"/>
-  <!-- Baseline 8px below bars bottom (y=128+8=136) -->
-  <rect x="47" y="136" width="98" height="2" rx="1" fill="#3D4F7C"/>
+  <rect width="192" height="192" rx="36" fill="#E8527A"/>
+  <circle cx="96" cy="96" r="82" stroke="#F5EFE2" stroke-width="10" fill="#1A1A2E"/>
+  <text x="96" y="91" text-anchor="middle" font-family="Nunito, Arial Black, sans-serif" font-weight="900" font-size="34" fill="#F5EFE2" letter-spacing="4">PLATE</text>
+  <path d="M 66 110 Q 96 136 126 110" stroke="#F5EFE2" stroke-width="8" stroke-linecap="round" fill="none"/>
 </svg>

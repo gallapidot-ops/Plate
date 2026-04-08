@@ -128,83 +128,17 @@
   pointer-events: none;
 }
 
+/* Mascot fades in on splash */
 .splash-logo-card {
-  width: fit-content;
-  background: var(--color-surface);
-  border-radius: 24px;
-  border: 3px solid #1A1A2E;
-  padding: 40px 56px;
-  box-shadow: 8px 8px 0 #1A1A2E;
-}
-
-/* Vertical inner layout: bars centred above wordmark */
-.splash-logo-inner {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  animation: splash-mascot-in 0.7s ease-out 0.3s both;
 }
 
-.splash-bars-svg {
-  display: block;
-  overflow: visible;
-  width: 93px;
-  height: 105px;
-}
-
-.splash-bar {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  transform: scaleY(0);
-  animation: splash-bar-rise 0.6s ease-out forwards;
-}
-
-.splash-bar--1 { animation-delay: 0.10s; }
-.splash-bar--2 { animation-delay: 0.25s; }
-.splash-bar--3 { animation-delay: 0.40s; }
-.splash-bar--4 { animation-delay: 0.30s; }
-
-@keyframes splash-bar-rise {
-  from { transform: scaleY(0); }
-  to   { transform: scaleY(1); }
-}
-
-/* Baseline: 8px below bars, 14px above PLATE wordmark */
-.splash-baseline {
-  width: 93px;
-  height: 2px;
-  background: #1A1A2E;
-  opacity: 0;
-  margin-top: 8px;
-  margin-bottom: 14px;
-  animation: splash-fade-up 0.4s ease-out 0.70s forwards;
-}
-
-.splash-wordmark {
-  font-family: 'Nunito', sans-serif;
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: 4px;
-  color: #1A1A2E;
-  text-indent: 4px;
-  line-height: 1;
-  opacity: 0;
-  animation: splash-fade-up 0.5s ease-out 0.85s forwards;
-}
-
-.splash-tagline {
-  font-family: 'Nunito', sans-serif;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  color: var(--color-accent);
-  text-indent: 3px;
-  opacity: 0;
-  animation: splash-fade-up 0.5s ease-out 1.10s forwards;
-}
-
-@keyframes splash-fade-up {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0);   }
+@keyframes splash-mascot-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.92); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
 }
 
 /* PlacePage full-screen overlay */

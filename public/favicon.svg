@@ -1,21 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <!-- Neumorphic card background -->
-  <defs>
-    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
-      <feDropShadow dx="2" dy="2" stdDeviation="2.5" flood-color="rgba(0,0,0,0.10)"/>
-      <feDropShadow dx="-1.5" dy="-1.5" stdDeviation="2" flood-color="rgba(255,255,255,0.90)"/>
-    </filter>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="#EFECE6" filter="url(#shadow)"/>
-
-  <!-- Bars — bottom-aligned at y=50, same proportions as logo mark -->
-  <!-- Heights proportional: 50/105, 80/105, 105/105, 70/105 × 32max = ~15, 24, 32, 21 -->
-  <!-- 4 bars × 7px wide, 4px gap → total 4×7+3×4=40px, centered in 64px → x start=12 -->
-  <rect x="12" y="35" width="7" height="15" rx="3.5" fill="#3D4F7C" fill-opacity="0.40"/>
-  <rect x="23" y="26" width="7" height="24" rx="3.5" fill="#3D4F7C" fill-opacity="0.65"/>
-  <rect x="34" y="18" width="7" height="32" rx="3.5" fill="#3D4F7C" fill-opacity="1.00"/>
-  <rect x="45" y="29" width="7" height="21" rx="3.5" fill="#3D4F7C" fill-opacity="0.65"/>
-
-  <!-- Baseline -->
-  <rect x="12" y="51" width="40" height="1.5" rx="0.75" fill="#3D4F7C"/>
+  <!-- Pink background -->
+  <rect width="64" height="64" rx="12" fill="#E8527A"/>
+  <!-- Dark circle with cream border -->
+  <circle cx="32" cy="32" r="27" stroke="#F5EFE2" stroke-width="3.5" fill="#1A1A2E"/>
+  <!-- PLATE text -->
+  <text x="32" y="30" text-anchor="middle" font-family="Nunito, Arial Black, sans-serif" font-weight="900" font-size="11" fill="#F5EFE2" letter-spacing="1.2">PLATE</text>
+  <!-- Smile arc -->
+  <path d="M 22 36 Q 32 45 42 36" stroke="#F5EFE2" stroke-width="2.5" stroke-linecap="round" fill="none"/>
 </svg>
