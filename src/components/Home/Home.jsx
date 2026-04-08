@@ -1,22 +1,22 @@
-import { useState, useRef } from 'react'
-import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, Wine, GlassWater, UtensilsCrossed } from 'lucide-react'
-import { addPlaceToWishlist } from '../../lib/db'
+import { useState, useEffect, useRef } from 'react'
+import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater } from 'lucide-react'
+import { addPlaceToWishlist, searchPlaces, searchUsers } from '../../lib/db'
 import './Home.css'
 
 const MEAL_TYPES = [
-  { id: 'cafe',        label: 'Café',          Icon: Coffee          },
-  { id: 'brunch',      label: 'Brunch',         Icon: Sunrise         },
-  { id: 'lunch',       label: 'Lunch',          Icon: Sun             },
-  { id: 'dinner',      label: 'Dinner',         Icon: Moon            },
-  { id: 'bakery_deli', label: 'Bakery & Deli',  Icon: Croissant       },
-  { id: 'drinks',      label: 'Drinks',         Icon: GlassWater      },
+  { id: 'cafe',        label: 'Café',         Icon: Coffee     },
+  { id: 'brunch',      label: 'Brunch',        Icon: Sunrise    },
+  { id: 'lunch',       label: 'Lunch',         Icon: Sun        },
+  { id: 'dinner',      label: 'Dinner',        Icon: Moon       },
+  { id: 'bakery_deli', label: 'Bakery & Deli', Icon: Croissant  },
+  { id: 'drinks',      label: 'Drinks',        Icon: GlassWater },
 ]
 
 const EXPERIENCES = [
   { id: 'quick_light',     label: 'Quick & Light',      Icon: Zap           },
   { id: 'catchup',         label: 'Catch-up / Hangout', Icon: MessageCircle },
-  { id: 'shared_table',    label: 'Shared Table',        Icon: Users         },
-  { id: 'full_experience', label: 'Full Experience',     Icon: Star          },
+  { id: 'shared_table',    label: 'Shared Table',       Icon: Users         },
+  { id: 'full_experience', label: 'Full Experience',    Icon: Star          },
 ]
 
 const TAGS = [
@@ -37,10 +37,10 @@ const TAGS = [
 ]
 
 const PRICES = [
-  { id: 'overpriced',        label: 'Overpriced'        },
-  { id: 'fair',              label: 'Reasonable'        },
-  { id: 'great_value',       label: 'Great Value'       },
-  { id: 'worth_every_penny', label: 'Worth Every Penny' },
+  { id: 'great_value',       label: '₪'    },
+  { id: 'fair',              label: '₪₪'   },
+  { id: 'overpriced',        label: '₪₪₪'  },
+  { id: 'worth_every_penny', label: '₪₪₪₪' },
 ]
 
 const RESERVATIONS = [
@@ -88,6 +88,7 @@ function MealCard({ item, active, onClick }) {
   )
 }
 
+/* ── Filters drawer (no Core Experience — it lives on the main screen) ── */
 function Drawer({ open, onClose, filters, setFilters }) {
   if (!open) return null
 
@@ -98,8 +99,11 @@ function Drawer({ open, onClose, filters, setFilters }) {
     }))
   }
 
-  function setSingle(key, id) {
-    setFilters(f => ({ ...f, [key]: f[key] === id ? null : id }))
+  function toggleArray(key, id) {
+    setFilters(f => ({
+      ...f,
+      [key]: f[key].includes(id) ? f[key].filter(x => x !== id) : [...f[key], id],
+    }))
   }
 
   return (
@@ -109,23 +113,6 @@ function Drawer({ open, onClose, filters, setFilters }) {
         <div className="drawer-handle" />
 
         <div className="drawer-scroll">
-          {/* Experience */}
-          <div className="drawer-section">
-            <h3 className="drawer-section-title">Core Experience</h3>
-            <div className="drawer-chips">
-              {EXPERIENCES.map(exp => (
-                <button
-                  key={exp.id}
-                  type="button"
-                  className={`chip ${filters.experience === exp.id ? 'chip--active' : ''}`}
-                  onClick={() => setSingle('experience', exp.id)}
-                >
-                  {exp.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Tags */}
           <div className="drawer-section">
             <h3 className="drawer-section-title">Tags</h3>
@@ -151,8 +138,8 @@ function Drawer({ open, onClose, filters, setFilters }) {
                 <button
                   key={p.id}
                   type="button"
-                  className={`chip ${filters.price === p.id ? 'chip--active' : ''}`}
-                  onClick={() => setSingle('price', p.id)}
+                  className={`chip ${filters.price.includes(p.id) ? 'chip--active' : ''}`}
+                  onClick={() => toggleArray('price', p.id)}
                 >
                   {p.label}
                 </button>
@@ -168,8 +155,8 @@ function Drawer({ open, onClose, filters, setFilters }) {
                 <button
                   key={r.id}
                   type="button"
-                  className={`chip ${filters.reservation === r.id ? 'chip--active' : ''}`}
-                  onClick={() => setSingle('reservation', r.id)}
+                  className={`chip ${filters.reservation.includes(r.id) ? 'chip--active' : ''}`}
+                  onClick={() => toggleArray('reservation', r.id)}
                 >
                   {r.label}
                 </button>
@@ -182,7 +169,7 @@ function Drawer({ open, onClose, filters, setFilters }) {
           <button
             type="button"
             className="btn-ghost drawer-clear"
-            onClick={() => setFilters(f => ({ ...f, experience: null, tags: [], price: null, reservation: null }))}
+            onClick={() => setFilters(f => ({ ...f, tags: [], price: [], reservation: [] }))}
           >
             Clear all
           </button>
@@ -195,8 +182,28 @@ function Drawer({ open, onClose, filters, setFilters }) {
   )
 }
 
+/* ── People tab ── */
 function PeopleTab() {
-  const [query, setQuery] = useState('')
+  const [query,     setQuery]     = useState('')
+  const [results,   setResults]   = useState([])
+  const [searching, setSearching] = useState(false)
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([])
+      setSearching(false)
+      return
+    }
+    let cancelled = false
+    setSearching(true)
+    searchUsers(query).then(data => {
+      if (!cancelled) {
+        setResults(data)
+        setSearching(false)
+      }
+    })
+    return () => { cancelled = true }
+  }, [query])
 
   return (
     <div className="home-people">
@@ -220,32 +227,36 @@ function PeopleTab() {
       </div>
 
       <div className="home-people-list">
-        <p className="home-people-empty">No users found</p>
+        {searching && (
+          <p className="home-people-empty">Searching…</p>
+        )}
+        {!searching && query.trim().length < 2 && (
+          <p className="home-people-empty">Type at least 2 characters to search</p>
+        )}
+        {!searching && query.trim().length >= 2 && results.length === 0 && (
+          <p className="home-people-empty">No users found for "{query}"</p>
+        )}
+        {!searching && results.map(user => (
+          <div key={user.id} className="home-people-card">
+            {user.avatar_url ? (
+              <img src={user.avatar_url} alt={user.name || user.username} className="home-people-avatar" />
+            ) : (
+              <div className="home-people-avatar home-people-avatar--placeholder">
+                {(user.username || '?')[0].toUpperCase()}
+              </div>
+            )}
+            <div className="home-people-info">
+              <span className="home-people-name">{user.name || user.username}</span>
+              <span className="home-people-meta">@{user.username}{user.home_city ? ` · ${user.home_city}` : ''}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
 }
 
-/* ── Mock search results ── */
-const MOCK_RESULTS = {
-  mine: [
-    { id: 'r1', name: 'לחמים', address: 'המלאכה 3, תל אביב', photo_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', computed_score: 21, experience_type: 'quick_light' },
-    { id: 'r2', name: 'קפה נמרוד', address: 'שינקין 45, תל אביב', photo_url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&q=80', computed_score: 18, experience_type: 'catchup' },
-  ],
-  social: [
-    { id: 'r1', name: 'לחמים', address: 'המלאכה 3, תל אביב', photo_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', computed_score: 21, experience_type: 'quick_light' },
-    { id: 'r3', name: 'ארקפה', address: 'דיזנגוף 99, תל אביב', photo_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80', computed_score: 20, experience_type: 'catchup' },
-    { id: 'r4', name: 'בוקה', address: 'רוטשילד 22, תל אביב', photo_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', computed_score: 23, experience_type: 'full_experience' },
-  ],
-  explore: [
-    { id: 'r1', name: 'לחמים', address: 'המלאכה 3, תל אביב', photo_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', computed_score: 21, experience_type: 'quick_light' },
-    { id: 'r3', name: 'ארקפה', address: 'דיזנגוף 99, תל אביב', photo_url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80', computed_score: 20, experience_type: 'catchup' },
-    { id: 'r4', name: 'בוקה', address: 'רוטשילד 22, תל אביב', photo_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80', computed_score: 23, experience_type: 'full_experience' },
-    { id: 'r5', name: 'הבית של שולמית', address: 'דיזנגוף 160, תל אביב', photo_url: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=400&q=80', computed_score: 19, experience_type: 'catchup' },
-    { id: 'r6', name: 'טרטין', address: 'מונטיפיורי 5, תל אביב', photo_url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80', computed_score: 22, experience_type: 'quick_light' },
-  ],
-}
-
+/* ── Search results panel ── */
 const RESULTS_TABS = [
   { id: 'mine',    label: 'My Places'      },
   { id: 'social',  label: 'Me + Following' },
@@ -259,23 +270,52 @@ const EXP_LABELS = {
   full_experience: 'Full Experience',
 }
 
-function ResultsPanel({ mealType, onBack }) {
+function ResultsPanel({ mealType, location, filters, onBack }) {
   const [activeTab,       setActiveTab]       = useState('mine')
-  const [savedToWishlist, setSavedToWishlist] = useState(new Set()) // place names
-  const [savingWishlist,  setSavingWishlist]  = useState(new Set()) // in-flight saves
-  const results    = MOCK_RESULTS[activeTab] || []
-  const mealLabel  = MEAL_TYPES.find(m => m.id === mealType)?.label || ''
+  const [results,         setResults]         = useState([])
+  const [loading,         setLoading]         = useState(true)
+  const [savedToWishlist, setSavedToWishlist] = useState(new Set())
+  const [savingWishlist,  setSavingWishlist]  = useState(new Set())
+
+  const mealLabel = MEAL_TYPES.find(m => m.id === mealType)?.label || ''
+
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setResults([])
+
+    const scope = activeTab === 'mine'   ? 'mine'
+                : activeTab === 'social' ? 'social'
+                : 'all'
+
+    searchPlaces({
+      mealType,
+      experience:  filters.experience,
+      location,
+      tags:        filters.tags,
+      price:       filters.price,
+      reservation: filters.reservation,
+      scope,
+    }).then(data => {
+      if (!cancelled) {
+        setResults(data)
+        setLoading(false)
+      }
+    })
+
+    return () => { cancelled = true }
+  }, [activeTab, mealType, location, filters])
 
   async function handleBookmark(place) {
-    if (savedToWishlist.has(place.name) || savingWishlist.has(place.name)) return
-    setSavingWishlist(prev => new Set(prev).add(place.name))
+    if (savedToWishlist.has(place.id) || savingWishlist.has(place.id)) return
+    setSavingWishlist(prev => new Set(prev).add(place.id))
     try {
       await addPlaceToWishlist({ name: place.name, address: place.address, photo_url: place.photo_url })
-      setSavedToWishlist(prev => new Set(prev).add(place.name))
+      setSavedToWishlist(prev => new Set(prev).add(place.id))
     } catch (e) {
       console.error('[Home] addPlaceToWishlist:', e)
     } finally {
-      setSavingWishlist(prev => { const s = new Set(prev); s.delete(place.name); return s })
+      setSavingWishlist(prev => { const s = new Set(prev); s.delete(place.id); return s })
     }
   }
 
@@ -290,7 +330,9 @@ function ResultsPanel({ mealType, onBack }) {
         </button>
         <div className="home-results-title-wrap">
           <span className="home-results-title">{mealLabel}</span>
-          <span className="home-results-count">{results.length} places</span>
+          {!loading && (
+            <span className="home-results-count">{results.length} place{results.length !== 1 ? 's' : ''}</span>
+          )}
         </div>
       </div>
 
@@ -310,14 +352,18 @@ function ResultsPanel({ mealType, onBack }) {
 
       {/* Results list */}
       <div className="home-results-list">
-        {results.length === 0 ? (
-          <p className="home-results-empty">No results in this category</p>
+        {loading ? (
+          <p className="home-results-empty">Loading…</p>
+        ) : results.length === 0 ? (
+          <p className="home-results-empty">No results found</p>
         ) : results.map(place => {
-          const isSaved   = savedToWishlist.has(place.name)
-          const isSaving  = savingWishlist.has(place.name)
+          const isSaved  = savedToWishlist.has(place.id)
+          const isSaving = savingWishlist.has(place.id)
           return (
             <div key={place.id} className="home-result-card">
-              <img src={place.photo_url} alt={place.name} className="home-result-img" />
+              {place.photo_url && (
+                <img src={place.photo_url} alt={place.name} className="home-result-img" />
+              )}
               <div className="home-result-body">
                 <span className="home-result-name">{place.name}</span>
                 <span className="home-result-addr">{place.address}</span>
@@ -325,7 +371,7 @@ function ResultsPanel({ mealType, onBack }) {
                   <span className="home-result-exp">{EXP_LABELS[place.experience_type]}</span>
                 )}
               </div>
-              {place.computed_score && (
+              {place.computed_score != null && (
                 <div className="home-result-score">
                   <span className="home-result-score-val">{place.computed_score}</span>
                   <span className="home-result-score-max">/25</span>
@@ -359,24 +405,24 @@ function ResultsPanel({ mealType, onBack }) {
 }
 
 export default function Home({ onSearch }) {
-  const [tab,        setTab]        = useState('places')
-  const [mealType,   setMealType]   = useState(null)
-  const [location,   setLocation]   = useState('')
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [tab,         setTab]         = useState('places')
+  const [mealType,    setMealType]    = useState(null)
+  const [location,    setLocation]    = useState('')
+  const [drawerOpen,  setDrawerOpen]  = useState(false)
   const [showResults, setShowResults] = useState(false)
-  const [expTooltip, setExpTooltip] = useState(false)
+  const [expTooltip,  setExpTooltip]  = useState(false)
   const [filters, setFilters] = useState({
-    experience: null,
-    tags: [],
-    price: null,
-    reservation: null,
+    experience:  null,
+    tags:        [],
+    price:       [],
+    reservation: [],
   })
   const scrollRef = useRef(null)
 
   const activeCount = [
     filters.experience,
-    filters.price,
-    filters.reservation,
+    ...filters.price,
+    ...filters.reservation,
     ...filters.tags,
   ].filter(Boolean).length
 
@@ -387,7 +433,14 @@ export default function Home({ onSearch }) {
   }
 
   if (showResults) {
-    return <ResultsPanel mealType={mealType} onBack={() => setShowResults(false)} />
+    return (
+      <ResultsPanel
+        mealType={mealType}
+        location={location}
+        filters={filters}
+        onBack={() => setShowResults(false)}
+      />
+    )
   }
 
   return (
@@ -478,7 +531,7 @@ export default function Home({ onSearch }) {
                 <input
                   className="field-input location-input"
                   type="text"
-                  placeholder="City, neighborhood, street..."
+                  placeholder="City, neighborhood, street…"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
                 />
@@ -505,13 +558,20 @@ export default function Home({ onSearch }) {
                       {EXPERIENCES.find(e => e.id === filters.experience)?.label}
                     </span>
                   )}
+                  {filters.price.map(p => (
+                    <span key={p} className="active-filter-chip">
+                      {PRICES.find(pr => pr.id === p)?.label}
+                    </span>
+                  ))}
                   {filters.tags.slice(0, 2).map(t => (
                     <span key={t} className="active-filter-chip">
                       {TAGS.find(tag => tag.id === t)?.label}
                     </span>
                   ))}
-                  {filters.tags.length > 2 && (
-                    <span className="active-filter-chip">+{filters.tags.length - 2}</span>
+                  {(filters.tags.length + filters.reservation.length) > 2 && (
+                    <span className="active-filter-chip">
+                      +{filters.tags.length + filters.reservation.length - 2}
+                    </span>
                   )}
                 </div>
               )}

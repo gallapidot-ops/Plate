@@ -192,3 +192,109 @@ export async function removeFromWishlist(placeId) {
 
   if (error) throw new Error(`removeFromWishlist: ${error.message}`)
 }
+
+/* ═══════════════════════════════════════════════════════════
+   SEARCH
+═══════════════════════════════════════════════════════════ */
+
+/**
+ * Search places filtered by meal type + optional filters.
+ * scope: 'mine' | 'social' | 'all'
+ */
+export async function searchPlaces({
+  mealType,
+  experience,
+  location,
+  tags        = [],
+  price       = [],
+  reservation = [],
+  scope       = 'all',
+}) {
+  const userId = await getUserId()
+
+  // Fetch following IDs for social scope
+  let userIds = null
+  if (scope === 'mine') {
+    userIds = [userId]
+  } else if (scope === 'social') {
+    const { data: follows } = await supabase
+      .from('follows')
+      .select('following_id')
+      .eq('follower_id', userId)
+    userIds = [userId, ...(follows ?? []).map(f => f.following_id)]
+  }
+
+  let query = supabase
+    .from('place_ratings')
+    .select(`
+      meal_type, experience_type, computed_score,
+      places ( id, name, address, photo_url )
+    `)
+    .eq('meal_type', mealType)
+    .order('computed_score', { ascending: false })
+
+  if (userIds) {
+    query = query.in('user_id', userIds)
+  }
+
+  if (experience) {
+    query = query.eq('experience_type', experience)
+  }
+
+  if (tags.length > 0) {
+    query = query.overlaps('tags', tags)
+  }
+
+  if (price.length > 0) {
+    query = query.in('price', price)
+  }
+
+  if (reservation.length > 0) {
+    query = query.in('need_reservation', reservation)
+  }
+
+  const { data, error } = await query
+
+  if (error) { console.error('[db] searchPlaces:', error.message); return [] }
+
+  let results = (data ?? [])
+    .filter(r => r.places !== null)
+    .map(r => ({
+      id:              r.places.id,
+      name:            r.places.name,
+      address:         r.places.address,
+      photo_url:       r.places.photo_url,
+      computed_score:  r.computed_score,
+      experience_type: r.experience_type,
+    }))
+
+  // Client-side location filter on address
+  if (location && location.trim()) {
+    const loc = location.trim().toLowerCase()
+    results = results.filter(r => r.address?.toLowerCase().includes(loc))
+  }
+
+  // Deduplicate by place id (a place may have multiple ratings)
+  const seen = new Set()
+  return results.filter(r => {
+    if (seen.has(r.id)) return false
+    seen.add(r.id)
+    return true
+  })
+}
+
+/**
+ * Search users by username (partial match, min 2 chars).
+ */
+export async function searchUsers(query) {
+  if (!query || query.trim().length < 2) return []
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, name, username, avatar_url, home_city')
+    .ilike('username', `%${query.trim()}%`)
+    .limit(20)
+
+  if (error) { console.error('[db] searchUsers:', error.message); return [] }
+  return data ?? []
+}

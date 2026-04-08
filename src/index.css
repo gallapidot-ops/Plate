@@ -135,6 +135,8 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   transition: all 0.15s;
   line-height: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .chip:hover {
