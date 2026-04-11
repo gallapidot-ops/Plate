@@ -545,23 +545,32 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
 
   const activeCount = [localFilters.experience, ...localFilters.price, ...localFilters.reservation, ...localFilters.tags].filter(Boolean).length
 
+  const vibeLabel = localFilters.experience ? EXP_LABELS[localFilters.experience] : null
+  const tabLabel  = RESULTS_TABS.find(t => t.id === activeTab)?.label ?? ''
+
   return (
     <div className="home-results">
       {/* Header */}
       <div className="home-results-header">
         <button className="home-results-back" onClick={onBack} aria-label="Back">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
         </button>
         <div className="home-results-title-wrap">
-          <span className="home-results-title">{mealLabel}</span>
-          {!loading && <span className="home-results-count">{results.length} place{results.length !== 1 ? 's' : ''}</span>}
+          <h1 className="home-results-title">{mealLabel}</h1>
+          <p className="home-results-subtitle">
+            {!loading && `${results.length} place${results.length !== 1 ? 's' : ''}`}
+            {location ? ` · ${location}` : ''}
+            {vibeLabel ? ` · ${vibeLabel}` : ''}
+            {activeCount > 0 ? ` · ${activeCount} filter${activeCount !== 1 ? 's' : ''}` : ''}
+          </p>
         </div>
         <button
           type="button"
           className={`results-filter-btn${activeCount > 0 ? ' results-filter-btn--active' : ''}`}
           onClick={() => setDrawerOpen(true)}
+          aria-label="Filters"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" x2="20" y1="6" y2="6"/><line x1="8" x2="20" y1="12" y2="12"/><line x1="12" x2="20" y1="18" y2="18"/>
@@ -583,7 +592,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
         ))}
       </div>
 
-      {/* Results list */}
+      {/* Results list — Spotify-style rows */}
       <div className="home-results-list">
         {loading ? (
           <p className="home-results-empty">Loading…</p>
@@ -592,43 +601,44 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
         ) : results.map(place => {
           const isSaved  = savedToWishlist.has(place.id)
           const isSaving = savingWishlist.has(place.id)
+          const meta = [place.address, place.experience_type ? EXP_LABELS[place.experience_type] : null].filter(Boolean).join(' · ')
           return (
             <div
               key={place.id}
-              className="home-result-card"
+              className="home-result-row"
               onClick={() => onOpenPlace?.(place)}
               style={{ cursor: onOpenPlace ? 'pointer' : 'default' }}
             >
-              <div className="home-result-body">
-                <div className="home-result-top-row">
-                  <span className="home-result-name">{place.name}</span>
-                  {place.computed_score != null && (
-                    <div className="home-result-score">
-                      <span className="home-result-score-val">{place.computed_score}</span>
-                      <span className="home-result-score-max">/25</span>
-                    </div>
-                  )}
-                </div>
-                <span className="home-result-addr">{place.address}</span>
-                {place.experience_type && (
-                  <span className="home-result-exp">{EXP_LABELS[place.experience_type]}</span>
-                )}
+              {/* Left: name + meta */}
+              <div className="home-result-info">
+                <span className="home-result-name">{place.name}</span>
+                {meta && <span className="home-result-meta">{meta}</span>}
               </div>
-              <button
-                className={`home-result-bookmark${isSaved ? ' home-result-bookmark--saved' : ''}`}
-                onClick={e => { e.stopPropagation(); handleBookmark(place) }}
-                disabled={isSaving || isSaved}
-                aria-label={isSaved ? 'Saved' : 'Save to Wishlist'}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24"
-                  fill={isSaved ? 'var(--color-accent)' : 'none'}
-                  stroke={isSaved ? 'var(--color-accent)' : 'currentColor'}
-                  strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                  style={isSaving ? { opacity: 0.4 } : {}}
+
+              {/* Right: score + bookmark */}
+              <div className="home-result-right">
+                {place.computed_score != null && (
+                  <div className="home-result-score">
+                    <span className="home-result-score-val">{place.computed_score}</span>
+                    <span className="home-result-score-max">/25</span>
+                  </div>
+                )}
+                <button
+                  className={`home-result-bookmark${isSaved ? ' home-result-bookmark--saved' : ''}`}
+                  onClick={e => { e.stopPropagation(); handleBookmark(place) }}
+                  disabled={isSaving || isSaved}
+                  aria-label={isSaved ? 'Saved' : 'Save'}
                 >
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
-              </button>
+                  <svg width="16" height="16" viewBox="0 0 24 24"
+                    fill={isSaved ? '#C63B2F' : 'none'}
+                    stroke={isSaved ? '#C63B2F' : 'currentColor'}
+                    strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={isSaving ? { opacity: 0.4 } : {}}
+                  >
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                  </svg>
+                </button>
+              </div>
             </div>
           )
         })}

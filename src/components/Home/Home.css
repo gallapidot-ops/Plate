@@ -324,10 +324,8 @@
 .home-results-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  border-bottom: 2px solid rgba(26, 43, 53, 0.1);
-  background: #F5F0E8;
+  gap: 14px;
+  padding: 18px 20px 14px;
   flex-shrink: 0;
 }
 
@@ -335,66 +333,74 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1A2B35;
+  background: none;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #F5F0E8;
+  color: #1A2B35;
   flex-shrink: 0;
   transition: opacity 0.15s;
+  padding: 0;
 }
 
-.home-results-back:hover { opacity: 0.8; }
+.home-results-back:hover { opacity: 0.55; }
 
 .home-results-title-wrap {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .home-results-title {
   font-family: var(--font-sans);
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 900;
   color: #1A2B35;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.1;
 }
 
-.home-results-count {
+.home-results-subtitle {
   font-size: 12px;
   font-weight: 600;
-  color: rgba(26, 43, 53, 0.5);
-  letter-spacing: 0.02em;
+  color: rgba(26, 43, 53, 0.4);
+  letter-spacing: 0.01em;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .results-filter-btn {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: rgba(26, 43, 53, 0.07);
-  border: 2px solid rgba(26, 43, 53, 0.18);
+  background: rgba(26, 43, 53, 0.06);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #1A2B35;
+  color: rgba(26, 43, 53, 0.5);
   flex-shrink: 0;
-  transition: background 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
-.results-filter-btn:hover { background: rgba(26, 43, 53, 0.12); }
-.results-filter-btn--active { border-color: #C63B2F; color: #C63B2F; }
+.results-filter-btn:hover { background: rgba(26, 43, 53, 0.11); color: #1A2B35; }
+.results-filter-btn--active { color: #C63B2F; }
 
 .results-filter-badge {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 16px;
-  height: 16px;
+  top: -3px;
+  right: -3px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: #C63B2F;
   color: #fff;
@@ -408,25 +414,25 @@
 /* ── Scope tabs ── */
 .home-results-tabs {
   display: flex;
-  border-bottom: 2px solid rgba(26, 43, 53, 0.1);
+  border-bottom: 1px solid rgba(26, 43, 53, 0.1);
   padding: 0 20px;
   flex-shrink: 0;
 }
 
 .home-results-tab {
   flex: 1;
-  padding: 13px 8px;
+  padding: 10px 4px;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(26, 43, 53, 0.45);
+  color: rgba(26, 43, 53, 0.38);
   cursor: pointer;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
   transition: color 0.15s, border-color 0.15s;
 }
 
@@ -435,52 +441,44 @@
   border-bottom-color: #C63B2F;
 }
 
-/* ── Results list ── */
+/* ── Results list — Spotify-style ── */
 .home-results-list {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .home-results-empty {
   text-align: center;
-  color: rgba(26, 43, 53, 0.45);
+  color: rgba(26, 43, 53, 0.38);
   font-size: 14px;
   font-weight: 600;
-  margin: 40px 0;
-  letter-spacing: 0.02em;
+  margin: 48px 0;
+  letter-spacing: 0.01em;
 }
 
-/* ── Result card ── */
-.home-result-card {
-  background: #fff;
-  border: 2px solid #1A2B35;
-  border-radius: 16px;
-  padding: 16px 14px 16px 18px;
+/* ── Result row (no card, just divider) ── */
+.home-result-row {
   display: flex;
   align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(26, 43, 53, 0.07);
   gap: 12px;
-  transition: background 0.12s;
+  transition: background 0.1s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.home-result-card:hover { background: rgba(26, 43, 53, 0.02); }
+.home-result-row:hover { background: rgba(26, 43, 53, 0.025); }
+.home-result-row:last-child { border-bottom: none; }
 
-.home-result-body {
+/* ── Left: name + meta ── */
+.home-result-info {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
-}
-
-.home-result-top-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
 }
 
 .home-result-name {
@@ -494,55 +492,56 @@
   text-overflow: ellipsis;
 }
 
-.home-result-score {
-  display: flex;
-  align-items: baseline;
-  gap: 1px;
-  flex-shrink: 0;
-}
-
-.home-result-score-val {
-  font-family: var(--font-sans);
-  font-size: 20px;
-  font-weight: 900;
-  color: #C63B2F;
-  line-height: 1;
-}
-
-.home-result-score-max {
-  font-size: 12px;
-  font-weight: 700;
+.home-result-meta {
+  font-size: 10px;
+  font-weight: 600;
   color: rgba(26, 43, 53, 0.4);
-}
-
-.home-result-addr {
-  font-size: 13px;
-  font-weight: 500;
-  color: rgba(26, 43, 53, 0.55);
+  letter-spacing: 0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.home-result-exp {
-  font-size: 12px;
+/* ── Right: score + bookmark ── */
+.home-result-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.home-result-score {
+  display: flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.home-result-score-val {
+  font-family: var(--font-sans);
+  font-size: 26px;
+  font-weight: 900;
+  color: #C63B2F;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.home-result-score-max {
+  font-size: 11px;
   font-weight: 700;
-  color: #7BAEC4;
-  letter-spacing: 0.02em;
+  color: rgba(26, 43, 53, 0.35);
 }
 
 .home-result-bookmark {
   background: none;
   border: none;
-  padding: 6px;
+  padding: 4px;
   cursor: pointer;
-  color: rgba(26, 43, 53, 0.35);
+  color: rgba(26, 43, 53, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: color 0.15s;
-  border-radius: 8px;
 }
 
 .home-result-bookmark:hover { color: #C63B2F; }
