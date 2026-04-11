@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { autocomplete, getPlaceDetails } from '../../lib/places'
+import { useState, useRef } from 'react'
+import { autocomplete, getPlaceDetails, checkOpenNow } from '../../lib/places'
 import { getPlacesForDiscovery } from '../../lib/db'
 import './BestMatch.css'
 
@@ -21,10 +21,17 @@ const VIBE_OPTIONS = [
 ]
 
 const WALK_OPTIONS = [
-  { value: 5,  label: '5 min',  km: 0.32 },
-  { value: 10, label: '10 min', km: 0.65 },
-  { value: 15, label: '15 min', km: 0.97 },
+  { value: 5,  label: '5 min',   km: 0.32 },
+  { value: 10, label: '10 min',  km: 0.65 },
+  { value: 15, label: '15 min',  km: 0.97 },
   { value: 20, label: '20+ min', km: 5.0  },
+]
+
+const DRIVE_OPTIONS = [
+  { value: 5,  label: '5 min',   km: 2.0  },
+  { value: 10, label: '10 min',  km: 4.0  },
+  { value: 15, label: '15 min',  km: 8.0  },
+  { value: 20, label: '20+ min', km: 25.0 },
 ]
 
 const EMPTY_QUIPS = [
@@ -55,7 +62,7 @@ function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
   const [dragging, setDragging] = useState(false)
   const [exiting, setExiting]   = useState(null) // 'left' | 'right'
 
-  const rotation   = dx * 0.065
+  const rotation    = dx * 0.065
   const likeOpacity = Math.min(1, Math.max(0, dx / 65))
   const nopeOpacity = Math.min(1, Math.max(0, -dx / 65))
 
@@ -104,7 +111,6 @@ function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
   }
 
   if (isNext) {
-    // Next card scales up slightly as the top card is dragged
     const progress = Math.min(1, Math.abs(dragDx) / 100)
     const scale = 0.94 + progress * 0.06
     return (
@@ -119,7 +125,7 @@ function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
 
   return (
     <div
-      className={`bm-card bm-card--top`}
+      className="bm-card bm-card--top"
       style={{ transform, transition }}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -138,6 +144,11 @@ function CardInner({ place, likeOpacity, nopeOpacity }) {
         : <div className="bm-card-photo-placeholder" />
       }
       <div className="bm-card-overlay" />
+
+      {/* Hours unknown indicator */}
+      {place.hoursUnknown && (
+        <div className="bm-card-hours-unknown">hours unknown</div>
+      )}
 
       {/* SAVE / SKIP badges */}
       <div className="bm-badge bm-badge--save" style={{ opacity: likeOpacity }}>SAVE</div>
@@ -169,8 +180,9 @@ export default function BestMatch({ onClose, onOpenPlace }) {
   const [location,  setLocation]  = useState(null) // { name, lat, lng }
   const locTimer = useRef(null)
 
-  /* Step 2 — walk time */
-  const [walkMins, setWalkMins] = useState(10)
+  /* Step 2 — distance */
+  const [walkMins,    setWalkMins]    = useState(10)
+  const [travelMode,  setTravelMode]  = useState('walk') // 'walk' | 'drive'
 
   /* Step 3 — preferences */
   const [selMeals, setSelMeals] = useState(() => new Set())
@@ -205,7 +217,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
     }
   }
 
-  /* ── Fetch + filter ── */
+  /* ── Fetch + filter + open-now check ── */
   async function startSwipe() {
     setStep('loading')
     setLoadErr(null)
@@ -216,14 +228,27 @@ export default function BestMatch({ onClose, onOpenPlace }) {
       const vibeKeys = [...selVibes]
 
       const all    = await getPlacesForDiscovery({ mealTypes: mealKeys, experienceTypes: vibeKeys })
-      const maxKm  = WALK_OPTIONS.find(w => w.value === walkMins)?.km ?? 0.65
+      const opts   = travelMode === 'drive' ? DRIVE_OPTIONS : WALK_OPTIONS
+      const maxKm  = opts.find(w => w.value === walkMins)?.km ?? 0.65
 
       const nearby = all.filter(p => {
         if (!p.lat || !p.lng) return false
         return haversineKm(location.lat, location.lng, p.lat, p.lng) <= maxKm
       })
 
-      setCards(nearby.slice(0, 10))
+      // Check open-now status in parallel (cap at 20 to limit API calls)
+      const toCheck = nearby.slice(0, 20)
+      const withOpenStatus = await Promise.all(
+        toCheck.map(async p => {
+          const openNow = p.google_place_id ? await checkOpenNow(p.google_place_id) : null
+          return { ...p, openNow, hoursUnknown: openNow === null }
+        })
+      )
+
+      // Filter out closed places; unknown hours are included
+      const filtered = withOpenStatus.filter(p => p.openNow !== false)
+
+      setCards(filtered.slice(0, 10))
       setIdx(0)
       setMaybe([])
       setHistory([])
@@ -263,6 +288,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
   }
 
   const quip = EMPTY_QUIPS[Math.floor(Math.random() * EMPTY_QUIPS.length)]
+  const distOptions = travelMode === 'drive' ? DRIVE_OPTIONS : WALK_OPTIONS
 
   /* ══════════════ RENDERS ══════════════ */
 
@@ -280,7 +306,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
       <div className="bm-body">
         <p className="bm-step-hint">Step 1</p>
         <h1 className="bm-title">Where are you?</h1>
-        <p className="bm-sub">Enter your location to find the best places within walking distance.</p>
+        <p className="bm-sub">Enter your location to find the best places nearby.</p>
         <div className="bm-loc-wrap">
           <svg className="bm-loc-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
@@ -329,7 +355,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
     </div>
   )
 
-  /* ── Step 2: Walk time ── */
+  /* ── Step 2: Distance + travel mode ── */
   if (step === 'distance') return (
     <div className="bm-screen">
       <div className="bm-header">
@@ -343,9 +369,28 @@ export default function BestMatch({ onClose, onOpenPlace }) {
       <div className="bm-body">
         <p className="bm-step-hint">Step 2</p>
         <h1 className="bm-title">How far are you willing to go?</h1>
-        <p className="bm-sub">Walking time from <strong>{location?.name}</strong></p>
+        <p className="bm-sub">
+          From <strong>{location?.name}</strong>
+        </p>
+
+        {/* Travel mode toggle */}
+        <div className="bm-travel-toggle">
+          <button
+            className={`bm-travel-btn${travelMode === 'walk' ? ' bm-travel-btn--active' : ''}`}
+            onClick={() => setTravelMode('walk')}
+          >
+            🚶 Walking
+          </button>
+          <button
+            className={`bm-travel-btn${travelMode === 'drive' ? ' bm-travel-btn--active' : ''}`}
+            onClick={() => setTravelMode('drive')}
+          >
+            🚗 Driving
+          </button>
+        </div>
+
         <div className="bm-walk-grid">
-          {WALK_OPTIONS.map(opt => (
+          {distOptions.map(opt => (
             <button
               key={opt.value}
               className={`bm-walk-pill${walkMins === opt.value ? ' bm-walk-pill--active' : ''}`}

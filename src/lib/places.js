@@ -128,3 +128,24 @@ export async function getPlaceDetails(placeId) {
     website:  p.websiteUri ?? null,
   }
 }
+
+/* ── Check if a place is currently open ──────────────────────────────
+   Returns true (open), false (closed), or null (no data / error)
+─────────────────────────────────────────────────────────────────────── */
+export async function checkOpenNow(googlePlaceId) {
+  if (!googlePlaceId || !KEY) return null
+  try {
+    const res = await fetch(`${BASE}/places/${googlePlaceId}`, {
+      headers: {
+        'X-Goog-Api-Key':  KEY,
+        'X-Goog-FieldMask': 'currentOpeningHours',
+      },
+    })
+    if (!res.ok) return null
+    const p = await res.json()
+    const openNow = p.currentOpeningHours?.openNow
+    return typeof openNow === 'boolean' ? openNow : null
+  } catch {
+    return null
+  }
+}

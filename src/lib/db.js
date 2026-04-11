@@ -388,7 +388,7 @@ export async function getPlacesForDiscovery({ mealTypes = [], experienceTypes = 
     .from('place_ratings')
     .select(`
       meal_type, experience_type, computed_score,
-      places ( id, name, address, city, photo_url, lat, lng )
+      places ( id, name, address, city, photo_url, lat, lng, google_place_id )
     `)
     .order('computed_score', { ascending: false })
 
@@ -417,6 +417,7 @@ export async function getPlacesForDiscovery({ mealTypes = [], experienceTypes = 
         photo_url:       p.photo_url,
         lat:             p.lat,
         lng:             p.lng,
+        google_place_id: p.google_place_id,
         computed_score:  r.computed_score ?? 0,
         meal_type:       r.meal_type,
         experience_type: r.experience_type,

@@ -643,23 +643,104 @@
   line-height: 1.55;
 }
 
-/* ── Entry link (used in Home.jsx) ── */
-.bm-entry-link {
+/* ── Travel mode toggle ── */
+.bm-travel-toggle {
   display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 6px;
-  background: none;
-  border: none;
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(245,240,232,0.75);
-  cursor: pointer;
-  padding: 10px 0 0;
-  letter-spacing: 0.02em;
-  -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s;
+  margin-bottom: 20px;
+  background: rgba(26,43,53,0.07);
+  padding: 4px;
+  border-radius: 14px;
 }
 
-.bm-entry-link:hover { color: #fff; }
+.bm-travel-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(26,43,53,0.45);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bm-travel-btn--active {
+  background: #fff;
+  color: #1A2B35;
+  box-shadow: 0 1px 4px rgba(26,43,53,0.14);
+}
+
+/* ── Hours unknown badge on swipe card ── */
+.bm-card-hours-unknown {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.75);
+  font-family: var(--font-sans);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ── Best Match entry banner (used in Home.jsx MealStep) ── */
+.bm-banner {
+  width: 100%;
+  background: #1A2B35;
+  border: none;
+  border-radius: 18px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 10px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s, transform 0.1s;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.bm-banner:active { transform: scale(0.98); opacity: 0.88; }
+
+.bm-banner-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.bm-banner-title {
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 900;
+  color: #F5F0E8;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.bm-banner-sub {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(245, 240, 232, 0.5);
+  letter-spacing: 0.03em;
+}
+
+.bm-banner-arrow {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 900;
+  color: #C63B2F;
+  flex-shrink: 0;
+  line-height: 1;
+}
