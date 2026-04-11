@@ -450,6 +450,23 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
   const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 })
   const [dataLoading,  setDataLoading]  = useState(true)
 
+  function groupByMonth(places) {
+    const groups = []
+    let currentLabel = null
+    for (const p of places) {
+      const label = p.last_visited
+        ? new Date(p.last_visited).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        : 'Unknown'
+      if (label !== currentLabel) {
+        currentLabel = label
+        groups.push({ label, places: [p] })
+      } else {
+        groups[groups.length - 1].places.push(p)
+      }
+    }
+    return groups
+  }
+
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -606,7 +623,7 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
         </div>
       )}
 
-      <div className={`pf-header${isViewMode ? ' pf-header--view' : ''}`}>
+      <div className={`pf-header pf-header--dark${isViewMode ? ' pf-header--view' : ''}`}>
 
         {/* ── Compact row (always visible) ── */}
         <div
@@ -644,6 +661,26 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             </svg>
           )}
         </div>
+
+        {/* ── Always-visible stats row (own profile) ── */}
+        {!isViewMode && (
+          <div className="pf-stats-row">
+            <div className="pf-stat">
+              <span className="pf-stat-num">{places.length}</span>
+              <span className="pf-stat-label">places</span>
+            </div>
+            <div className="pf-stat-divider" />
+            <div className="pf-stat">
+              <span className="pf-stat-num">{wishlist.length}</span>
+              <span className="pf-stat-label">wishlist</span>
+            </div>
+            <div className="pf-stat-divider" />
+            <div className="pf-stat">
+              <span className="pf-stat-num pf-stat-num--accent">{places.length > 0 ? Math.round(places.reduce((s,p) => s + (p.computed_score ?? 0), 0) / places.length) : '—'}</span>
+              <span className="pf-stat-label">avg score</span>
+            </div>
+          </div>
+        )}
 
         {/* ── Expandable stats (own profile) ── */}
         {!isViewMode && (
@@ -826,23 +863,28 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             <div className="pf-place-list">
               {filteredRecent.length === 0 ? (
                 <p className="pf-recent-empty">No places yet</p>
-              ) : filteredRecent.map(p => (
-                <button
-                  key={p.id}
-                  className="pf-place-row"
-                  onClick={() => onOpenPlace?.(p)}
-                >
-                  <div className="pf-place-info">
-                    <span className="pf-place-name">{p.name}</span>
-                    <span className="pf-place-meta">
-                      {[p.meal_types?.[0]?.replace('_', ' & '), formatVisitDate(p.last_visited)].filter(Boolean).join(' · ')}
-                    </span>
-                  </div>
-                  <div className="pf-place-score-wrap">
-                    <span className="pf-place-score-val">{p.computed_score}</span>
-                    <span className="pf-place-score-max">/25</span>
-                  </div>
-                </button>
+              ) : groupByMonth(filteredRecent).map(group => (
+                <div key={group.label}>
+                  <div className="pf-month-label">{group.label}</div>
+                  {group.places.map(p => (
+                    <button
+                      key={p.id}
+                      className="pf-place-row"
+                      onClick={() => onOpenPlace?.(p)}
+                    >
+                      <div className="pf-place-info">
+                        <span className="pf-place-name">{p.name}</span>
+                        <span className="pf-place-meta">
+                          {[p.meal_types?.[0]?.replace('_', ' & '), formatVisitDate(p.last_visited)].filter(Boolean).join(' · ')}
+                        </span>
+                      </div>
+                      <div className="pf-place-score-wrap">
+                        <span className="pf-place-score-val">{p.computed_score}</span>
+                        <span className="pf-place-score-max">/25</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               ))}
             </div>
           )}
