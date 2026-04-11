@@ -557,56 +557,61 @@ export default function BestMatch({ onClose, onOpenPlace }) {
   }
 
   /* ── Results ── */
-  if (step === 'results') return (
-    <div className="bm-screen">
-      <div className="bm-header">
-        <button className="bm-close-btn" onClick={onClose} aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6 6 18M6 6l12 12"/>
-          </svg>
-        </button>
-        <button className="bm-restart-btn" onClick={() => { setStep('location'); setLocQuery(''); setLocation(null); setLocSugg([]) }}>
-          Start Over
-        </button>
-      </div>
+  if (step === 'results') {
+    const sortedMaybe = [...maybe].sort((a, b) => (b.computed_score ?? 0) - (a.computed_score ?? 0))
+    const neighborhood = addr => addr?.split(',').slice(1).join(',').trim() || addr || ''
 
-      {maybe.length === 0 ? (
-        <div className="bm-empty-state">
-          <span className="bm-empty-emoji">🤔</span>
-          <h2 className="bm-empty-title">Nothing saved</h2>
-          <p className="bm-empty-sub">{quip}</p>
-          <button className="bm-btn-primary" style={{ marginTop: 28 }} onClick={() => { setStep('swipe'); setIdx(0); setMaybe([]); setHistory([]) }}>
-            Try Again
+    return (
+      <div className="bm-screen bm-screen--results">
+        <div className="bm-header">
+          <button className="bm-close-btn" onClick={onClose} aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          <button className="bm-restart-btn" onClick={() => { setStep('location'); setLocQuery(''); setLocation(null); setLocSugg([]) }}>
+            Start Over
           </button>
         </div>
-      ) : (
-        <>
-          <div className="bm-results-header">
-            <h2 className="bm-results-title">Your Picks</h2>
-            <p className="bm-results-sub">{maybe.length} place{maybe.length !== 1 ? 's' : ''} saved</p>
+
+        {maybe.length === 0 ? (
+          <div className="bm-empty-state">
+            <span className="bm-empty-emoji">🤔</span>
+            <h2 className="bm-empty-title">Nothing saved</h2>
+            <p className="bm-empty-sub">{quip}</p>
+            <button className="bm-btn-primary" style={{ marginTop: 28 }} onClick={() => { setStep('swipe'); setIdx(0); setMaybe([]); setHistory([]) }}>
+              Try Again
+            </button>
           </div>
-          <div className="bm-results-list">
-            {maybe.map(place => (
-              <button
-                key={place.id}
-                className="bm-result-row"
-                onClick={() => onOpenPlace?.(place)}
-              >
-                <div className="bm-result-info">
-                  <span className="bm-result-name">{place.name}</span>
-                  <span className="bm-result-meta">{place.address}</span>
-                </div>
-                <div className="bm-result-score-wrap">
-                  <span className="bm-result-score-val">{place.computed_score}</span>
-                  <span className="bm-result-score-max">/25</span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  )
+        ) : (
+          <>
+            <div className="bm-results-header">
+              <h2 className="bm-results-title">Your Picks</h2>
+              <p className="bm-results-sub">{maybe.length} place{maybe.length !== 1 ? 's' : ''} saved</p>
+            </div>
+            <div className="bm-results-list">
+              {sortedMaybe.map(place => (
+                <button
+                  key={place.id}
+                  className="bm-result-row"
+                  onClick={() => onOpenPlace?.(place)}
+                >
+                  <div className="bm-result-info">
+                    <span className="bm-result-name">{place.name}</span>
+                    <span className="bm-result-meta">{neighborhood(place.address)}</span>
+                  </div>
+                  <div className="bm-result-score-wrap">
+                    <span className="bm-result-score-val">{place.computed_score}</span>
+                    <span className="bm-result-score-max">/25</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    )
+  }
 
   return null
 }
