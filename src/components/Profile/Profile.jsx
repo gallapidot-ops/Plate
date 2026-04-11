@@ -432,9 +432,10 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
   const displayProfile = isViewMode ? viewedProfile : currentProfile
 
   const [profileTab,     setProfileTab]     = useState('main')
-  const [expFilter,      setExpFilter]      = useState(null)
-  const [activeCatKey,   setActiveCatKey]   = useState(null)
-  const [activeCityKey,  setActiveCityKey]  = useState(null)
+  const [headerExpanded, setHeaderExpanded] = useState(false)
+  const [activeMealKeys, setActiveMealKeys] = useState(() => new Set())
+  const [activeVibeKeys, setActiveVibeKeys] = useState(() => new Set())
+  const [activeCityKeys, setActiveCityKeys] = useState(() => new Set())
   const [showSettings,   setShowSettings]   = useState(false)
   const [showCharts,     setShowCharts]     = useState(false)
   const [followDrawer,   setFollowDrawer]   = useState(null)
@@ -534,46 +535,54 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
   }
 
   /* ── Derived data ── */
-  const expData = EXP_LIST.map(exp => ({
-    ...exp,
-    count:  places.filter(p => p.experience_type === exp.id).length,
-    places: places.filter(p => p.experience_type === exp.id),
-  })).filter(e => e.count > 0)
+  const catData  = buildCatData(places)  // used for charts
+  const cityData = buildCityData(places, displayProfile?.home_city)
 
-  const filteredPlaces = expFilter
-    ? places.filter(p => p.experience_type === expFilter)
-    : places
-
-  const catData    = buildCatData(filteredPlaces)
-  const cityData   = buildCityData(places, displayProfile?.home_city)
-  const activeCat  = catData.find(c => c.key === activeCatKey) ?? null
-  const activeCity = cityData.find(c => c.city === activeCityKey) ?? null
+  // Which filter options exist in this user's data
+  const mealTypesPresent = CAT_ORDER.filter(cat =>
+    places.some(p => cat.keys.some(k => p.meal_types?.includes(k)))
+  )
+  const vibeTypesPresent = EXP_LIST.filter(exp =>
+    places.some(p => p.experience_type === exp.id)
+  )
 
   const filteredRecent = (() => {
-    let result = [...filteredPlaces]
-    if (activeCatKey) {
-      const cat = CAT_ORDER.find(c => c.key === activeCatKey)
-      if (cat) result = result.filter(p => cat.keys.some(k => p.meal_types.includes(k)))
+    let result = [...places]
+    if (activeMealKeys.size > 0) {
+      result = result.filter(p =>
+        [...activeMealKeys].some(key => {
+          const cat = CAT_ORDER.find(c => c.key === key)
+          return cat?.keys.some(k => p.meal_types?.includes(k))
+        })
+      )
     }
-    if (activeCityKey) {
+    if (activeVibeKeys.size > 0) {
+      result = result.filter(p => activeVibeKeys.has(p.experience_type))
+    }
+    if (activeCityKeys.size > 0) {
       result = result.filter(p => {
         const city = p.city || displayProfile?.home_city || ''
-        return city === activeCityKey
+        return activeCityKeys.has(city)
       })
     }
     return result.sort((a, b) => new Date(b.last_visited) - new Date(a.last_visited))
   })()
 
-  const hasActiveFilter = !!(expFilter || activeCatKey || activeCityKey)
+  const hasActiveFilter = activeMealKeys.size > 0 || activeVibeKeys.size > 0 || activeCityKeys.size > 0
 
-  function toggleExpFilter(id) {
-    setExpFilter(prev => prev === id ? null : id)
+  function toggleMeal(key) {
+    setActiveMealKeys(prev => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s })
   }
-
+  function toggleVibe(id) {
+    setActiveVibeKeys(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+  }
+  function toggleCity(city) {
+    setActiveCityKeys(prev => { const s = new Set(prev); s.has(city) ? s.delete(city) : s.add(city); return s })
+  }
   function clearAllFilters() {
-    setExpFilter(null)
-    setActiveCatKey(null)
-    setActiveCityKey(null)
+    setActiveMealKeys(new Set())
+    setActiveVibeKeys(new Set())
+    setActiveCityKeys(new Set())
   }
 
   const displayName = displayProfile?.name || displayProfile?.username || '—'
@@ -587,7 +596,6 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
     <div className="pf-screen">
 
       {/* ════ Header ════ */}
-      {/* Back button row (view mode only) */}
       {isViewMode && onBack && (
         <div className="pf-back-row">
           <button className="pf-back-btn" onClick={onBack} aria-label="Back">
@@ -599,55 +607,95 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
       )}
 
       <div className={`pf-header${isViewMode ? ' pf-header--view' : ''}`}>
-        {avatarUrl ? (
-          <img src={avatarUrl} alt={displayName} className="pf-avatar" />
-        ) : (
-          <div
-            className="pf-avatar pf-avatar--initials"
-            style={{ background: bgColor }}
-          >
-            {initials}
-          </div>
-        )}
-        <div className="pf-header-info">
-          <div className="pf-name-row">
+
+        {/* ── Compact row (always visible) ── */}
+        <div
+          className="pf-header-compact"
+          onClick={() => !isViewMode && setHeaderExpanded(v => !v)}
+          style={{ cursor: isViewMode ? 'default' : 'pointer' }}
+        >
+          {avatarUrl ? (
+            <img src={avatarUrl} alt={displayName} className="pf-avatar" />
+          ) : (
+            <div className="pf-avatar pf-avatar--initials" style={{ background: bgColor }}>
+              {initials}
+            </div>
+          )}
+          <div className="pf-header-compact-info">
             <h1 className="pf-name">{displayName}</h1>
             {username && <span className="pf-username" dir="ltr">{username}</span>}
           </div>
-          <div className="pf-meta-row">
-            <span className="pf-meta-item">{places.length} places</span>
-            <span className="pf-meta-dot">·</span>
-            <button className="pf-meta-btn" onClick={() => setFollowDrawer('followers')}>
-              {followCounts.followers} followers
+          {isViewMode ? (
+            <button
+              className={`pf-view-follow-btn${followStatus === 'following' ? ' pf-view-follow-btn--following' : followStatus === 'requested' ? ' pf-view-follow-btn--requested' : ''}`}
+              onClick={e => { e.stopPropagation(); handleFollow() }}
+              disabled={acting}
+              aria-label="Follow"
+            >
+              {followLabel()}
             </button>
-            <span className="pf-meta-dot">·</span>
-            <button className="pf-meta-btn" onClick={() => setFollowDrawer('following')}>
-              {followCounts.following} following
-            </button>
-            {joinDate && <>
-              <span className="pf-meta-dot">·</span>
-              <span className="pf-meta-item pf-meta-joined">Member since {joinDate}</span>
-            </>}
-          </div>
+          ) : (
+            <svg
+              className={`pf-header-chevron${headerExpanded ? ' pf-header-chevron--open' : ''}`}
+              width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+            >
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          )}
         </div>
 
-        {/* Gear (own profile) or Follow button (view mode) */}
-        {isViewMode ? (
-          <button
-            className={`pf-view-follow-btn${followStatus === 'following' ? ' pf-view-follow-btn--following' : followStatus === 'requested' ? ' pf-view-follow-btn--requested' : ''}`}
-            onClick={handleFollow}
-            disabled={acting}
-            aria-label="Follow"
-          >
-            {followLabel()}
-          </button>
-        ) : (
-          <button className="pf-gear-btn" onClick={() => setShowSettings(true)} aria-label="Settings">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"/>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-            </svg>
-          </button>
+        {/* ── Expandable stats (own profile) ── */}
+        {!isViewMode && (
+          <div className={`pf-header-expanded${headerExpanded ? ' pf-header-expanded--open' : ''}`}>
+            <div className="pf-header-expanded-inner">
+              <div className="pf-header-expanded-left">
+                <div className="pf-meta-row">
+                  <span className="pf-meta-item">{places.length} places</span>
+                  <span className="pf-meta-dot">·</span>
+                  <button className="pf-meta-btn" onClick={() => setFollowDrawer('followers')}>
+                    {followCounts.followers} followers
+                  </button>
+                  <span className="pf-meta-dot">·</span>
+                  <button className="pf-meta-btn" onClick={() => setFollowDrawer('following')}>
+                    {followCounts.following} following
+                  </button>
+                </div>
+                {joinDate && <span className="pf-meta-joined">Member since {joinDate}</span>}
+              </div>
+              <button
+                className="pf-gear-btn"
+                onClick={e => { e.stopPropagation(); setShowSettings(true) }}
+                aria-label="Settings"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── Stats always visible in view mode ── */}
+        {isViewMode && (
+          <div className="pf-header-view-stats">
+            <div className="pf-meta-row">
+              <span className="pf-meta-item">{places.length} places</span>
+              <span className="pf-meta-dot">·</span>
+              <button className="pf-meta-btn" onClick={() => setFollowDrawer('followers')}>
+                {followCounts.followers} followers
+              </button>
+              <span className="pf-meta-dot">·</span>
+              <button className="pf-meta-btn" onClick={() => setFollowDrawer('following')}>
+                {followCounts.following} following
+              </button>
+              {joinDate && <>
+                <span className="pf-meta-dot">·</span>
+                <span className="pf-meta-item pf-meta-joined">Since {joinDate}</span>
+              </>}
+            </div>
+          </div>
         )}
       </div>
 
@@ -696,24 +744,62 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             </p>
           )}
 
-          {/* ── Category filter pills ── */}
-          {!dataLoading && catData.length > 0 && (
-            <div className="pf-cat-pills-row">
-              <button
-                className={`pf-cat-pill${activeCatKey === null ? ' pf-cat-pill--active' : ''}`}
-                onClick={() => setActiveCatKey(null)}
-              >
-                All ({filteredPlaces.length})
-              </button>
-              {catData.map(cat => (
-                <button
-                  key={cat.key}
-                  className={`pf-cat-pill${activeCatKey === cat.key ? ' pf-cat-pill--active' : ''}`}
-                  onClick={() => setActiveCatKey(cat.key)}
-                >
-                  {cat.name} ({cat.count})
+          {/* ── Three filter rows ── */}
+          {!dataLoading && (
+            <div className="pf-filters">
+              {mealTypesPresent.length > 0 && (
+                <div className="pf-filter-row">
+                  <span className="pf-filter-label">MEAL</span>
+                  <div className="pf-filter-pills">
+                    {mealTypesPresent.map(cat => (
+                      <button
+                        key={cat.key}
+                        className={`pf-cat-pill${activeMealKeys.has(cat.key) ? ' pf-cat-pill--active' : ''}`}
+                        onClick={() => toggleMeal(cat.key)}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {vibeTypesPresent.length > 0 && (
+                <div className="pf-filter-row">
+                  <span className="pf-filter-label">VIBE</span>
+                  <div className="pf-filter-pills">
+                    {vibeTypesPresent.map(exp => (
+                      <button
+                        key={exp.id}
+                        className={`pf-cat-pill${activeVibeKeys.has(exp.id) ? ' pf-cat-pill--active' : ''}`}
+                        onClick={() => toggleVibe(exp.id)}
+                      >
+                        {exp.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {cityData.length > 1 && (
+                <div className="pf-filter-row">
+                  <span className="pf-filter-label">CITY</span>
+                  <div className="pf-filter-pills">
+                    {cityData.map(cd => (
+                      <button
+                        key={cd.city}
+                        className={`pf-cat-pill${activeCityKeys.has(cd.city) ? ' pf-cat-pill--active' : ''}`}
+                        onClick={() => toggleCity(cd.city)}
+                      >
+                        {cd.city}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {hasActiveFilter && (
+                <button className="pf-filter-clear" onClick={clearAllFilters}>
+                  ✕ Clear filters
                 </button>
-              ))}
+              )}
             </div>
           )}
 
