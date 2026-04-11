@@ -696,120 +696,55 @@ export default function Profile({ onOpenPlace, currentProfile, viewedProfile = n
             </p>
           )}
 
-          {/* ── Experience filter chips ── */}
-          {!dataLoading && expData.length > 0 && (
-            <div className="pf-exp-filters">
-              {expData.map(exp => {
-                const { Icon } = exp
-                return (
-                  <button
-                    key={exp.id}
-                    className={`pf-exp-chip${expFilter === exp.id ? ' pf-exp-chip--active' : ''}`}
-                    onClick={() => toggleExpFilter(exp.id)}
-                  >
-                    <Icon size={13} strokeWidth={1.6} />
-                    <span>{exp.label}</span>
-                    <span className="pf-exp-chip-count">{exp.count}</span>
-                  </button>
-                )
-              })}
-              {expFilter && (
-                <button className="pf-exp-chip-clear" onClick={() => setExpFilter(null)}>
-                  ✕ All
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* ── Category highlights ── */}
-          {catData.length > 0 && (
-            <section className="pf-section">
-              <p className="pf-section-label">Categories</p>
-              <div className="pf-cat-scroll">
-                {catData.map(cat => (
-                  <button
-                    key={cat.key}
-                    className={`pf-cat-chip${activeCatKey === cat.key ? ' pf-cat-chip--active' : ''}`}
-                    onClick={() => setActiveCatKey(cat.key)}
-                  >
-                    <span className="pf-cat-chip-name">{cat.name}</span>
-                    <span className="pf-cat-chip-count">{cat.count}</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* ── Cities ── */}
-          <section className="pf-section">
-            <p className="pf-section-label">Cities</p>
-            <div className="pf-cities-scroll">
-              {cityData.map(cd => (
+          {/* ── Category filter pills ── */}
+          {!dataLoading && catData.length > 0 && (
+            <div className="pf-cat-pills-row">
+              <button
+                className={`pf-cat-pill${activeCatKey === null ? ' pf-cat-pill--active' : ''}`}
+                onClick={() => setActiveCatKey(null)}
+              >
+                All ({filteredPlaces.length})
+              </button>
+              {catData.map(cat => (
                 <button
-                  key={cd.city}
-                  className={`pf-city-bubble ${activeCityKey === cd.city ? 'pf-city-bubble--active' : ''} ${cd.isHome ? 'pf-city-bubble--home' : ''}`}
-                  onClick={() => setActiveCityKey(cd.city)}
+                  key={cat.key}
+                  className={`pf-cat-pill${activeCatKey === cat.key ? ' pf-cat-pill--active' : ''}`}
+                  onClick={() => setActiveCatKey(cat.key)}
                 >
-                  {cd.isHome && (
-                    <svg className="pf-city-home-icon" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                    </svg>
-                  )}
-                  <span className="pf-city-name">{cd.city}</span>
-                  <span className="pf-city-count">{cd.count}</span>
+                  {cat.name} ({cat.count})
                 </button>
               ))}
             </div>
-          </section>
+          )}
 
-          {/* ── Recent visits ── */}
-          <section className="pf-section">
-            <div className="pf-recent-header">
-              <p className="pf-section-label" style={{ margin: 0 }}>Recent Visits</p>
-              {hasActiveFilter && (
-                <button className="pf-recent-clear" onClick={clearAllFilters}>
-                  ✕ Clear filters
-                </button>
-              )}
-            </div>
-            {filteredRecent.length === 0 ? (
-              <p className="pf-recent-empty">No visits match the selected filters</p>
-            ) : (
-              <div className="pf-recent-list">
-                {filteredRecent.map(p => (
-                  <button
-                    key={p.id}
-                    className="pf-visit-card"
-                    onClick={() => onOpenPlace?.(p)}
-                  >
-                    <span className="pf-visit-name">
-                      {p.name}
-                      {p.is_regular && (
-                        <svg className="pf-visit-regular-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
-                          <path d="M17 1l4 4-4 4"/>
-                          <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                          <path d="M7 23l-4-4 4-4"/>
-                          <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-                        </svg>
-                      )}
+          {/* ── Places list ── */}
+          {!dataLoading && (
+            <div className="pf-place-list">
+              {filteredRecent.length === 0 ? (
+                <p className="pf-recent-empty">No places yet</p>
+              ) : filteredRecent.map(p => (
+                <button
+                  key={p.id}
+                  className="pf-place-row"
+                  onClick={() => onOpenPlace?.(p)}
+                >
+                  <div className="pf-place-info">
+                    <span className="pf-place-name">{p.name}</span>
+                    <span className="pf-place-meta">
+                      {[p.meal_types?.[0]?.replace('_', ' & '), formatVisitDate(p.last_visited)].filter(Boolean).join(' · ')}
                     </span>
-                    <div className="pf-visit-meta-row">
-                      <span className="pf-visit-score">
-                        <span className="pf-visit-score-val">{p.computed_score}</span>
-                        <span className="pf-visit-score-max">/25</span>
-                      </span>
-                      {p.last_visited && (
-                        <span className="pf-visit-date">{formatVisitDate(p.last_visited)}</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </section>
+                  </div>
+                  <div className="pf-place-score-wrap">
+                    <span className="pf-place-score-val">{p.computed_score}</span>
+                    <span className="pf-place-score-max">/25</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* ── Charts ── */}
-          <section className="pf-section pf-section--chart pf-section--last">
+          <section className="pf-section pf-section--chart pf-section--last" style={{ padding: '16px 20px 24px' }}>
             <button className="pf-charts-toggle" onClick={() => setShowCharts(v => !v)}>
               <span className="pf-section-label" style={{ margin: 0 }}>Stats</span>
               <svg
