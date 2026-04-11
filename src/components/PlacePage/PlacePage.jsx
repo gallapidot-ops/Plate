@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
 import { enrichPlace, RESERVATION_LABELS, PRICE_LABELS } from '../../data/mockPlaceDetails'
+
+/* ── Trim address to "Street, City" — drop postal code and country ── */
+function formatAddress(addr) {
+  if (!addr) return ''
+  return addr.split(',').map(p => p.trim()).slice(0, 2).join(', ')
+}
 import { computeBreakdown, getPlaceScores } from '../../data/scoring'
 import { getPlacePhotos } from '../../lib/places'
 import { getFollowing, sharePlace } from '../../lib/db'
@@ -108,7 +114,7 @@ function ShareSheet({ place, onClose }) {
         {/* Place preview inside sheet */}
         <div className="pp-sheet-place-preview">
           <div className="pp-sheet-place-name">{place.name}</div>
-          <div className="pp-sheet-place-sub">{place.address}</div>
+          <div className="pp-sheet-place-sub">{formatAddress(place.address)}</div>
         </div>
 
         {sent ? (
@@ -387,7 +393,7 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
             </svg>
-            {place.address}
+            {formatAddress(place.address)}
           </p>
         </div>
       </div>

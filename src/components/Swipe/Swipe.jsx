@@ -2,6 +2,12 @@ import { useState, useRef } from 'react'
 import { MOCK_SWIPE_CARDS, MOCK_FRIENDS, MEAL_TYPE_LABELS } from '../../data/mockSocial'
 import './Swipe.css'
 
+/* ── Trim address to "Street, City" — drop postal code and country ── */
+function formatAddress(addr) {
+  if (!addr) return ''
+  return addr.split(',').map(p => p.trim()).slice(0, 2).join(', ')
+}
+
 function SwipeCard({ card, onSwipe, isTop }) {
   const startX = useRef(null)
   const currentX = useRef(0)
@@ -85,7 +91,7 @@ function SwipeCard({ card, onSwipe, isTop }) {
         <div className="swipe-info-top">
           <div>
             <h2 className="swipe-place-name">{card.place.name}</h2>
-            <p className="swipe-place-address">{card.place.address}</p>
+            <p className="swipe-place-address">{formatAddress(card.place.address)}</p>
           </div>
           <div className="swipe-score">
             <span className="swipe-score-val">{card.score}</span>

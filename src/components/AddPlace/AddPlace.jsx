@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
+
+/* ── Trim address to "Street, City" — drop postal code and country ── */
+function formatAddress(addr) {
+  if (!addr) return ''
+  return addr.split(',').map(p => p.trim()).slice(0, 2).join(', ')
+}
 import {
   TASTE_OPTIONS, SPREAD_OPTIONS, AESTHETIC_OPTIONS, SERVICE_OPTIONS,
   TAGS, computeScore,
@@ -28,10 +34,10 @@ const MEAL_TYPES_ORDERED = [
 
 /* ── Rating categories ────────────────────────────────────────────── */
 const CATS = [
-  { key: 'taste',     label: 'Taste Level',   opts: TASTE_OPTIONS     },
-  { key: 'spread',    label: 'The Spread',     opts: SPREAD_OPTIONS    },
-  { key: 'aesthetic', label: 'Aesthetic Mood', opts: AESTHETIC_OPTIONS },
-  { key: 'service',   label: 'Service Flow',   opts: SERVICE_OPTIONS   },
+  { key: 'taste',     label: 'Taste',     opts: TASTE_OPTIONS     },
+  { key: 'spread',    label: 'Spread',    opts: SPREAD_OPTIONS    },
+  { key: 'aesthetic', label: 'Aesthetic', opts: AESTHETIC_OPTIONS },
+  { key: 'service',   label: 'Service',   opts: SERVICE_OPTIONS   },
 ]
 
 /* ── Community averages ───────────────────────────────────────────── */
@@ -245,7 +251,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange, onNext }) {
             {bgImage && <div className="ap-hero-scrim" />}
             <div className="ap-hero-body">
               <h2 className="ap-hero-name">{place.name}</h2>
-              <span className="ap-hero-addr">{place.address}</span>
+              <span className="ap-hero-addr">{formatAddress(place.address)}</span>
             </div>
             <div className="ap-hero-actions">
               <button className="ap-hero-btn" onClick={() => fileRef.current?.click()}>
@@ -317,7 +323,7 @@ function StepVisit({ place, photo, onPhotoChange, onPlaceChange,
         {bgImage && <div className="ap-hero-scrim" />}
         <div className="ap-hero-body">
           <h2 className="ap-hero-name">{place?.name}</h2>
-          <span className="ap-hero-addr">{place?.address}</span>
+          <span className="ap-hero-addr">{formatAddress(place?.address)}</span>
         </div>
         <div className="ap-hero-actions">
           <button className="ap-hero-btn" onClick={() => fileRef.current?.click()}>
@@ -552,94 +558,119 @@ function StepRating({ mealType, rating, onChange, note, onNote, tags, onTags, on
     }
   }
 
+  const checkSVG = (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </svg>
+  )
+
   return (
     <div className="ap-step ap-step--rating">
 
-      {/* EQ columns – tall, vertical, equalizer style */}
-      <div className="ap-eq-cols">
-        {CATS.map(cat => (
-          <EQColumn
-            key={cat.key}
-            catKey={cat.key}
-            label={cat.label}
-            options={cat.opts}
-            mealType={mealType}
-            selected={rating[cat.key]}
-            onChange={val => onChange(cat.key, val)}
-          />
-        ))}
+      {/* ── Dark header: step indicators + score + avg ── */}
+      <div className="ap-rating-header">
+
+        {/* Step indicator circles */}
+        <div className="ap-rating-steps">
+          <div className="ap-rating-step ap-rating-step--done">{checkSVG}</div>
+          <div className="ap-rating-step-line" />
+          <div className="ap-rating-step ap-rating-step--done">{checkSVG}</div>
+          <div className="ap-rating-step-line" />
+          <div className="ap-rating-step ap-rating-step--active">3</div>
+        </div>
+
+        {/* Score number */}
+        <div className="ap-rating-score-display">
+          <span className="ap-rating-score-big">{score}</span>
+          <span className="ap-rating-score-denom">/25</span>
+        </div>
+
+        {/* Plate avg + delta */}
+        {plateAvg > 0 && (
+          <div className="ap-rating-avg-row">
+            Plate avg: {plateAvg}
+            {delta !== 0 && (
+              <span className={`ap-rating-delta${delta > 0 ? ' ap-rating-delta--up' : ' ap-rating-delta--dn'}`}>
+                {delta > 0 ? ` +${delta}` : ` ${delta}`}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Score reveal */}
-      {(phase === 'revealing' || phase === 'done') && (
-        <div className={`ap-score-reveal${phase === 'done' ? ' ap-score-reveal--settle' : ''}`}>
-          <div className="ap-score-num">
-            <span className="ap-score-big">{score}</span>
-            <span className="ap-score-denom">/25</span>
-          </div>
-        </div>
-      )}
-
-      {/* Post-rating */}
-      {phase === 'done' && (
-        <div className="ap-post-rating">
-          {plateAvg > 0 && (
-            <div className="ap-score-plate-ref">
-              Plate avg: {plateAvg}
-              {delta !== 0 && (
-                <span className={`ap-score-delta${delta > 0 ? ' ap-score-delta--up' : ' ap-score-delta--dn'}`}>
-                  {delta > 0 ? ` +${delta}` : ` ${delta}`}
-                </span>
-              )}
-            </div>
-          )}
-          <div className="ap-field-group">
-            <label className="ap-label">Personal note</label>
-            <textarea
-              className="ap-textarea"
-              placeholder="What made it special?"
-              value={note}
-              onChange={e => onNote(e.target.value)}
-              rows={3}
+      {/* ── Bars card (white) ── */}
+      <div className="ap-rating-bars-card">
+        <div className="ap-eq-cols">
+          {CATS.map(cat => (
+            <EQColumn
+              key={cat.key}
+              catKey={cat.key}
+              label={cat.label}
+              options={cat.opts}
+              mealType={mealType}
+              selected={rating[cat.key]}
+              onChange={val => onChange(cat.key, val)}
             />
-          </div>
-          <div className="ap-field-group">
-            <label className="ap-label ap-label--sm">Tags</label>
-            <div className="ap-chips ap-chips--sm">
-              {TAGS.map(tag => (
-                <button
-                  key={tag.id}
-                  className={`ap-chip ap-chip--sm${tags.includes(tag.label) ? ' ap-chip--on' : ''}`}
-                  onClick={() => toggleTag(tag.label)}
-                >
-                  {tag.label}
-                </button>
-              ))}
-              {/* Custom tags added by user */}
-              {tags.filter(t => !TAGS.some(st => st.label === t) && !['₪','₪₪','₪₪₪','₪₪₪₪'].includes(t)).map(t => (
-                <button
-                  key={t}
-                  className="ap-chip ap-chip--sm ap-chip--on"
-                  onClick={() => onTags(prev => prev.filter(x => x !== t))}
-                >
-                  {t} ×
-                </button>
-              ))}
-            </div>
-            <input
-              className="ap-custom-tag-input"
-              placeholder="Add custom tag, press Enter"
-              value={customTagInput}
-              onChange={e => setCustomTagInput(e.target.value)}
-              onKeyDown={handleCustomTagKey}
-            />
-          </div>
-          <button className="ap-save-btn btn-primary" onClick={onSave}>Save to Plate</button>
+          ))}
         </div>
-      )}
+      </div>
 
-      <div className="ap-step-footer ap-step-footer--back-only">
-        <button className="btn-ghost" onClick={onBack}>Back</button>
+      {/* ── Scrollable body ── */}
+      <div className="ap-rating-body">
+        {phase === 'done' && (
+          <div className="ap-post-rating">
+            <div className="ap-field-group">
+              <label className="ap-label">Personal note</label>
+              <textarea
+                className="ap-textarea"
+                placeholder="What made it special?"
+                value={note}
+                onChange={e => onNote(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="ap-field-group">
+              <label className="ap-label ap-label--sm">Tags</label>
+              <div className="ap-chips ap-chips--sm">
+                {TAGS.map(tag => (
+                  <button
+                    key={tag.id}
+                    className={`ap-chip ap-chip--sm${tags.includes(tag.label) ? ' ap-chip--on' : ''}`}
+                    onClick={() => toggleTag(tag.label)}
+                  >
+                    {tag.label}
+                  </button>
+                ))}
+                {/* Custom tags added by user */}
+                {tags.filter(t => !TAGS.some(st => st.label === t) && !['₪','₪₪','₪₪₪','₪₪₪₪'].includes(t)).map(t => (
+                  <button
+                    key={t}
+                    className="ap-chip ap-chip--sm ap-chip--on"
+                    onClick={() => onTags(prev => prev.filter(x => x !== t))}
+                  >
+                    {t} ×
+                  </button>
+                ))}
+              </div>
+              <input
+                className="ap-custom-tag-input"
+                placeholder="Add custom tag, press Enter"
+                value={customTagInput}
+                onChange={e => setCustomTagInput(e.target.value)}
+                onKeyDown={handleCustomTagKey}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ── CTA footer ── */}
+      <div className="ap-step-footer">
+        {phase === 'done' ? (
+          <button className="ap-cta-btn" onClick={onSave}>Save to Plate →</button>
+        ) : (
+          <button className="btn-ghost" onClick={onBack}>← Back</button>
+        )}
       </div>
     </div>
   )
@@ -846,6 +877,7 @@ export default function AddPlace({ onSaved, prefill = null }) {
       'ap-screen',
       step === 0 && !place && !saving ? 'ap-screen--search' : '',
       ((step === 0 && !!place) || step === 1) && !saving ? 'ap-screen--details' : '',
+      step === 2 && !saving ? 'ap-screen--rating' : '',
     ].filter(Boolean).join(' ')}>
 
       {/* Progress — hidden in wishlist mode */}

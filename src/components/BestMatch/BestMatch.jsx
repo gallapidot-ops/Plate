@@ -51,10 +51,24 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.asin(Math.sqrt(a))
 }
 
+/* ── Format distance: "X min walk" up to 20 min, then "X.X km away" ── */
+function formatDistance(km) {
+  if (!km || km <= 0) return ''
+  const mins = Math.round(km / 0.08) // ~4.8 km/h walking pace
+  if (mins <= 20) return `${mins} min walk`
+  return `${km < 10 ? km.toFixed(1) : Math.round(km)} km away`
+}
+
+/* ── Trim address to "Street, City" — drop postal code and country ── */
+function formatAddress(addr) {
+  if (!addr) return ''
+  return addr.split(',').map(p => p.trim()).slice(0, 2).join(', ')
+}
+
 /* ══════════════════════════════════════
    SWIPE CARD
 ══════════════════════════════════════ */
-function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
+function SwipeCard({ place, onSwipe, isTop, isNext, dragDx, userLoc }) {
   const startX = useRef(null)
   const startY = useRef(null)
   const [dx, setDx]         = useState(0)
@@ -118,7 +132,7 @@ function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
         className="bm-card bm-card--next"
         style={{ transform: `scale(${scale}) translateY(14px)`, transition: 'transform 0.15s' }}
       >
-        <CardInner place={place} likeOpacity={0} nopeOpacity={0} />
+        <CardInner place={place} likeOpacity={0} nopeOpacity={0} userLoc={userLoc} />
       </div>
     )
   }
@@ -131,12 +145,16 @@ function SwipeCard({ place, onSwipe, isTop, isNext, dragDx }) {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <CardInner place={place} likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} />
+      <CardInner place={place} likeOpacity={likeOpacity} nopeOpacity={nopeOpacity} userLoc={userLoc} />
     </div>
   )
 }
 
-function CardInner({ place, likeOpacity, nopeOpacity }) {
+function CardInner({ place, likeOpacity, nopeOpacity, userLoc }) {
+  const distKm = (userLoc?.lat && userLoc?.lng && place.lat && place.lng)
+    ? haversineKm(userLoc.lat, userLoc.lng, place.lat, place.lng)
+    : null
+
   return (
     <>
       {place.photo_url
@@ -161,7 +179,16 @@ function CardInner({ place, likeOpacity, nopeOpacity }) {
           <span className="bm-card-score-max">/25</span>
         </div>
         <h2 className="bm-card-name">{place.name}</h2>
-        <p className="bm-card-addr">{place.address}</p>
+        <p className="bm-card-addr">{formatAddress(place.address)}</p>
+        {distKm !== null && (
+          <p className="bm-card-dist">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '3px', opacity: 0.75 }}>
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {formatDistance(distKm)}
+          </p>
+        )}
       </div>
     </>
   )
@@ -520,6 +547,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
               isNext={true}
               dragDx={topDx}
               onSwipe={() => {}}
+              userLoc={location}
             />
           )}
           <SwipeCard
@@ -529,6 +557,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
             isNext={false}
             dragDx={topDx}
             onSwipe={handleSwipe}
+            userLoc={location}
           />
         </div>
 
@@ -559,7 +588,6 @@ export default function BestMatch({ onClose, onOpenPlace }) {
   /* ── Results ── */
   if (step === 'results') {
     const sortedMaybe = [...maybe].sort((a, b) => (b.computed_score ?? 0) - (a.computed_score ?? 0))
-    const neighborhood = addr => addr?.split(',').slice(1).join(',').trim() || addr || ''
 
     return (
       <div className="bm-screen bm-screen--results">
@@ -598,7 +626,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
                 >
                   <div className="bm-result-info">
                     <span className="bm-result-name">{place.name}</span>
-                    <span className="bm-result-meta">{neighborhood(place.address)}</span>
+                    <span className="bm-result-meta">{formatAddress(place.address)}</span>
                   </div>
                   <div className="bm-result-score-wrap">
                     <span className="bm-result-score-val">{place.computed_score}</span>

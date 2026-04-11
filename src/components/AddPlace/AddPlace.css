@@ -1697,3 +1697,256 @@
   background: #C63B2F;
   color: #fff;
 }
+
+/* ════════════════════════════════════════════════════════════════
+   STEP 3 – RATING (redesign)
+════════════════════════════════════════════════════════════════ */
+
+/* Hide external progress bar — rating screen has its own header */
+.ap-screen--rating .ap-progress { display: none; }
+
+/* Prevent ap-body from double-scrolling */
+.ap-screen--rating .ap-body { overflow: hidden; }
+
+/* Rating step fills ap-body as a flex column */
+.ap-step--rating {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+}
+
+/* ── Dark header ── */
+.ap-rating-header {
+  background: #1A2B35;
+  padding: 18px 24px 22px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Step indicator row */
+.ap-rating-steps {
+  display: flex;
+  align-items: center;
+  width: 120px;
+  margin-bottom: 10px;
+}
+
+.ap-rating-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+
+.ap-rating-step--done {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ap-rating-step--active {
+  background: #C63B2F;
+  color: #fff;
+}
+
+.ap-rating-step-line {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 5px;
+}
+
+/* Score */
+.ap-rating-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.ap-rating-score-big {
+  font-family: var(--font-sans);
+  font-size: 52px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  letter-spacing: -2px;
+  transition: color 0.3s ease;
+}
+
+.ap-rating-score-denom {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Plate avg */
+.ap-rating-avg-row {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  animation: ap-fade-in 0.4s ease;
+}
+
+.ap-rating-delta--up { color: #5DBF85; }
+.ap-rating-delta--dn { color: #C63B2F; }
+
+/* ── Bars card (white) ── */
+.ap-rating-bars-card {
+  background: #fff;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(26, 43, 53, 0.06);
+}
+
+.ap-rating-bars-card .ap-eq-cols {
+  height: clamp(170px, 42svh, 260px);
+  padding: 16px 20px 8px;
+  gap: 10px;
+}
+
+/* Track = #F5F0E8 */
+.ap-rating-bars-card .eq-col-track {
+  background: #F5F0E8;
+  border: none;
+  border-radius: 10px;
+}
+
+/* Fill = #C63B2F */
+.ap-rating-bars-card .eq-col-fill {
+  background: #C63B2F;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Notches: white lines spanning full bar width */
+.ap-rating-bars-card .eq-notch {
+  background: #fff;
+  height: 2px;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  z-index: 3;
+}
+
+/* Selected option label above bar */
+.ap-rating-bars-card .eq-col-label-wrap {
+  height: 22px;
+}
+
+.ap-rating-bars-card .eq-col-sel-label {
+  font-size: 9px;
+  color: #C63B2F;
+}
+
+/* Category label below bar: small caps, muted */
+.ap-rating-bars-card .eq-col-cat {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(26, 43, 53, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-sans);
+  height: auto;
+  padding: 5px 0 8px;
+}
+
+/* Avg line on bars */
+.ap-rating-bars-card .eq-col-avg-line {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: none;
+}
+
+/* ── Scrollable body (#F5F0E8) ── */
+.ap-rating-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 0;
+  background: #F5F0E8;
+}
+
+/* Override post-rating for new design */
+.ap-step--rating .ap-post-rating {
+  padding: 24px 24px 120px;
+  animation: ap-fade-up 0.38s ease;
+}
+
+/* Labels in small caps style */
+.ap-step--rating .ap-label {
+  color: rgba(26, 43, 53, 0.45);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+/* Textarea: white, rounded */
+.ap-step--rating .ap-textarea {
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.12);
+  border-radius: 14px;
+}
+
+.ap-step--rating .ap-textarea:focus {
+  border-color: #C63B2F;
+}
+
+/* Tag chips: white unselected, #1A2B35 selected */
+.ap-step--rating .ap-chip {
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.12);
+  color: rgba(26, 43, 53, 0.75);
+}
+
+.ap-step--rating .ap-chip--on {
+  background: #1A2B35;
+  color: #fff;
+  font-weight: 700;
+  border-color: #1A2B35;
+}
+
+/* Custom tag input: dashed border, rounded */
+.ap-step--rating .ap-custom-tag-input {
+  border: 1.5px dashed rgba(26, 43, 53, 0.28);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--color-text-primary);
+  margin-top: 10px;
+}
+
+.ap-step--rating .ap-custom-tag-input:focus {
+  border-color: rgba(26, 43, 53, 0.5);
+  outline: none;
+}
+
+/* ── Footer ── */
+.ap-screen--rating .ap-step-footer {
+  background: #F5F0E8;
+  border-top: none;
+  padding: 12px 20px 16px;
+}
+
+/* Save CTA: #C63B2F, full width, rounded */
+.ap-screen--rating .ap-cta-btn {
+  background: #C63B2F;
+  color: #fff;
+  border-radius: 16px;
+  font-weight: 900;
+  font-size: 16px;
+  width: 100%;
+}
+
+.ap-screen--rating .ap-cta-btn:hover { opacity: 0.9; }
+.ap-screen--rating .ap-cta-btn:active { transform: scale(0.98); }
