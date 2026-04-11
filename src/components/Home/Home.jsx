@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater } from 'lucide-react'
 import { addPlaceToWishlist, searchPlaces, searchUsers, followUser, unfollowUser, sendFollowRequest, cancelFollowRequest } from '../../lib/db'
+import { PlateCircleLogo } from '../Logo/Logo'
 import './Home.css'
 
 /* ── Data ── */
@@ -94,7 +95,7 @@ function ChevronRight() {
 /* ════════════════════════════════════════
    STEP 1 — Meal Type  (red background)
 ════════════════════════════════════════ */
-function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople }) {
+function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople, onOpenBestMatch }) {
   const n    = MEAL_TYPES.length
   const meal = MEAL_TYPES[mealIndex]
   const swipe = useSwipe(
@@ -104,10 +105,13 @@ function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople }) {
 
   return (
     <div className="conv-step conv-step--meal" {...swipe}>
-      {/* Sub-tabs */}
-      <div className="conv-tabs">
-        <button className="conv-tab conv-tab--active">Places</button>
-        <button className="conv-tab" onClick={onSwitchToPeople}>People</button>
+      {/* Top bar: logo + tabs */}
+      <div className="conv-top-bar">
+        <PlateCircleLogo size={44} circleFill="none" stroke="rgba(255,255,255,0.88)" />
+        <div className="conv-tabs">
+          <button className="conv-tab conv-tab--active">Places</button>
+          <button className="conv-tab" onClick={onSwitchToPeople}>People</button>
+        </div>
       </div>
 
       {/* Centered meal selector */}
@@ -153,6 +157,14 @@ function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople }) {
         <button className="conv-btn conv-btn--dark" onClick={onNext}>
           This one →
         </button>
+        {onOpenBestMatch && (
+          <button className="bm-entry-link" onClick={onOpenBestMatch}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            Best Match
+          </button>
+        )}
       </div>
     </div>
   )
@@ -657,7 +669,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
 /* ════════════════════════════════════════
    HOME — main export
 ════════════════════════════════════════ */
-export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction, onOpenPlace }) {
+export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction, onOpenPlace, onOpenBestMatch }) {
   const [tab,          setTab]         = useState('places') // 'places' | 'people'
   const [step,         setStep]        = useState(1)        // 1 | 2 | 3
   const [mealIndex,    setMealIndex]   = useState(0)
@@ -710,6 +722,7 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
           onChangeMeal={setMealIndex}
           onNext={handleMealNext}
           onSwitchToPeople={() => setTab('people')}
+          onOpenBestMatch={onOpenBestMatch}
         />
       )}
       {step === 2 && (

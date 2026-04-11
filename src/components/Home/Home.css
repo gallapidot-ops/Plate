@@ -5,7 +5,7 @@
 .home-conv {
   display: flex;
   flex-direction: column;
-  min-height: calc(100svh - 72px - 80px);
+  min-height: calc(100svh - 80px);
   background: #F5F0E8;
   font-family: var(--font-sans);
 }
@@ -16,7 +16,7 @@
 
 .conv-step {
   flex: 1;
-  min-height: calc(100svh - 72px - 80px);
+  min-height: calc(100svh - 80px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -26,11 +26,21 @@
 .conv-step--vibe  { background: #7BAEC4; }
 .conv-step--where { background: #F5F0E8; }
 
+/* ── Top bar: logo + tabs ── */
+.conv-top-bar {
+  display: flex;
+  align-items: center;
+  padding: 52px 20px 0 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 /* ── Sub-tabs (on Meal step) ── */
 .conv-tabs {
   display: flex;
   gap: 4px;
-  padding: 20px 24px 0;
+  padding: 0;
+  flex: 1;
   flex-shrink: 0;
 }
 
@@ -314,7 +324,7 @@
 
 .home-results {
   background: #F5F0E8;
-  min-height: calc(100svh - 72px - 80px);
+  min-height: calc(100svh - 80px);
   display: flex;
   flex-direction: column;
   font-family: var(--font-sans);

@@ -367,6 +367,55 @@ export async function searchPlaces({
 }
 
 /**
+ * Fetch all community places for Best Match discovery.
+ * Returns places with lat/lng, sorted by score desc.
+ * Optionally filtered by meal types and/or experience types.
+ */
+export async function getPlacesForDiscovery({ mealTypes = [], experienceTypes = [] } = {}) {
+  let query = supabase
+    .from('place_ratings')
+    .select(`
+      meal_type, experience_type, computed_score,
+      places ( id, name, address, city, photo_url, lat, lng )
+    `)
+    .order('computed_score', { ascending: false })
+
+  if (mealTypes.length > 0) {
+    query = query.in('meal_type', mealTypes)
+  }
+  if (experienceTypes.length > 0) {
+    query = query.in('experience_type', experienceTypes)
+  }
+
+  const { data, error } = await query
+  if (error) { console.error('[db] getPlacesForDiscovery:', error.message); return [] }
+
+  // Deduplicate by place id — keep highest computed_score row
+  const map = new Map()
+  for (const r of data ?? []) {
+    const p = r.places
+    if (!p?.lat || !p?.lng) continue
+    const existing = map.get(p.id)
+    if (!existing || (r.computed_score ?? 0) > (existing.computed_score ?? 0)) {
+      map.set(p.id, {
+        id:              p.id,
+        name:            p.name,
+        address:         p.address,
+        city:            p.city,
+        photo_url:       p.photo_url,
+        lat:             p.lat,
+        lng:             p.lng,
+        computed_score:  r.computed_score ?? 0,
+        meal_type:       r.meal_type,
+        experience_type: r.experience_type,
+      })
+    }
+  }
+
+  return [...map.values()].sort((a, b) => b.computed_score - a.computed_score)
+}
+
+/**
  * Search users by username (partial match, min 2 chars).
  */
 export async function searchUsers(query) {

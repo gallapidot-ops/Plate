@@ -10,6 +10,7 @@ import Profile            from './components/Profile/Profile'
 import Notifications      from './components/Notifications/Notifications'
 import UserProfile        from './components/UserProfile/UserProfile'
 import Swipe              from './components/Swipe/Swipe'
+import BestMatch          from './components/BestMatch/BestMatch'
 import PlacePage          from './components/PlacePage/PlacePage'
 import AppHeader          from './components/AppHeader/AppHeader'
 import GuestSheet         from './components/GuestSheet/GuestSheet'
@@ -90,6 +91,7 @@ export default function App() {
   const [screen,         setScreen]         = useState('home')
   const [selectedPlace,  setSelectedPlace]  = useState(null)
   const [showSwipe,      setShowSwipe]      = useState(false)
+  const [showBestMatch,  setShowBestMatch]  = useState(false)
   const [viewingUserId,  setViewingUserId]  = useState(null) // UserProfile overlay
   const [notifCount,     setNotifCount]     = useState(0)
   const [addPrefill,        setAddPrefill]        = useState(null) // prefill data for AddPlace
@@ -235,7 +237,7 @@ export default function App() {
     const exitGuest    = () => { setIsGuest(false); setShowGuestSheet(false) }
 
     const showUserOverlay = viewingUserId && !selectedPlace && !showSwipe
-    const hideNav         = selectedPlace || showSwipe || showUserOverlay
+    const hideNav         = selectedPlace || showSwipe || showUserOverlay || showBestMatch
 
     return (
       <div className="app-shell">
@@ -244,6 +246,14 @@ export default function App() {
           <div className="place-page-overlay">
             <Swipe onBack={() => setShowSwipe(false)} />
           </div>
+        )}
+
+        {/* Best Match overlay */}
+        {showBestMatch && (
+          <BestMatch
+            onClose={() => setShowBestMatch(false)}
+            onOpenPlace={p => { setShowBestMatch(false); setSelectedPlace(p) }}
+          />
         )}
 
         {/* Place detail overlay */}
@@ -271,14 +281,6 @@ export default function App() {
           </div>
         )}
 
-        {!hideNav && (
-          <AppHeader
-            onOpenInbox={isGuest ? undefined : () => setScreen('notifications')}
-            notifCount={isGuest ? 0 : notifCount}
-            onGoHome={() => setScreen('home')}
-          />
-        )}
-
         <div className={`app-content${showSplash ? ' app-content--splash-enter' : ''}`}>
           {screen === 'home' && (
             <Home
@@ -287,6 +289,7 @@ export default function App() {
               currentUserId={isGuest ? null : authUser?.id}
               onGuestAction={guestAction}
               onOpenPlace={setSelectedPlace}
+              onOpenBestMatch={() => setShowBestMatch(true)}
             />
           )}
           {screen === 'add' && !isGuest && (
@@ -306,6 +309,8 @@ export default function App() {
               onWishlistVisit={handleWishlistVisit}
               refreshKey={profileRefreshKey}
               onProfileUpdated={setProfile}
+              onOpenInbox={() => setScreen('notifications')}
+              notifCount={notifCount}
             />
           )}
           {screen === 'profile' && isGuest && (
