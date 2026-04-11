@@ -185,9 +185,10 @@ export default function BestMatch({ onClose, onOpenPlace }) {
   const [travelMode,  setTravelMode]  = useState('walk') // 'walk' | 'drive'
 
   /* Step 3 — preferences */
-  const [selMeals, setSelMeals] = useState(() => new Set())
-  const [selVibes, setSelVibes] = useState(() => new Set())
-  const [loadErr,  setLoadErr]  = useState(null)
+  const [selMeals,       setSelMeals]       = useState(() => new Set())
+  const [selVibes,       setSelVibes]       = useState(() => new Set())
+  const [openNowFilter,  setOpenNowFilter]  = useState(false)
+  const [loadErr,        setLoadErr]        = useState(null)
 
   /* Step 4 — swipe */
   const [cards,   setCards]   = useState([])
@@ -236,17 +237,21 @@ export default function BestMatch({ onClose, onOpenPlace }) {
         return haversineKm(location.lat, location.lng, p.lat, p.lng) <= maxKm
       })
 
-      // Check open-now status in parallel (cap at 20 to limit API calls)
-      const toCheck = nearby.slice(0, 20)
-      const withOpenStatus = await Promise.all(
-        toCheck.map(async p => {
-          const openNow = p.google_place_id ? await checkOpenNow(p.google_place_id) : null
-          return { ...p, openNow, hoursUnknown: openNow === null }
-        })
-      )
-
-      // Filter out closed places; unknown hours are included
-      const filtered = withOpenStatus.filter(p => p.openNow !== false)
+      // Optionally check open-now status (only when toggle is ON)
+      let filtered
+      if (openNowFilter) {
+        const toCheck = nearby.slice(0, 20)
+        const withOpenStatus = await Promise.all(
+          toCheck.map(async p => {
+            const openNow = p.google_place_id ? await checkOpenNow(p.google_place_id) : null
+            return { ...p, openNow, hoursUnknown: openNow === null }
+          })
+        )
+        // Keep open + hours-unknown; drop confirmed-closed
+        filtered = withOpenStatus.filter(p => p.openNow !== false)
+      } else {
+        filtered = nearby.map(p => ({ ...p, hoursUnknown: false }))
+      }
 
       setCards(filtered.slice(0, 10))
       setIdx(0)
@@ -379,13 +384,13 @@ export default function BestMatch({ onClose, onOpenPlace }) {
             className={`bm-travel-btn${travelMode === 'walk' ? ' bm-travel-btn--active' : ''}`}
             onClick={() => setTravelMode('walk')}
           >
-            🚶 Walking
+            Walking
           </button>
           <button
             className={`bm-travel-btn${travelMode === 'drive' ? ' bm-travel-btn--active' : ''}`}
             onClick={() => setTravelMode('drive')}
           >
-            🚗 Driving
+            Driving
           </button>
         </div>
 
@@ -449,6 +454,22 @@ export default function BestMatch({ onClose, onOpenPlace }) {
               {v.label}
             </button>
           ))}
+        </div>
+
+        {/* Open Now toggle */}
+        <div className="bm-open-now-row">
+          <div className="bm-open-now-label">
+            <span className="bm-open-now-title">Open now</span>
+            <span className="bm-open-now-sub">Only show places currently open</span>
+          </div>
+          <button
+            role="switch"
+            aria-checked={openNowFilter}
+            className={`bm-toggle${openNowFilter ? ' bm-toggle--on' : ''}`}
+            onClick={() => setOpenNowFilter(v => !v)}
+          >
+            <span className="bm-toggle-thumb" />
+          </button>
         </div>
 
         {loadErr && <p className="bm-error">Error: {loadErr}</p>}
