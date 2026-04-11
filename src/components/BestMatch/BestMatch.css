@@ -744,3 +744,31 @@
   flex-shrink: 0;
   line-height: 1;
 }
+
+/* ── Best Match entry button (Home MealStep footer) ── */
+.bm-entry-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 14px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 14px;
+  font-family: var(--font-main);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  box-shadow: 3px 3px 0 var(--color-accent);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.bm-entry-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--color-accent);
+}
