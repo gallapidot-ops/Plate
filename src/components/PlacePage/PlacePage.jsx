@@ -43,10 +43,10 @@ function ScoreBar({ label, optionLabel, value, max }) {
 }
 
 /* ── Practical row ── */
-function PracticalRow({ icon, label, value, href }) {
+function PracticalRow({ icon, label, value, href, rowClass }) {
   if (!value && value !== false) return null
   const inner = (
-    <div className="pp-practical-row">
+    <div className={`pp-practical-row${rowClass ? ' ' + rowClass : ''}`}>
       <span className="pp-practical-icon">{icon}</span>
       <span className="pp-practical-label">{label}</span>
       <span className={`pp-practical-value${href ? ' pp-practical-value--link' : ''}`}>{value}</span>
@@ -163,6 +163,7 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
   const place = enrichPlace(rawPlace)
   const [favorite, setFavorite] = useState(place.is_favorite ?? false)
   const [showShare, setShowShare] = useState(false)
+  const [scoreOpen, setScoreOpen] = useState(true)
 
   // Per-meal-type scores from ratings
   const mealTypeScores = getPlaceScores(place)
@@ -188,35 +189,27 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
   return (
     <div className="pp-screen">
 
-      {/* ── Hero ── */}
-      <div className="pp-hero">
-        <img src={place.photo_url || place.photo} alt={place.name} className="pp-hero-img" />
-        <div className="pp-hero-overlay" />
+      {/* ── Hero (dark navy, no photo) ── */}
+      <div className="pp-hero pp-hero--no-photo">
 
         {/* Top bar */}
         <div className="pp-hero-topbar">
-          {/* Back – right side (RTL) */}
-          <button className="pp-hero-btn" onClick={onBack} aria-label="חזרה">
+          <button className="pp-hero-btn" onClick={onBack} aria-label="Back">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 5l-7 7 7 7"/>
             </svg>
           </button>
-
-          {/* Left actions */}
           <div className="pp-hero-actions">
-            {/* Edit */}
             {onEdit && (
-              <button className="pp-hero-btn" onClick={() => onEdit(rawPlace)} aria-label="ערוך">
+              <button className="pp-hero-btn" onClick={() => onEdit(rawPlace)} aria-label="Edit">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                 </svg>
               </button>
             )}
-
-            {/* Delete */}
             {onDelete && (
-              <button className="pp-hero-btn pp-hero-btn--delete" onClick={() => onDelete(rawPlace.id)} aria-label="מחקי">
+              <button className="pp-hero-btn pp-hero-btn--delete" onClick={() => onDelete(rawPlace.id)} aria-label="Delete">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -225,59 +218,33 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
                 </svg>
               </button>
             )}
-
-            {/* Share */}
-            <button className="pp-hero-btn" onClick={() => setShowShare(true)} aria-label="שתפי">
+            <button className="pp-hero-btn" onClick={() => setShowShare(true)} aria-label="Share">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                 <polyline points="16 6 12 2 8 6"/>
                 <line x1="12" y1="2" x2="12" y2="15"/>
               </svg>
             </button>
-
-            {/* Favorite */}
-            <button
-              className={`pp-hero-btn pp-hero-btn--fav ${favorite ? 'pp-hero-btn--fav-active' : ''}`}
-              onClick={() => setFavorite(v => !v)}
-              aria-label="מועדפים"
-            >
-              <svg width="17" height="17" viewBox="0 0 24 24" fill={favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-              </svg>
-            </button>
           </div>
         </div>
 
-        {/* Hero title */}
+        {/* Bottom hero content */}
         <div className="pp-hero-info">
-          <div className="pp-hero-chips">
-            {mealTypes.map(m => <span key={m} className="pp-hero-chip">{m}</span>)}
-          </div>
-          <h1 className="pp-hero-name">
-            {place.name}
-            {place.is_regular && (
-              <svg className="pp-regular-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-label="Regular spot">
-                <path d="M17 1l4 4-4 4"/>
-                <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-                <path d="M7 23l-4-4 4-4"/>
-                <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          <div className="pp-hero-bottom-row">
+            <div className="pp-hero-chips">
+              {mealTypes.map(m => <span key={m} className="pp-hero-chip">{m}</span>)}
+            </div>
+            <button className="pp-hero-photos-btn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
               </svg>
-            )}
-          </h1>
-
-          {/* Experience badge */}
-          {place.experience_type && (() => {
-            const ExpIcon = EXPERIENCE_ICONS[place.experience_type]
-            return (
-              <div className="pp-exp-badge">
-                {ExpIcon && <ExpIcon size={11} strokeWidth={2} />}
-                <span>{EXPERIENCE_LABELS[place.experience_type]}</span>
-              </div>
-            )
-          })()}
-
+              Photos
+            </button>
+          </div>
+          <h1 className="pp-hero-name">{place.name}</h1>
           <p className="pp-hero-address">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginLeft: '4px' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }}>
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
             </svg>
             {place.address}
@@ -287,42 +254,31 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
 
       <div className="pp-body">
 
-        {/* ── The Take ── */}
-        {(place.personal_note || place.added_note) && (
-          <section className="pp-section">
-            <p className="pp-section-label">The Take</p>
-            <p className="pp-take">"{place.personal_note || place.added_note}"</p>
-          </section>
+        {/* ── Tags ── */}
+        {place.tags && place.tags.length > 0 && (
+          <div className="pp-tags-row">
+            {place.tags.map(t => (
+              <span key={t} className="pp-tag-chip">{t}</span>
+            ))}
+          </div>
         )}
 
-        {/* ── Score – per meal type bubbles ── */}
+        {/* ── Score card (collapsible) ── */}
         {scoredTypes.length > 0 && (
           <section className="pp-section pp-section--score">
-            <p className="pp-section-label">Score</p>
-
-            {/* Bubble row */}
-            <div className="pp-score-bubbles">
-              {scoredTypes.map(mt => {
-                const s = mealTypeScores[mt]
-                const isActive = activeTab === mt
-                return (
-                  <button
-                    key={mt}
-                    className={`pp-score-bubble ${isActive ? 'pp-score-bubble--active' : ''}`}
-                    onClick={() => setActiveTab(isActive ? null : mt)}
-                  >
-                    <span className="pp-score-bubble-name">{MEAL_TYPE_LABELS[mt] || mt}</span>
-                    <span className="pp-score-bubble-score">
-                      <span className="pp-score-bubble-val">{s}</span>
-                      <span className="pp-score-bubble-max">/25</span>
-                    </span>
-                  </button>
-                )
-              })}
+            <div className="pp-score-card-header" onClick={() => setScoreOpen(v => !v)}>
+              <div className="pp-score-badge-wrap">
+                <span className="pp-score-badge-type">{MEAL_TYPE_LABELS[activeTab] || activeTab}</span>
+                <span className="pp-score-badge-num">
+                  {mealTypeScores[activeTab]}<span className="pp-score-badge-max">/25</span>
+                </span>
+              </div>
+              <button className="pp-score-toggle-btn" type="button">
+                {scoreOpen ? 'Hide ↑' : 'Show ↓'}
+              </button>
             </div>
 
-            {/* Breakdown for active tab */}
-            {activeBreakdown.length > 0 && (
+            {scoreOpen && activeBreakdown.length > 0 && (
               <div className="pp-score-breakdown">
                 <div className="pp-score-bars">
                   {activeBreakdown.map(cat => (
@@ -342,72 +298,23 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
 
         {/* ── Practical Stuff ── */}
         <section className="pp-section">
-          <p className="pp-section-label">The Practical Stuff</p>
+          <p className="pp-section-label">Practical Stuff</p>
           <div className="pp-practical">
             <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
-              label="Hours" value={place.hours}
-            />
-            <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>}
-              label="Price" value={place.price ? PRICE_LABELS[place.price] : null}
-            />
-            <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>}
-              label="Reservation" value={place.need_reservation ? RESERVATION_LABELS[place.need_reservation] : null}
-            />
-            <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>}
-              label="Parking" value={place.parking === true ? 'Parking available' : place.parking === false ? 'No parking' : null}
-            />
-            <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>}
-              label="Happy Hour" value={place.happy_hour === true ? 'Yes' : place.happy_hour === false ? 'No' : null}
-            />
-            <PracticalRow
+              rowClass="pp-practical-row--website"
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>}
               label="Website"
               value={websiteDisplay}
               href={place.website ? (place.website.startsWith('http') ? place.website : `https://${place.website}`) : null}
             />
             <PracticalRow
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
-              label="Experience" value={place.experience_type ? EXPERIENCE_LABELS[place.experience_type] : null}
+              rowClass="pp-practical-row--hours"
+              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>}
+              label="Hours"
+              value={place.hours}
             />
-            {lastVisited && (
-              <PracticalRow
-                icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>}
-                label="Last visit" value={lastVisited}
-              />
-            )}
           </div>
         </section>
-
-        {/* ── Highlights ── */}
-        {place.tags && place.tags.length > 0 && (
-          <section className="pp-section">
-            <p className="pp-section-label">Highlights</p>
-            <div className="pp-highlights">
-              {place.tags.map(t => (
-                <span key={t} className="pp-highlight-tag">{t}</span>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* ── Gallery ── */}
-        {place.gallery && place.gallery.length > 0 && (
-          <section className="pp-section pp-section--last">
-            <p className="pp-section-label">תמונות</p>
-            <div className="pp-gallery">
-              {place.gallery.map((src, i) => (
-                <div key={i} className={`pp-gallery-item ${i === 0 ? 'pp-gallery-item--wide' : ''}`}>
-                  <img src={src} alt="" className="pp-gallery-img" loading="lazy" />
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
       </div>
 
