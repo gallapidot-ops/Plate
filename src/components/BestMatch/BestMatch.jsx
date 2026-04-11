@@ -24,6 +24,8 @@ const WALK_OPTIONS = [
   { value: 5,  label: '5',   sublabel: 'min walk', hint: 'up to 0.4 km', km: 0.4  },
   { value: 10, label: '10',  sublabel: 'min walk', hint: 'up to 0.8 km', km: 0.8  },
   { value: 15, label: '15',  sublabel: 'min walk', hint: 'up to 1.2 km', km: 1.2  },
+  { value: 30, label: '30',  sublabel: 'min walk', hint: 'up to 2.4 km', km: 2.4  },
+  { value: 60, label: '1hr', sublabel: 'walk',     hint: 'up to 5 km',   km: 5.0  },
   { value: 20, label: 'Any', sublabel: '',          hint: 'no limit',     km: 9999 },
 ]
 

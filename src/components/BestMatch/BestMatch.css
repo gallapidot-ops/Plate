@@ -187,7 +187,7 @@
   font-weight: 700;
 }
 
-/* 2×2 distance card grid */
+/* 3×2 distance card grid */
 .bm-dist-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
