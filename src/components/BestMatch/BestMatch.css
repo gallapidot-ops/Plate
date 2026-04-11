@@ -128,6 +128,124 @@
   opacity: 1;
 }
 
+/* ══════════════════════════════════════════
+   STEP 2 — DISTANCE  (red full-screen)
+══════════════════════════════════════════ */
+.bm-screen--distance {
+  background: var(--color-accent);
+}
+
+.bm-screen--distance .bm-back-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+
+.bm-screen--distance .bm-step-dot {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bm-screen--distance .bm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 28px 24px;
+}
+
+/* Clock icon circle */
+.bm-dist-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.bm-screen--distance .bm-title {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  font-family: Georgia, 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.bm-screen--distance .bm-sub {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 32px;
+}
+
+.bm-screen--distance .bm-sub strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 700;
+}
+
+/* 2×2 distance card grid */
+.bm-dist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.bm-dist-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 22px 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  border-radius: 18px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bm-dist-card--active {
+  background: #1A2B35;
+  border-color: #1A2B35;
+}
+
+.bm-dist-num {
+  font-family: var(--font-sans);
+  font-size: 38px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.bm-dist-sub {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
+}
+
+.bm-dist-hint {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 2px;
+}
+
+/* CTA button: dark bg, white text */
+.bm-screen--distance .bm-footer .bm-btn-primary {
+  background: #1A2B35;
+  color: #fff;
+}
+
 /* ── Header strip ── */
 .bm-header {
   display: flex;

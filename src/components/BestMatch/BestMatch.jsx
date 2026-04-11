@@ -21,10 +21,10 @@ const VIBE_OPTIONS = [
 ]
 
 const WALK_OPTIONS = [
-  { value: 5,  label: '5 min',   km: 0.32 },
-  { value: 10, label: '10 min',  km: 0.65 },
-  { value: 15, label: '15 min',  km: 0.97 },
-  { value: 20, label: '20+ min', km: 5.0  },
+  { value: 5,  label: '5',   sublabel: 'min walk', hint: 'up to 0.4 km', km: 0.4  },
+  { value: 10, label: '10',  sublabel: 'min walk', hint: 'up to 0.8 km', km: 0.8  },
+  { value: 15, label: '15',  sublabel: 'min walk', hint: 'up to 1.2 km', km: 1.2  },
+  { value: 20, label: 'Any', sublabel: '',          hint: 'no limit',     km: 9999 },
 ]
 
 const DRIVE_OPTIONS = [
@@ -366,55 +366,45 @@ export default function BestMatch({ onClose, onOpenPlace }) {
     </div>
   )
 
-  /* ── Step 2: Distance + travel mode ── */
+  /* ── Step 2: Distance ── */
   if (step === 'distance') return (
-    <div className="bm-screen">
+    <div className="bm-screen bm-screen--distance">
       <div className="bm-header">
         <button className="bm-back-btn" onClick={() => setStep('location')} aria-label="Back">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
         </button>
-        <span className="bm-step-dot">2 / 3</span>
+        <span className="bm-step-dot">2 / 2</span>
       </div>
       <div className="bm-body">
-        <p className="bm-step-hint">Step 2</p>
-        <h1 className="bm-title">How far are you willing to go?</h1>
-        <p className="bm-sub">
-          From <strong>{location?.name}</strong>
-        </p>
-
-        {/* Travel mode toggle */}
-        <div className="bm-travel-toggle">
-          <button
-            className={`bm-travel-btn${travelMode === 'walk' ? ' bm-travel-btn--active' : ''}`}
-            onClick={() => setTravelMode('walk')}
-          >
-            Walking
-          </button>
-          <button
-            className={`bm-travel-btn${travelMode === 'drive' ? ' bm-travel-btn--active' : ''}`}
-            onClick={() => setTravelMode('drive')}
-          >
-            Driving
-          </button>
+        {/* Clock icon circle */}
+        <div className="bm-dist-icon-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
         </div>
+        <h1 className="bm-title">How far are you willing to go?</h1>
+        <p className="bm-sub">From <strong>{location?.name}</strong></p>
 
-        <div className="bm-walk-grid">
-          {distOptions.map(opt => (
+        <div className="bm-dist-grid">
+          {WALK_OPTIONS.map(opt => (
             <button
               key={opt.value}
-              className={`bm-walk-pill${walkMins === opt.value ? ' bm-walk-pill--active' : ''}`}
+              className={`bm-dist-card${walkMins === opt.value ? ' bm-dist-card--active' : ''}`}
               onClick={() => setWalkMins(opt.value)}
             >
-              {opt.label}
+              <span className="bm-dist-num">{opt.label}</span>
+              {opt.sublabel && <span className="bm-dist-sub">{opt.sublabel}</span>}
+              <span className="bm-dist-hint">{opt.hint}</span>
             </button>
           ))}
         </div>
       </div>
       <div className="bm-footer">
         <button className="bm-btn-primary" onClick={() => setStep('prefs')}>
-          Next →
+          Find my place →
         </button>
       </div>
     </div>
