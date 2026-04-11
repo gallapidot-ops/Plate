@@ -540,9 +540,30 @@
   transition: background 0.15s;
 }
 
-.pp-sheet-conv-row:hover .pp-sheet-conv-send {
+.pp-sheet-conv-row:not(:disabled):hover .pp-sheet-conv-send {
   background: var(--color-accent);
   color: #fff;
+}
+
+/* Sent state — green circle with checkmark */
+.pp-sheet-conv-send--sent {
+  background: #4CAF7D !important;
+  color: #fff !important;
+}
+
+/* Row dims slightly once sent */
+.pp-sheet-conv-row--sent {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* Error message */
+.pp-sheet-error {
+  font-size: 12px;
+  color: var(--color-accent);
+  text-align: center;
+  margin: 0 22px 10px;
+  letter-spacing: 0.01em;
 }
 
 /* Footer */

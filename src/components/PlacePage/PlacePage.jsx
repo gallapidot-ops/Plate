@@ -68,8 +68,9 @@ function PracticalRow({ icon, label, value, href, rowClass }) {
 function ShareSheet({ place, onClose }) {
   const [friends,  setFriends]  = useState([])
   const [loading,  setLoading]  = useState(true)
-  const [sending,  setSending]  = useState(null)   // userId being sent to
-  const [sent,     setSent]     = useState(null)   // name of person we just shared with
+  const [sending,  setSending]  = useState(null)        // userId currently in-flight
+  const [sentIds,  setSentIds]  = useState(new Set())   // userIds successfully sent
+  const [error,    setError]    = useState(null)
   const [copied,   setCopied]   = useState(false)
 
   useEffect(() => {
@@ -77,14 +78,16 @@ function ShareSheet({ place, onClose }) {
   }, [])
 
   async function handleSend(friend) {
-    if (sending) return
+    if (sending || sentIds.has(friend.id)) return
     setSending(friend.id)
+    setError(null)
     try {
       await sharePlace(friend.id, place.id ?? null)
-      setSent(friend.name || friend.username || 'החברה')
-      setTimeout(onClose, 1600)
+      setSentIds(prev => new Set(prev).add(friend.id))
     } catch (e) {
       console.error('[ShareSheet] sharePlace error:', e)
+      setError('Failed to send. Please try again.')
+    } finally {
       setSending(null)
     }
   }
@@ -117,76 +120,77 @@ function ShareSheet({ place, onClose }) {
           <div className="pp-sheet-place-sub">{formatAddress(place.address)}</div>
         </div>
 
-        {sent ? (
-          <div className="pp-sheet-sent">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 6 9 17l-5-5"/>
-            </svg>
-            Sent to {sent}!
-          </div>
-        ) : (
-          <>
-            <div className="pp-sheet-conv-list">
-              {loading ? (
-                <p className="pp-sheet-empty">Loading…</p>
-              ) : friends.length === 0 ? (
-                <p className="pp-sheet-empty">You're not following anyone yet.</p>
-              ) : (
-                friends.map(friend => (
-                  <button
-                    key={friend.id}
-                    className="pp-sheet-conv-row"
-                    onClick={() => handleSend(friend)}
-                    disabled={!!sending}
-                  >
-                    {friend.avatar_url ? (
-                      <img src={friend.avatar_url} alt={friend.name} className="pp-sheet-conv-avatar" />
-                    ) : (
-                      <div className="pp-sheet-conv-avatar pp-sheet-conv-avatar--placeholder">
-                        {(friend.username || friend.name || '?')[0].toUpperCase()}
-                      </div>
-                    )}
-                    <div className="pp-sheet-conv-info">
-                      <span className="pp-sheet-conv-name">{friend.name || friend.username}</span>
-                      <span className="pp-sheet-conv-last">@{friend.username}</span>
-                    </div>
-                    <div className="pp-sheet-conv-send">
-                      {sending === friend.id ? (
-                        <span className="pp-sheet-sending-dot">…</span>
-                      ) : (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="m22 2-7 20-4-9-9-4 20-7z"/>
-                          <path d="M22 2 11 13"/>
-                        </svg>
-                      )}
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
+        {error && <p className="pp-sheet-error">{error}</p>}
 
-            <div className="pp-sheet-footer">
-              <button className="pp-sheet-copy-btn" onClick={handleCopyLink}>
-                {copied ? (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 6 9 17l-5-5"/>
-                    </svg>
-                    Link copied!
-                  </>
-                ) : (
-                  <>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                    </svg>
-                    Copy link
-                  </>
-                )}
-              </button>
-            </div>
-          </>
-        )}
+        <div className="pp-sheet-conv-list">
+          {loading ? (
+            <p className="pp-sheet-empty">Loading…</p>
+          ) : friends.length === 0 ? (
+            <p className="pp-sheet-empty">You're not following anyone yet.</p>
+          ) : (
+            friends.map(friend => {
+              const isSending = sending === friend.id
+              const isSent    = sentIds.has(friend.id)
+              return (
+                <button
+                  key={friend.id}
+                  className={`pp-sheet-conv-row${isSent ? ' pp-sheet-conv-row--sent' : ''}`}
+                  onClick={() => handleSend(friend)}
+                  disabled={isSending || isSent}
+                >
+                  {friend.avatar_url ? (
+                    <img src={friend.avatar_url} alt={friend.name} className="pp-sheet-conv-avatar" />
+                  ) : (
+                    <div className="pp-sheet-conv-avatar pp-sheet-conv-avatar--placeholder">
+                      {(friend.username || friend.name || '?')[0].toUpperCase()}
+                    </div>
+                  )}
+                  <div className="pp-sheet-conv-info">
+                    <span className="pp-sheet-conv-name">{friend.name || friend.username}</span>
+                    <span className="pp-sheet-conv-last">@{friend.username}</span>
+                  </div>
+                  <div className={`pp-sheet-conv-send${isSent ? ' pp-sheet-conv-send--sent' : ''}`}>
+                    {isSending ? (
+                      <span className="pp-sheet-sending-dot">…</span>
+                    ) : isSent ? (
+                      /* Checkmark — sent state */
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6 9 17l-5-5"/>
+                      </svg>
+                    ) : (
+                      /* Send icon — default */
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4 20-7z"/>
+                        <path d="M22 2 11 13"/>
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              )
+            })
+          )}
+        </div>
+
+        <div className="pp-sheet-footer">
+          <button className="pp-sheet-copy-btn" onClick={handleCopyLink}>
+            {copied ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+                Link copied!
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                Copy link
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </>
   )
