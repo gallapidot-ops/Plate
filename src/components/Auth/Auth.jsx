@@ -48,30 +48,48 @@ export default function Auth({ onGuestMode }) {
     }
   }
 
+  /* ── Confirmation screen ── */
   if (success) {
     return (
       <div className="auth-screen">
-        <div className="auth-inner">
-          <div className="auth-success-icon">
+        <div className="auth-inner auth-inner--confirm">
+          <div className="auth-confirm-icon">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5"/>
             </svg>
           </div>
-          <h2 className="auth-success-title">Check your email</h2>
-          <p className="auth-success-sub">We sent a confirmation link to {email}</p>
+          <h2 className="auth-confirm-title">Check your email</h2>
+          <p className="auth-confirm-sub">
+            We sent a confirmation link to<br />
+            <strong>{email}</strong>
+          </p>
+          <a
+            className="auth-confirm-gmail-btn"
+            href="https://mail.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open Gmail →
+          </a>
+          <button className="auth-confirm-resend" onClick={() => setSuccess(false)} type="button">
+            Didn't get it? Resend
+          </button>
         </div>
       </div>
     )
   }
 
+  /* ── Sign-in / Sign-up screen ── */
   return (
     <div className="auth-screen">
       <div className="auth-inner">
 
-        {/* Logo */}
-        <div className="auth-logo-card">
-          <PlateCircleLogo size={96} circleFill="#1A2B35" stroke="#F5F0E8" />
+        {/* Logo + headline */}
+        <div className="auth-logo-wrap">
+          <PlateCircleLogo size={72} circleFill="rgba(255,255,255,0.12)" stroke="#fff" />
         </div>
+        <h1 className="auth-headline">Your food, your taste.</h1>
+        <p className="auth-subtitle">Save places that actually match how you eat.</p>
 
         {/* Google */}
         <button className="auth-google-btn" onClick={handleGoogle} disabled={loading}>
@@ -110,7 +128,7 @@ export default function Auth({ onGuestMode }) {
           />
           {error && <p className="auth-error">{error}</p>}
           <button className="auth-submit-btn" type="submit" disabled={loading || !email || !password}>
-            {loading ? '...' : mode === 'signin' ? 'Sign In' : 'Sign Up'}
+            {loading ? '…' : mode === 'signin' ? 'Sign In →' : 'Sign Up →'}
           </button>
         </form>
 
