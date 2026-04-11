@@ -118,12 +118,7 @@ const PRIORITY_OPTS = [
 ]
 
 /* ── Step 1: Place + Experience + Meal Type ───────────────────────── */
-function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
-                     expType, onExpChange, mealType, onMealType,
-                     extraTypes, onExtraTypes,
-                     isWishlist, onIsWishlist,
-                     wishNote, onWishNote, priority, onPriority,
-                     onNext, onWishlistSave }) {
+function StepPlace({ place, onPlaceChange, photo, onPhotoChange, onNext }) {
   const [query,     setQuery]     = useState(place?.name || '')
   const [results,   setResults]   = useState([])
   const [open,      setOpen]      = useState(false)
@@ -174,19 +169,21 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
     onPhotoChange(URL.createObjectURL(file))
   }
 
-  function toggleExtra(id) {
-    if (id === mealType) return
-    onExtraTypes(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
-  }
-
   const bgImage = photo || place?.photo_url
 
   return (
-    <div className={`ap-step${place ? ' ap-step--has-place' : ''}`}>
+    <div className={`ap-step${place ? ' ap-step--has-place' : (!loadingPlace ? ' ap-step--search' : '')}`}>
       {!place && !loadingPlace ? (
         /* ── Search state ── */
         <div className="ap-search-block">
+          <div className="ap-search-icon-circle">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
           <p className="ap-search-prompt">Which place?</p>
+          <p className="ap-search-subtitle">Search for the restaurant, café, or bar you visited.</p>
           <div className="ap-search-field">
             {searching ? (
               <svg className="ap-search-icon ap-search-icon--spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -242,7 +239,7 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
         <>
           {/* Hero image – fixed height */}
           <div
-            className="ap-hero"
+            className="ap-hero ap-hero--dark"
             style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
           >
             {bgImage && <div className="ap-hero-scrim" />}
@@ -268,189 +265,237 @@ function StepPlace({ place, onPlaceChange, photo, onPhotoChange,
             <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
           </div>
 
-          {/* Below-hero: wishlist toggle + content */}
-          <div className="ap-below-hero">
-
-            {/* ── Wishlist toggle ── */}
-            <button
-              className={`ap-wishlist-toggle${isWishlist ? ' ap-wishlist-toggle--on' : ''}`}
-              onClick={() => onIsWishlist(v => !v)}
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>{isWishlist ? 'Save to Wishlist' : 'Add to Wishlist'}</span>
-              <span className={`ap-wishlist-pill${isWishlist ? ' ap-wishlist-pill--on' : ''}`}>
-                {isWishlist ? 'ON' : 'OFF'}
-              </span>
-            </button>
-
-            {isWishlist ? (
-              /* ── Wishlist mode ── */
-              <>
-                <div className="ap-field-group">
-                  <label className="ap-label">What type of meal?</label>
-                  <div className="ap-chips">
-                    {MEAL_TYPES_ORDERED.map(mt => (
-                      <button
-                        key={mt.id}
-                        className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
-                        onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}
-                      >
-                        {mt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="ap-field-group">
-                  <label className="ap-label ap-label--sm">Priority</label>
-                  <div className="ap-chips ap-chips--sm">
-                    {PRIORITY_OPTS.map(p => (
-                      <button
-                        key={p.id}
-                        className={`ap-chip ap-chip--sm${priority === p.id ? ' ap-chip--on' : ''}`}
-                        onClick={() => onPriority(prev => prev === p.id ? null : p.id)}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="ap-field-group">
-                  <label className="ap-label ap-label--sm">Note <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
-                  <textarea
-                    className="ap-textarea"
-                    placeholder="Why do you want to try it?"
-                    value={wishNote}
-                    onChange={e => onWishNote(e.target.value)}
-                    rows={2}
-                  />
-                </div>
-              </>
-            ) : (
-              /* ── Rate mode ── */
-              <>
-                <div className="ap-field-group">
-                  <label className="ap-label">Core Experience</label>
-                  <div className="ap-exp-cards">
-                    {EXPERIENCE_LIST.map(({ id, label, desc, Icon }) => (
-                      <button
-                        key={id}
-                        className={`ap-exp-card${expType === id ? ' ap-exp-card--active' : ''}`}
-                        onClick={() => onExpChange(id)}
-                      >
-                        <Icon size={16} strokeWidth={1.5} />
-                        <span className="ap-exp-card-label">{label}</span>
-                        <span className="ap-exp-card-desc">{desc}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="ap-field-group">
-                  <label className="ap-label">What did you have?</label>
-                  <div className="ap-chips">
-                    {MEAL_TYPES_ORDERED.map(mt => (
-                      <button
-                        key={mt.id}
-                        className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
-                        onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}
-                      >
-                        {mt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {mealType && (
-                  <div className="ap-field-group">
-                    <label className="ap-label ap-label--sm">This place also serves:</label>
-                    <div className="ap-chips ap-chips--sm">
-                      {MEAL_TYPES_ORDERED.filter(mt => mt.id !== mealType).map(mt => (
-                        <button
-                          key={mt.id}
-                          className={`ap-chip ap-chip--sm${extraTypes.includes(mt.id) ? ' ap-chip--on' : ''}`}
-                          onClick={() => toggleExtra(mt.id)}
-                        >
-                          {mt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
         </>
       )}
 
       <div className="ap-step-footer">
-        {isWishlist ? (
-          <button className="btn-primary" onClick={onWishlistSave} disabled={!place}>
-            Add to Wishlist
-          </button>
-        ) : (
-          <button className="btn-primary" onClick={onNext} disabled={!place || !expType || !mealType}>
-            Continue
-          </button>
-        )}
+        <button className="ap-cta-btn" onClick={onNext} disabled={!place}>
+          Continue →
+        </button>
       </div>
     </div>
   )
 }
 
-/* ── Step 2: Visit details ────────────────────────────────────────── */
-function StepVisit({ date, onDate, isRegular, onIsRegular, with_, onWith, price, onPrice, onBack, onNext }) {
+/* ── Step 2: Visit details (combined details screen) ─────────────────── */
+function StepVisit({ place, photo, onPhotoChange, onPlaceChange,
+                     expType, onExpChange, mealType, onMealType, extraTypes, onExtraTypes,
+                     isWishlist, onIsWishlist, wishNote, onWishNote, priority, onPriority,
+                     date, onDate, isRegular, onIsRegular, with_, onWith, price, onPrice,
+                     onBack, onNext, onWishlistSave }) {
+  const fileRef = useRef()
+  const bgImage = photo || place?.photo_url
+
+  function handlePhoto(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    onPhotoChange(URL.createObjectURL(file))
+  }
+
+  function toggleExtra(id) {
+    if (id === mealType) return
+    onExtraTypes(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
+  }
+
   return (
-    <div className="ap-step">
+    <div className="ap-step ap-step--details">
 
-      <div className="ap-field-group">
-        <label className="ap-label ap-label--sm">Price</label>
-        <div className="ap-chips ap-chips--sm">
-          {PRICE_OPTS.map(p => (
-            <button
-              key={p.id}
-              className={`ap-chip ap-chip--sm ap-chip--price${price === p.id ? ' ap-chip--on' : ''}`}
-              onClick={() => onPrice(price === p.id ? null : p.id)}
-            >
-              {p.label}
-            </button>
-          ))}
+      {/* ── Dark hero ── */}
+      <div
+        className="ap-hero ap-hero--dark"
+        style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+      >
+        {bgImage && <div className="ap-hero-scrim" />}
+        <div className="ap-hero-body">
+          <h2 className="ap-hero-name">{place?.name}</h2>
+          <span className="ap-hero-addr">{place?.address}</span>
         </div>
-      </div>
-
-      <div className="ap-compact-row">
-        {!isRegular && (
-          <div className="ap-compact-field">
-            <label className="ap-label ap-label--sm">Date</label>
-            <input type="date" className="ap-inline-input" value={date} onChange={e => onDate(e.target.value)} />
-          </div>
-        )}
-        <div className="ap-compact-field">
-          <label className="ap-label ap-label--sm">&nbsp;</label>
-          <button
-            className={`ap-regular-btn${isRegular ? ' ap-regular-btn--on' : ''}`}
-            onClick={() => onIsRegular(v => !v)}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-              <circle cx="12" cy="9" r="2.5"/>
+        <div className="ap-hero-actions">
+          <button className="ap-hero-btn" onClick={() => fileRef.current?.click()}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+              <circle cx="12" cy="13" r="3"/>
             </svg>
-            My Regular
+            {photo ? 'Change photo' : 'Add photo'}
+          </button>
+          <button className="ap-hero-btn" onClick={() => { onPlaceChange(null); onBack() }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+            Change
           </button>
         </div>
-        <div className="ap-compact-field ap-compact-field--grow">
-          <label className="ap-label ap-label--sm">Who were you with?</label>
-          <input type="text" className="ap-inline-input" placeholder="@username..." value={with_} onChange={e => onWith(e.target.value)} />
-        </div>
+        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
       </div>
 
+      {/* ── Scrollable details ── */}
+      <div className="ap-details-body">
+
+        {/* Wishlist toggle */}
+        <button
+          className={`ap-wishlist-toggle${isWishlist ? ' ap-wishlist-toggle--on' : ''}`}
+          onClick={() => onIsWishlist(v => !v)}
+          type="button"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill={isWishlist ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Add to Wishlist</span>
+          <span className="ap-wishlist-switch">
+            <span className={`ap-wishlist-thumb${isWishlist ? ' ap-wishlist-thumb--on' : ''}`} />
+          </span>
+        </button>
+
+        {isWishlist ? (
+          /* ── Wishlist mode ── */
+          <>
+            <div className="ap-field-group">
+              <label className="ap-label">What type of meal?</label>
+              <div className="ap-chips">
+                {MEAL_TYPES_ORDERED.map(mt => (
+                  <button key={mt.id} className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
+                    onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}>
+                    {mt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="ap-field-group">
+              <label className="ap-label ap-label--sm">Priority</label>
+              <div className="ap-chips ap-chips--sm">
+                {PRIORITY_OPTS.map(p => (
+                  <button key={p.id} className={`ap-chip ap-chip--sm${priority === p.id ? ' ap-chip--on' : ''}`}
+                    onClick={() => onPriority(prev => prev === p.id ? null : p.id)}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="ap-field-group">
+              <label className="ap-label ap-label--sm">Note <span style={{ fontWeight: 400, opacity: 0.6 }}>(optional)</span></label>
+              <textarea className="ap-textarea" placeholder="Why do you want to try it?"
+                value={wishNote} onChange={e => onWishNote(e.target.value)} rows={2} />
+            </div>
+          </>
+        ) : (
+          /* ── Rate mode ── */
+          <>
+            {/* Core Experience */}
+            <div className="ap-field-group">
+              <label className="ap-label">Core Experience</label>
+              <div className="ap-exp-cards">
+                {EXPERIENCE_LIST.map(({ id, label, desc, Icon }) => (
+                  <button key={id} className={`ap-exp-card${expType === id ? ' ap-exp-card--active' : ''}`}
+                    onClick={() => onExpChange(id)}>
+                    <Icon size={18} strokeWidth={1.5} />
+                    <span className="ap-exp-card-label">{label}</span>
+                    <span className="ap-exp-card-desc">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* What did you have */}
+            <div className="ap-field-group">
+              <label className="ap-label">What did you have?</label>
+              <div className="ap-chips">
+                {MEAL_TYPES_ORDERED.map(mt => (
+                  <button key={mt.id} className={`ap-chip${mealType === mt.id ? ' ap-chip--on' : ''}`}
+                    onClick={() => onMealType(prev => prev === mt.id ? null : mt.id)}>
+                    {mt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* This place also serves */}
+            {mealType && (
+              <div className="ap-field-group">
+                <label className="ap-label ap-label--sm">This place also serves:</label>
+                <div className="ap-chips ap-chips--sm">
+                  {MEAL_TYPES_ORDERED.filter(mt => mt.id !== mealType).map(mt => (
+                    <button key={mt.id} className={`ap-chip ap-chip--sm${extraTypes.includes(mt.id) ? ' ap-chip--on' : ''}`}
+                      onClick={() => toggleExtra(mt.id)}>
+                      {mt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Price */}
+            <div className="ap-field-group">
+              <label className="ap-label ap-label--sm">Price</label>
+              <div className="ap-chips ap-chips--sm">
+                {PRICE_OPTS.map(p => (
+                  <button key={p.id} className={`ap-chip ap-chip--sm ap-chip--price${price === p.id ? ' ap-chip--on' : ''}`}
+                    onClick={() => onPrice(price === p.id ? null : p.id)}>
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Who with + My Regular */}
+            <div className="ap-field-group">
+              <label className="ap-label ap-label--sm">Who were you with?</label>
+              <div className="ap-who-row">
+                <button
+                  className={`ap-regular-btn${isRegular ? ' ap-regular-btn--on' : ''}`}
+                  onClick={() => onIsRegular(v => !v)}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                    <circle cx="12" cy="9" r="2.5"/>
+                  </svg>
+                  My Regular
+                </button>
+                <input
+                  type="text"
+                  className="ap-who-input"
+                  placeholder="@username..."
+                  value={with_}
+                  onChange={e => onWith(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* When — hidden when My Regular */}
+            {!isRegular && (
+              <div className="ap-field-group">
+                <label className="ap-label ap-label--sm">When?</label>
+                <label className="ap-date-card">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <span className="ap-date-card-text">{date || 'Select date…'}</span>
+                  <input
+                    type="date"
+                    className="ap-date-hidden-input"
+                    value={date}
+                    onChange={e => onDate(e.target.value)}
+                  />
+                </label>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* ── Footer ── */}
       <div className="ap-step-footer">
-        <button className="btn-ghost" onClick={onBack}>Back</button>
-        <button className="btn-primary" onClick={onNext}>Continue</button>
+        {isWishlist ? (
+          <button className="ap-cta-btn" onClick={onWishlistSave}>
+            Add to Wishlist →
+          </button>
+        ) : (
+          <button className="ap-cta-btn" onClick={onNext} disabled={!expType || !mealType}>
+            Continue →
+          </button>
+        )}
       </div>
     </div>
   )
@@ -782,7 +827,11 @@ export default function AddPlace({ onSaved, prefill = null }) {
   }
 
   return (
-    <div className="ap-screen">
+    <div className={[
+      'ap-screen',
+      step === 0 && !place && !saving ? 'ap-screen--search' : '',
+      ((step === 0 && !!place) || step === 1) && !saving ? 'ap-screen--details' : '',
+    ].filter(Boolean).join(' ')}>
 
       {/* Progress — hidden in wishlist mode */}
       {!isWishlist && (
@@ -805,7 +854,14 @@ export default function AddPlace({ onSaved, prefill = null }) {
       <div className="ap-body">
         {step === 0 && (
           <StepPlace
-            place={place}            onPlaceChange={setPlace}
+            place={place}   onPlaceChange={setPlace}
+            photo={photo}   onPhotoChange={setPhoto}
+            onNext={() => setStep(1)}
+          />
+        )}
+        {step === 1 && (
+          <StepVisit
+            place={place}
             photo={photo}            onPhotoChange={setPhoto}
             expType={experienceType} onExpChange={setExperienceType}
             mealType={mealType}      onMealType={setMealType}
@@ -813,18 +869,14 @@ export default function AddPlace({ onSaved, prefill = null }) {
             isWishlist={isWishlist}  onIsWishlist={setIsWishlist}
             wishNote={wishNote}      onWishNote={setWishNote}
             priority={priority}      onPriority={setPriority}
-            onNext={() => setStep(1)}
-            onWishlistSave={handleWishlistSave}
-          />
-        )}
-        {step === 1 && (
-          <StepVisit
-            date={date}           onDate={setDate}
-            isRegular={isRegular} onIsRegular={setIsRegular}
-            with_={with_}         onWith={setWith}
-            price={price}         onPrice={handlePriceChange}
+            date={date}              onDate={setDate}
+            isRegular={isRegular}    onIsRegular={setIsRegular}
+            with_={with_}            onWith={setWith}
+            price={price}            onPrice={handlePriceChange}
+            onPlaceChange={setPlace}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
+            onWishlistSave={handleWishlistSave}
           />
         )}
         {step === 2 && (

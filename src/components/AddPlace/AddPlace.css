@@ -1148,3 +1148,546 @@
 .field-input:focus { border-color: var(--color-accent); }
 
 .field-group { margin-bottom: 24px; }
+
+/* ════════════════════════════════════════════════════════════════
+   STEP 1 – SEARCH STATE  (#1A2B35 dark full-screen)
+════════════════════════════════════════════════════════════════ */
+
+/* ── Screen bg ── */
+.ap-screen--search {
+  background: #1A2B35;
+}
+
+/* ── Progress bar ── */
+.ap-screen--search .ap-progress {
+  background: transparent;
+  padding-bottom: 0;
+}
+
+.ap-screen--search .ap-prog-step {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.ap-screen--search .ap-prog-step--active {
+  background: #C63B2F;
+  color: #fff;
+}
+
+.ap-screen--search .ap-prog-step--done {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.ap-screen--search .ap-prog-frac {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Body: vertically center the search block ── */
+.ap-screen--search .ap-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── Step wrapper: no scroll padding, full-width ── */
+.ap-step--search {
+  padding: 0 24px 80px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Search block: column, centered ── */
+.ap-screen--search .ap-search-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+/* ── Location pin icon circle ── */
+.ap-search-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+/* ── Heading ── */
+.ap-screen--search .ap-search-prompt {
+  font-family: var(--font-sans);
+  font-size: 34px;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* ── Subtitle ── */
+.ap-search-subtitle {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+/* ── Search field wrapper ── */
+.ap-screen--search .ap-search-field {
+  width: 100%;
+}
+
+/* ── Input ── */
+.ap-screen--search .ap-search-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.ap-screen--search .ap-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.ap-screen--search .ap-search-input:focus {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.13);
+}
+
+/* ── Search icon ── */
+.ap-screen--search .ap-search-icon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Clear button ── */
+.ap-screen--search .ap-search-clear {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Results dropdown ── */
+.ap-screen--search .ap-results {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(12px);
+}
+
+.ap-screen--search .ap-result-item {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.ap-screen--search .ap-result-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ap-screen--search .ap-result-name {
+  color: #fff;
+}
+
+.ap-screen--search .ap-result-addr {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ap-screen--search .ap-results--empty {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Footer ── */
+.ap-screen--search .ap-step-footer {
+  background: transparent;
+  border-top: none;
+}
+
+/* Continue button base — full width, pill on dark bg */
+.ap-screen--search .ap-step-footer .btn-primary {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 16px;
+  border-radius: 16px;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+/* Continue button — disabled (no place selected yet) */
+.ap-screen--search .ap-step-footer .btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.4);
+  opacity: 1;
+  cursor: default;
+}
+
+/* Continue button — active (place selected) */
+.ap-screen--search .ap-step-footer .btn-primary:not(:disabled) {
+  background: #C63B2F;
+  color: #fff;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   STEP 2 – DETAILS SCREEN  (dark hero + #F5F0E8 scroll)
+════════════════════════════════════════════════════════════════ */
+
+/* ── Progress bar blends into dark hero ── */
+.ap-screen--details .ap-progress {
+  background: #1A2B35;
+  padding-bottom: 0;
+}
+
+.ap-screen--details .ap-prog-step {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.ap-screen--details .ap-prog-step--active {
+  background: #C63B2F;
+  color: #fff;
+}
+
+.ap-screen--details .ap-prog-step--done {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ap-screen--details .ap-prog-frac {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Dark hero variant ── */
+.ap-hero--dark {
+  background: #1A2B35;
+  border-radius: 0 0 28px 28px;
+  height: auto;
+  min-height: 140px;
+}
+
+.ap-hero--dark .ap-hero-name {
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+
+.ap-hero--dark .ap-hero-addr {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.ap-hero--dark .ap-hero-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ap-hero--dark .ap-hero-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Step wrapper ── */
+.ap-step--details {
+  padding: 0 0 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Scrollable body ── */
+.ap-details-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 0 0;
+}
+
+/* ── Wishlist toggle — white card ── */
+.ap-screen--details .ap-wishlist-toggle {
+  background: #fff;
+  border-radius: 16px;
+  border: none;
+  margin: 0 16px 20px;
+  width: calc(100% - 32px);
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: #1A2B35;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: none;
+  transition: background 0.15s;
+}
+
+.ap-screen--details .ap-wishlist-toggle:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.ap-screen--details .ap-wishlist-toggle svg {
+  color: rgba(26, 43, 53, 0.4);
+  flex-shrink: 0;
+}
+
+.ap-screen--details .ap-wishlist-toggle--on svg {
+  color: #C63B2F;
+}
+
+/* Toggle switch visual */
+.ap-wishlist-switch {
+  margin-left: auto;
+  width: 44px;
+  height: 26px;
+  border-radius: 50px;
+  background: rgba(26, 43, 53, 0.1);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.ap-wishlist-toggle--on .ap-wishlist-switch {
+  background: #C63B2F;
+}
+
+.ap-wishlist-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s cubic-bezier(0.34, 1.3, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.ap-wishlist-thumb--on {
+  transform: translateX(18px);
+}
+
+/* Remove old pill */
+.ap-screen--details .ap-wishlist-pill { display: none; }
+
+/* ── Field labels ── */
+.ap-screen--details .ap-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(26, 43, 53, 0.45);
+  margin-bottom: 12px;
+}
+
+/* ── Experience cards: 2×2 grid ── */
+.ap-screen--details .ap-exp-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0;
+}
+
+.ap-screen--details .ap-exp-card {
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.1);
+  border-radius: 16px;
+  color: rgba(26, 43, 53, 0.55);
+  padding: 16px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 80px;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.ap-screen--details .ap-exp-card--active {
+  background: #1A2B35;
+  border-color: #1A2B35;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ap-screen--details .ap-exp-card-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: inherit;
+}
+
+.ap-screen--details .ap-exp-card-desc {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.6;
+  color: inherit;
+}
+
+/* ── Chips: dark selected ── */
+.ap-screen--details .ap-chip {
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.12);
+  color: #1A2B35;
+  font-weight: 500;
+}
+
+.ap-screen--details .ap-chip:hover {
+  border-color: rgba(26, 43, 53, 0.3);
+  color: #1A2B35;
+}
+
+.ap-screen--details .ap-chip--on {
+  background: #1A2B35;
+  border-color: #1A2B35;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ── Who row ── */
+.ap-who-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ap-who-input {
+  flex: 1;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  border: 1.5px solid rgba(26, 43, 53, 0.12);
+  border-radius: 50px;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  color: #1A2B35;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+
+.ap-who-input:focus { border-color: rgba(26, 43, 53, 0.35); }
+.ap-who-input::placeholder { color: rgba(26, 43, 53, 0.35); }
+
+/* ── My Regular button on details screen ── */
+.ap-screen--details .ap-regular-btn {
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.12);
+  color: #1A2B35;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 50px;
+}
+
+.ap-screen--details .ap-regular-btn:hover {
+  border-color: rgba(26, 43, 53, 0.3);
+  color: #1A2B35;
+}
+
+.ap-screen--details .ap-regular-btn--on {
+  background: #1A2B35;
+  border-color: #1A2B35;
+  color: #fff;
+  box-shadow: none;
+}
+
+.ap-screen--details .ap-regular-btn--on svg { stroke: #fff; }
+
+/* ── Date card ── */
+.ap-date-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1.5px solid rgba(26, 43, 53, 0.1);
+  border-radius: 14px;
+  cursor: pointer;
+  color: rgba(26, 43, 53, 0.4);
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ap-date-card-text {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(26, 43, 53, 0.5);
+}
+
+.ap-date-hidden-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+/* ── CTA button ── */
+.ap-cta-btn {
+  width: 100%;
+  padding: 16px;
+  background: #C63B2F;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ap-cta-btn:disabled {
+  background: rgba(26, 43, 53, 0.1);
+  color: rgba(26, 43, 53, 0.35);
+  cursor: default;
+}
+
+.ap-cta-btn:hover:not(:disabled) { opacity: 0.9; }
+.ap-cta-btn:active:not(:disabled) { transform: scale(0.98); }
+
+/* ── Footer on details screen: no border-top ── */
+.ap-screen--details .ap-step-footer {
+  border-top: none;
+  background: transparent;
+  padding: 12px 20px 16px;
+}
+
+/* ── Step 1 confirm screen (step 0 + place selected): CTA continues ── */
+.ap-screen--details .ap-step--has-place > .ap-step-footer .ap-cta-btn {
+  background: #C63B2F;
+  color: #fff;
+}

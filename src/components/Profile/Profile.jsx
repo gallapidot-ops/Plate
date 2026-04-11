@@ -144,10 +144,30 @@ function ListDrawer({ title, sub, places, onClose, onOpenPlace }) {
 }
 
 /* ── Settings sheet ── */
+const SettingsGlobeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+)
+const SettingsPeopleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+)
+const SettingsLockIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+)
+
 const PRIVACY_OPTIONS = [
-  { id: 'public',    label: 'Public',          sub: 'Everyone can see your places'       },
-  { id: 'followers', label: 'Followers only',  sub: 'Only people you approve can see'    },
-  { id: 'private',   label: 'Private',         sub: 'Only you can see your places'       },
+  { id: 'public',    Icon: SettingsGlobeIcon,  label: 'Public',          sub: 'Everyone can see your places'    },
+  { id: 'followers', Icon: SettingsPeopleIcon, label: 'Followers only',  sub: 'Only people you approve can see' },
+  { id: 'private',   Icon: SettingsLockIcon,   label: 'Private',         sub: 'Only you can see your places'    },
 ]
 const USERNAME_RE = /^[a-zA-Z0-9_]+$/
 
@@ -309,20 +329,24 @@ function SettingsSheet({ profile, onClose, onSaved }) {
           <div className="pf-set-field">
             <label className="pf-set-label">Privacy</label>
             <div className="pf-set-privacy-group">
-              {PRIVACY_OPTIONS.map(opt => (
+              {PRIVACY_OPTIONS.map(({ id, Icon, label, sub }) => (
                 <button
-                  key={opt.id}
-                  className={`pf-set-privacy-row${privacy === opt.id ? ' pf-set-privacy-row--active' : ''}`}
-                  onClick={() => setPrivacy(opt.id)}
+                  key={id}
+                  className={`pf-set-privacy-row${privacy === id ? ' pf-set-privacy-row--active' : ''}`}
+                  onClick={() => setPrivacy(id)}
+                  type="button"
                 >
-                  <div>
-                    <div className="pf-set-privacy-label">{opt.label}</div>
-                    <div className="pf-set-privacy-sub">{opt.sub}</div>
+                  <span className="pf-set-privacy-icon"><Icon /></span>
+                  <div className="pf-set-privacy-text">
+                    <div className="pf-set-privacy-label">{label}</div>
+                    <div className="pf-set-privacy-sub">{sub}</div>
                   </div>
-                  {privacy === opt.id && (
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 6 9 17l-5-5"/>
-                    </svg>
+                  {privacy === id && (
+                    <div className="pf-set-privacy-check">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6 9 17l-5-5"/>
+                      </svg>
+                    </div>
                   )}
                 </button>
               ))}
@@ -331,19 +355,17 @@ function SettingsSheet({ profile, onClose, onSaved }) {
 
           {error && <p className="pf-set-error">{error}</p>}
 
-          <button className="btn-primary" style={{ width: '100%' }} onClick={handleSave} disabled={!canSave}>
-            {saving ? 'Saving…' : 'Save Changes'}
+          <button className="pf-set-save-btn" onClick={handleSave} disabled={!canSave}>
+            {saving ? 'Saving…' : 'Save Changes →'}
           </button>
 
-          <button className="pf-settings-row pf-settings-row--danger" style={{ marginTop: 16 }} onClick={() => signOut()}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <button className="pf-set-signout-btn" type="button" onClick={() => signOut()}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/>
               <line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
-            <div className="pf-settings-row-info">
-              <span className="pf-settings-row-label">Sign Out</span>
-            </div>
+            Sign Out
           </button>
         </div>
       </div>
