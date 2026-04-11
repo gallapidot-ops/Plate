@@ -412,7 +412,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
 
   /* ── Step 3: Preferences ── */
   if (step === 'prefs') return (
-    <div className="bm-screen">
+    <div className="bm-screen bm-screen--prefs">
       <div className="bm-header">
         <button className="bm-back-btn" onClick={() => setStep('distance')} aria-label="Back">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -422,9 +422,8 @@ export default function BestMatch({ onClose, onOpenPlace }) {
         <span className="bm-step-dot">3 / 3</span>
       </div>
       <div className="bm-body">
-        <p className="bm-step-hint">Step 3 · Optional</p>
         <h1 className="bm-title">What are you looking for?</h1>
-        <p className="bm-sub">Leave both empty to see everything nearby.</p>
+        <p className="bm-sub">Optional — leave empty to see everything nearby</p>
 
         <p className="bm-filter-label">MEAL</p>
         <div className="bm-pill-row">
@@ -471,6 +470,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
         {loadErr && <p className="bm-error">Error: {loadErr}</p>}
       </div>
       <div className="bm-footer">
+        <button className="bm-prefs-skip" onClick={startSwipe}>Skip →</button>
         <button className="bm-btn-primary" onClick={startSwipe}>
           Find Matches →
         </button>

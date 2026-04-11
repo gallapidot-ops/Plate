@@ -246,6 +246,116 @@
   color: #fff;
 }
 
+/* ══════════════════════════════════════════
+   STEP 3 — PREFS  (red full-screen)
+══════════════════════════════════════════ */
+.bm-screen--prefs {
+  background: var(--color-accent);
+}
+
+.bm-screen--prefs .bm-back-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+
+.bm-screen--prefs .bm-step-dot {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.bm-screen--prefs .bm-title {
+  color: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  font-family: Georgia, 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.bm-screen--prefs .bm-sub {
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 28px;
+}
+
+/* Section labels */
+.bm-screen--prefs .bm-filter-label {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Chips — default state */
+.bm-screen--prefs .bm-pill {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.bm-screen--prefs .bm-pill:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Chips — selected state */
+.bm-screen--prefs .bm-pill--active {
+  background: #1A2B35;
+  border-color: #1A2B35;
+  color: #fff;
+  font-weight: 800;
+}
+
+/* Open now row */
+.bm-screen--prefs .bm-open-now-row {
+  border-top-color: rgba(255, 255, 255, 0.15);
+}
+
+.bm-screen--prefs .bm-open-now-title {
+  color: #fff;
+  font-weight: 700;
+}
+
+.bm-screen--prefs .bm-open-now-sub {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Toggle — off state */
+.bm-screen--prefs .bm-toggle {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Toggle — on state stays accent (already defined), override to keep dark */
+.bm-screen--prefs .bm-toggle--on {
+  background: #1A2B35;
+}
+
+/* Error */
+.bm-screen--prefs .bm-error {
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Skip link */
+.bm-prefs-skip {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0 0 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* CTA button */
+.bm-screen--prefs .bm-footer .bm-btn-primary {
+  background: #1A2B35;
+  color: #fff;
+  border-radius: 20px;
+}
+
 /* ── Header strip ── */
 .bm-header {
   display: flex;
