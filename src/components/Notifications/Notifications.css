@@ -157,3 +157,68 @@
   opacity: 0.5;
   cursor: default;
 }
+
+/* ── Place share notification ── */
+.notif-card--share {
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s;
+  border-radius: 10px;
+  padding: 14px 6px;
+  margin: 0 -6px;
+}
+.notif-card--share:active {
+  background: rgba(26, 43, 53, 0.05);
+}
+
+.notif-card--unread {
+  background: rgba(198, 59, 47, 0.05);
+}
+.notif-card--unread:active {
+  background: rgba(198, 59, 47, 0.1);
+}
+
+.notif-place-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 2px 0 3px;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  flex-shrink: 0;
+}
+
+/* ── Share sheet empty / placeholder avatar ── */
+.pp-sheet-empty {
+  padding: 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.02em;
+}
+
+.pp-sheet-conv-avatar--placeholder {
+  background: var(--color-text);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-serif);
+}
+
+.pp-sheet-sending-dot {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  line-height: 1;
+}

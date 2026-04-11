@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
-import { MOCK_FRIENDS, MOCK_CONVERSATIONS } from '../../data/mockSocial'
 import { enrichPlace, RESERVATION_LABELS, PRICE_LABELS } from '../../data/mockPlaceDetails'
 import { computeBreakdown, getPlaceScores } from '../../data/scoring'
 import { getPlacePhotos } from '../../lib/places'
+import { getFollowing, sharePlace } from '../../lib/db'
 import './PlacePage.css'
 
 const EXPERIENCE_ICONS = {
@@ -60,13 +60,27 @@ function PracticalRow({ icon, label, value, href, rowClass }) {
 
 /* ── Share sheet ── */
 function ShareSheet({ place, onClose }) {
-  const [sent,   setSent]   = useState(null)
-  const [copied, setCopied] = useState(false)
+  const [friends,  setFriends]  = useState([])
+  const [loading,  setLoading]  = useState(true)
+  const [sending,  setSending]  = useState(null)   // userId being sent to
+  const [sent,     setSent]     = useState(null)   // name of person we just shared with
+  const [copied,   setCopied]   = useState(false)
 
-  function handleSend(conv) {
-    const friend = MOCK_FRIENDS.find(f => f.id === conv.with)
-    setSent(friend?.name ?? 'החברה')
-    setTimeout(onClose, 1600)
+  useEffect(() => {
+    getFollowing().then(list => { setFriends(list); setLoading(false) })
+  }, [])
+
+  async function handleSend(friend) {
+    if (sending) return
+    setSending(friend.id)
+    try {
+      await sharePlace(friend.id, place.id ?? null)
+      setSent(friend.name || friend.username || 'החברה')
+      setTimeout(onClose, 1600)
+    } catch (e) {
+      console.error('[ShareSheet] sharePlace error:', e)
+      setSending(null)
+    }
   }
 
   function handleCopyLink() {
@@ -107,29 +121,42 @@ function ShareSheet({ place, onClose }) {
         ) : (
           <>
             <div className="pp-sheet-conv-list">
-              {MOCK_CONVERSATIONS.map(conv => {
-                const friend = MOCK_FRIENDS.find(f => f.id === conv.with)
-                if (!friend) return null
-                return (
+              {loading ? (
+                <p className="pp-sheet-empty">Loading…</p>
+              ) : friends.length === 0 ? (
+                <p className="pp-sheet-empty">You're not following anyone yet.</p>
+              ) : (
+                friends.map(friend => (
                   <button
-                    key={conv.id}
+                    key={friend.id}
                     className="pp-sheet-conv-row"
-                    onClick={() => handleSend(conv)}
+                    onClick={() => handleSend(friend)}
+                    disabled={!!sending}
                   >
-                    <img src={friend.avatar} alt={friend.name} className="pp-sheet-conv-avatar" />
+                    {friend.avatar_url ? (
+                      <img src={friend.avatar_url} alt={friend.name} className="pp-sheet-conv-avatar" />
+                    ) : (
+                      <div className="pp-sheet-conv-avatar pp-sheet-conv-avatar--placeholder">
+                        {(friend.username || friend.name || '?')[0].toUpperCase()}
+                      </div>
+                    )}
                     <div className="pp-sheet-conv-info">
-                      <span className="pp-sheet-conv-name">{friend.name}</span>
-                      <span className="pp-sheet-conv-last">{conv.last_message}</span>
+                      <span className="pp-sheet-conv-name">{friend.name || friend.username}</span>
+                      <span className="pp-sheet-conv-last">@{friend.username}</span>
                     </div>
                     <div className="pp-sheet-conv-send">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m22 2-7 20-4-9-9-4 20-7z"/>
-                        <path d="M22 2 11 13"/>
-                      </svg>
+                      {sending === friend.id ? (
+                        <span className="pp-sheet-sending-dot">…</span>
+                      ) : (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m22 2-7 20-4-9-9-4 20-7z"/>
+                          <path d="M22 2 11 13"/>
+                        </svg>
+                      )}
                     </div>
                   </button>
-                )
-              })}
+                ))
+              )}
             </div>
 
             <div className="pp-sheet-footer">

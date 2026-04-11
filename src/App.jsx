@@ -300,7 +300,10 @@ export default function App() {
             />
           )}
           {screen === 'notifications' && !isGuest && (
-            <Notifications onNotifCountChange={handleNotifCountChange} />
+            <Notifications
+              onNotifCountChange={handleNotifCountChange}
+              onOpenPlace={p => { setSelectedPlace(p); setScreen('home') }}
+            />
           )}
           {screen === 'profile' && !isGuest && (
             <Profile

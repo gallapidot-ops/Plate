@@ -607,6 +607,85 @@ export async function getPlaceCountByUser(userId) {
   return count ?? 0
 }
 
+/* ═══════════════════════════════════════════════════════════
+   NOTIFICATIONS
+═══════════════════════════════════════════════════════════ */
+
+/** Returns the list of users the current user follows (for sharing). */
+export async function getFollowing() {
+  const userId = await getUserId()
+
+  const { data: followData, error: followErr } = await supabase
+    .from('follows')
+    .select('following_id')
+    .eq('follower_id', userId)
+
+  if (followErr) { console.error('[db] getFollowing follows:', followErr.message); return [] }
+
+  const ids = (followData ?? []).map(f => f.following_id)
+  if (ids.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('users')
+    .select('id, name, username, avatar_url')
+    .in('id', ids)
+
+  if (error) { console.error('[db] getFollowing users:', error.message); return [] }
+  return data ?? []
+}
+
+/** Share a place with another user — inserts a place_share notification row. */
+export async function sharePlace(toUserId, placeId) {
+  const userId = await getUserId()
+  const { error } = await supabase.from('notifications').insert({
+    type:         'place_share',
+    from_user_id: userId,
+    to_user_id:   toUserId,
+    place_id:     placeId ?? null,
+    message:      'שיתפה איתך מקום',
+  })
+  if (error) throw new Error(`sharePlace: ${error.message}`)
+}
+
+/** Fetch place_share notifications received by the current user. */
+export async function getPlaceShareNotifications() {
+  const userId = await getUserId()
+  const { data, error } = await supabase
+    .from('notifications')
+    .select(`
+      id, message, read, created_at,
+      from_user:from_user_id ( id, name, username, avatar_url ),
+      place:place_id ( id, name, address, photo_url )
+    `)
+    .eq('to_user_id', userId)
+    .eq('type', 'place_share')
+    .order('created_at', { ascending: false })
+  if (error) { console.error('[db] getPlaceShareNotifications:', error.message); return [] }
+  return data ?? []
+}
+
+/** Mark a notification as read. */
+export async function markNotificationRead(notifId) {
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read: true })
+    .eq('id', notifId)
+  if (error) throw new Error(`markNotificationRead: ${error.message}`)
+}
+
+/** Count of unread place_share notifications for badge display. */
+export async function getUnreadShareCount() {
+  const userId = await getUserId()
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('to_user_id', userId)
+    .eq('type', 'place_share')
+    .eq('read', false)
+  if (error) return 0
+  return count ?? 0
+}
+
 /** Delete a place (and its ratings) owned by the current user. */
 export async function deletePlace(placeId) {
   const userId = await getUserId()
