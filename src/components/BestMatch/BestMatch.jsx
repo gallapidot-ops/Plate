@@ -299,19 +299,25 @@ export default function BestMatch({ onClose, onOpenPlace }) {
 
   /* ── Step 1: Location ── */
   if (step === 'location') return (
-    <div className="bm-screen">
+    <div className="bm-screen bm-screen--location">
       <div className="bm-header">
         <button className="bm-close-btn" onClick={onClose} aria-label="Close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6 6 18M6 6l12 12"/>
           </svg>
         </button>
-        <span className="bm-step-dot">1 / 3</span>
+        <span className="bm-step-dot">1 / 2</span>
       </div>
       <div className="bm-body">
-        <p className="bm-step-hint">Step 1</p>
+        {/* Decorative pin icon circle */}
+        <div className="bm-loc-pin-wrap">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
         <h1 className="bm-title">Where are you?</h1>
-        <p className="bm-sub">Enter your location to find the best places nearby.</p>
+        <p className="bm-sub">We'll find the best places near you</p>
         <div className="bm-loc-wrap">
           <svg className="bm-loc-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
@@ -345,7 +351,7 @@ export default function BestMatch({ onClose, onOpenPlace }) {
         )}
         {location && (
           <div className="bm-loc-confirmed">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C63B2F" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6 9 17l-5-5"/>
             </svg>
             <span>{location.name}</span>

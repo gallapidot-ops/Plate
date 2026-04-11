@@ -18,6 +18,116 @@
   gap: 16px;
 }
 
+/* ══════════════════════════════════════════
+   STEP 1 — LOCATION  (red full-screen)
+══════════════════════════════════════════ */
+.bm-screen--location {
+  background: var(--color-accent);
+}
+
+/* Header: transparent, white controls */
+.bm-screen--location .bm-close-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+
+.bm-screen--location .bm-step-dot {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+/* Body: vertically centred, centred text */
+.bm-screen--location .bm-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 28px 24px;
+  overflow-y: visible;
+}
+
+/* Hide the generic step hint label */
+.bm-screen--location .bm-step-hint { display: none; }
+
+/* Pin icon circle */
+.bm-loc-pin-wrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+/* Heading */
+.bm-screen--location .bm-title {
+  color: #fff;
+  font-size: 34px;
+  font-weight: 900;
+  font-family: Georgia, 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+/* Subtitle */
+.bm-screen--location .bm-sub {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 15px;
+  margin-bottom: 32px;
+}
+
+/* Input wrapper: frosted glass */
+.bm-screen--location .bm-loc-wrap {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  width: 100%;
+}
+
+.bm-screen--location .bm-loc-wrap:focus-within {
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+.bm-screen--location .bm-loc-icon   { color: rgba(255, 255, 255, 0.65); }
+.bm-screen--location .bm-loc-input  { color: #fff; }
+.bm-screen--location .bm-loc-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+.bm-screen--location .bm-loc-clear  { color: rgba(255, 255, 255, 0.65); }
+
+/* Suggestion dropdown: keep white for readability */
+.bm-screen--location .bm-sugg-list {
+  background: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+  text-align: left;
+}
+
+/* Confirmed location: white text + white checkmark */
+.bm-screen--location .bm-loc-confirmed {
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 12px;
+}
+
+.bm-screen--location .bm-loc-confirmed svg {
+  stroke: rgba(255, 255, 255, 0.9);
+}
+
+/* CTA button: dark bg, white text */
+.bm-screen--location .bm-footer .bm-btn-primary {
+  background: var(--color-text);
+  color: #fff;
+}
+
+.bm-screen--location .bm-footer .bm-btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 1;
+}
+
 /* ── Header strip ── */
 .bm-header {
   display: flex;
