@@ -17,10 +17,31 @@ function getInitials(username) {
   return username.slice(0, 2).toUpperCase()
 }
 
+/* SVG icons for privacy options */
+const GlobeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+)
+const PeopleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+  </svg>
+)
+const LockIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+)
+
 const PRIVACY_OPTIONS = [
-  { id: 'public',    icon: '🌍', label: 'Public',          sub: 'Everyone can see your places' },
-  { id: 'followers', icon: '👥', label: 'Followers only',  sub: 'Only people you approve'      },
-  { id: 'private',   icon: '🔒', label: 'Private',         sub: 'Just you'                     },
+  { id: 'public',    Icon: GlobeIcon,  label: 'Public',          sub: 'Everyone can see your places' },
+  { id: 'followers', Icon: PeopleIcon, label: 'Followers only',  sub: 'Only people you approve'      },
+  { id: 'private',   Icon: LockIcon,   label: 'Private',         sub: 'Just you'                     },
 ]
 
 const USERNAME_RE = /^[a-zA-Z0-9_]+$/
@@ -37,7 +58,7 @@ export default function ProfileSetup({ user, onCreated }) {
   const [loading,        setLoading]        = useState(false)
   const [error,          setError]          = useState(null)
 
-  const fileRef    = useRef()
+  const fileRef          = useRef()
   const usernameDebounce = useRef(null)
   const cityDebounce     = useRef(null)
 
@@ -119,25 +140,25 @@ export default function ProfileSetup({ user, onCreated }) {
   const canSubmit = usernameStatus === 'ok' && !loading
 
   const statusEl = {
-    checking: <span className="ps-username-status ps-username-status--checking">Checking...</span>,
+    checking: <span className="ps-username-status ps-username-status--checking">Checking…</span>,
     ok:       <span className="ps-username-status ps-username-status--ok">✓ Available</span>,
     taken:    <span className="ps-username-status ps-username-status--err">✗ Taken</span>,
     invalid:  <span className="ps-username-status ps-username-status--err">Letters, numbers and underscores only</span>,
     short:    <span className="ps-username-status ps-username-status--err">At least 3 characters</span>,
   }[usernameStatus] ?? null
 
-  const bg     = avatarColor(username)
+  const bg       = avatarColor(username)
   const initials = getInitials(username)
 
   return (
     <div className="ps-screen">
       <div className="ps-inner">
 
-        {/* Header */}
+        {/* Step indicator + heading */}
         <div className="ps-header">
-          <span className="ps-header-logo">Plate</span>
-          <h1 className="ps-header-title">Create Your Profile</h1>
-          <p className="ps-header-sub">Step 2 of 2</p>
+          <span className="ps-step-indicator">STEP 2 OF 2</span>
+          <h1 className="ps-header-title">Create your profile</h1>
+          <p className="ps-header-sub">Almost there — just a few details</p>
         </div>
 
         {/* Avatar */}
@@ -146,10 +167,15 @@ export default function ProfileSetup({ user, onCreated }) {
             className="ps-avatar"
             style={avatarPreview
               ? { backgroundImage: `url(${avatarPreview})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-              : { background: bg }
+              : { background: 'rgba(255,255,255,0.15)' }
             }
           >
-            {!avatarPreview && <span className="ps-avatar-initials">{initials}</span>}
+            {!avatarPreview && (
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            )}
             <div className="ps-avatar-overlay">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
@@ -185,7 +211,7 @@ export default function ProfileSetup({ user, onCreated }) {
             <input
               className="ps-input"
               type="text"
-              placeholder="Tel Aviv, Jerusalem..."
+              placeholder="Tel Aviv, Jerusalem…"
               value={city}
               onChange={handleCityInput}
               onBlur={() => setTimeout(() => setCityOpen(false), 150)}
@@ -215,17 +241,19 @@ export default function ProfileSetup({ user, onCreated }) {
         <div className="ps-field">
           <label className="ps-label">Privacy</label>
           <div className="ps-privacy-cards">
-            {PRIVACY_OPTIONS.map(opt => (
+            {PRIVACY_OPTIONS.map(({ id, Icon, label, sub }) => (
               <button
-                key={opt.id}
-                className={`ps-privacy-card${privacy === opt.id ? ' ps-privacy-card--active' : ''}`}
-                onClick={() => setPrivacy(opt.id)}
+                key={id}
+                className={`ps-privacy-card${privacy === id ? ' ps-privacy-card--active' : ''}`}
+                onClick={() => setPrivacy(id)}
                 type="button"
               >
-                <span className="ps-privacy-icon">{opt.icon}</span>
-                <span className="ps-privacy-label">{opt.label}</span>
-                <span className="ps-privacy-sub">{opt.sub}</span>
-                {privacy === opt.id && (
+                <span className="ps-privacy-icon"><Icon /></span>
+                <div className="ps-privacy-text">
+                  <span className="ps-privacy-label">{label}</span>
+                  <span className="ps-privacy-sub">{sub}</span>
+                </div>
+                {privacy === id && (
                   <div className="ps-privacy-check">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20 6 9 17l-5-5"/>
@@ -245,7 +273,7 @@ export default function ProfileSetup({ user, onCreated }) {
           onClick={handleSubmit}
           disabled={!canSubmit}
         >
-          {loading ? 'Creating profile...' : 'Create my profile'}
+          {loading ? 'Creating profile…' : 'Create my profile →'}
         </button>
 
       </div>
