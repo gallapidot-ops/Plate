@@ -32,7 +32,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(26,43,53,0.07);
+  background: var(--color-divider);
   border: none;
   display: flex;
   align-items: center;
@@ -76,7 +76,7 @@
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(26,43,53,0.35);
+  color: rgba(26, 43, 53,0.35);
   margin: 0 0 8px;
 }
 
@@ -106,7 +106,7 @@
   align-items: center;
   gap: 10px;
   background: #fff;
-  border: 2px solid rgba(26,43,53,0.15);
+  border: 2px solid rgba(26, 43, 53,0.15);
   border-radius: 14px;
   padding: 12px 14px;
   transition: border-color 0.15s;
@@ -149,7 +149,7 @@
   margin: 6px 0 0;
   padding: 0;
   background: #fff;
-  border: 1.5px solid rgba(26,43,53,0.1);
+  border: 1.5px solid rgba(26, 43, 53,0.1);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -159,13 +159,13 @@
   flex-direction: column;
   padding: 11px 14px;
   cursor: pointer;
-  border-bottom: 1px solid rgba(26,43,53,0.06);
+  border-bottom: 1px solid rgba(26, 43, 53,0.06);
   transition: background 0.12s;
   -webkit-tap-highlight-color: transparent;
 }
 
 .bm-sugg-item:last-child { border-bottom: none; }
-.bm-sugg-item:hover, .bm-sugg-item:active { background: rgba(26,43,53,0.04); }
+.bm-sugg-item:hover, .bm-sugg-item:active { background: rgba(26, 43, 53,0.04); }
 
 .bm-sugg-main {
   font-size: 14px;
@@ -200,7 +200,7 @@
 
 .bm-walk-pill {
   padding: 16px 12px;
-  border: 2px solid rgba(26,43,53,0.15);
+  border: 2px solid rgba(26, 43, 53,0.15);
   border-radius: 16px;
   background: #fff;
   font-family: var(--font-sans);
@@ -225,7 +225,7 @@
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(26,43,53,0.3);
+  color: rgba(26, 43, 53,0.3);
   margin: 0 0 8px;
 }
 
@@ -237,7 +237,7 @@
 
 .bm-pill {
   padding: 7px 14px;
-  border: 1.5px solid rgba(26,43,53,0.2);
+  border: 1.5px solid rgba(26, 43, 53,0.2);
   border-radius: 100px;
   background: none;
   font-family: var(--font-sans);
@@ -315,7 +315,7 @@
 .bm-swipe-screen {
   position: fixed;
   inset: 0;
-  background: #1A2B35;
+  background: var(--color-text);
   display: flex;
   flex-direction: column;
   font-family: var(--font-sans);
@@ -534,7 +534,7 @@
 ══════════════════════════════════════════ */
 .bm-results-header {
   padding: 4px 24px 16px;
-  border-bottom: 1px solid rgba(26,43,53,0.07);
+  border-bottom: 1px solid var(--color-divider);
 }
 
 .bm-results-title {
@@ -561,7 +561,7 @@
   align-items: center;
   padding: 14px 24px;
   border: none;
-  border-bottom: 1px solid rgba(26,43,53,0.07);
+  border-bottom: 1px solid var(--color-divider);
   background: none;
   width: 100%;
   text-align: left;
@@ -591,7 +591,7 @@
 
 .bm-result-meta {
   font-size: 11px;
-  color: rgba(26,43,53,0.45);
+  color: rgba(26, 43, 53,0.45);
 }
 
 .bm-result-score-wrap {
@@ -648,7 +648,7 @@
   display: flex;
   gap: 6px;
   margin-bottom: 20px;
-  background: rgba(26,43,53,0.07);
+  background: var(--color-divider);
   padding: 4px;
   border-radius: 14px;
 }
@@ -662,7 +662,7 @@
   font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 700;
-  color: rgba(26,43,53,0.45);
+  color: rgba(26, 43, 53,0.45);
   cursor: pointer;
   transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   -webkit-tap-highlight-color: transparent;
@@ -670,8 +670,8 @@
 
 .bm-travel-btn--active {
   background: #fff;
-  color: #1A2B35;
-  box-shadow: 0 1px 4px rgba(26,43,53,0.14);
+  color: var(--color-text);
+  box-shadow: 0 1px 4px rgba(26, 43, 53,0.14);
 }
 
 /* ── Hours unknown badge on swipe card ── */
@@ -695,7 +695,7 @@
 /* ── Best Match entry banner (used in Home.jsx MealStep) ── */
 .bm-banner {
   width: 100%;
-  background: #1A2B35;
+  background: var(--color-text);
   border: none;
   border-radius: 18px;
   padding: 16px 20px;
@@ -723,7 +723,7 @@
   font-family: var(--font-sans);
   font-size: 20px;
   font-weight: 900;
-  color: #F5F0E8;
+  color: var(--color-bg);
   letter-spacing: -0.01em;
   line-height: 1.1;
 }
@@ -740,7 +740,7 @@
   font-family: var(--font-sans);
   font-size: 24px;
   font-weight: 900;
-  color: #C63B2F;
+  color: var(--color-accent);
   flex-shrink: 0;
   line-height: 1;
 }

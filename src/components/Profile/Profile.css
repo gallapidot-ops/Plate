@@ -34,7 +34,7 @@
 
 .pf-header-chevron {
   flex-shrink: 0;
-  color: rgba(26,43,53,0.35);
+  color: rgba(26, 43, 53,0.35);
   transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -82,7 +82,7 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 2.5px solid #1A2B35;
+  border: 2.5px solid var(--color-text);
 }
 
 .pf-avatar--initials {
@@ -188,7 +188,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(26,43,53,0.06);
+  background: rgba(26, 43, 53,0.06);
   border: none;
   display: flex;
   align-items: center;
@@ -200,7 +200,7 @@
 }
 
 .pf-back-btn:hover {
-  background: rgba(26,43,53,0.12);
+  background: rgba(26, 43, 53,0.12);
 }
 
 /* ── Follow button (view mode — replaces gear) ── */
@@ -225,12 +225,12 @@
 .pf-view-follow-btn:disabled { opacity: 0.5; cursor: default; }
 
 .pf-view-follow-btn--following {
-  background: rgba(26,43,53,0.1);
+  background: rgba(26, 43, 53,0.1);
   color: var(--color-text-primary);
 }
 
 .pf-view-follow-btn--requested {
-  background: rgba(26,43,53,0.07);
+  background: var(--color-divider);
   color: var(--color-text-secondary);
 }
 
@@ -339,9 +339,9 @@
   padding: 12px 18px;
   background: var(--color-surface);
   border-radius: 18px;
-  border: 2px solid #1A1A2E;
+  border: 2px solid var(--color-text);
   cursor: pointer;
-  box-shadow: 3px 3px 0 #1A1A2E;
+  box-shadow: 3px 3px 0 var(--color-text);
   transition: background 0.15s;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -354,7 +354,7 @@
 .pf-cat-chip--active {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 3px 3px 0 #1A1A2E;
+  box-shadow: 3px 3px 0 var(--color-text);
 }
 
 .pf-cat-chip-name {
@@ -652,7 +652,7 @@
   padding: 13px 20px;
   background: none;
   border: none;
-  border-bottom: 1px solid rgba(26,43,53,0.07);
+  border-bottom: 1px solid var(--color-divider);
   cursor: pointer;
   text-align: left;
   touch-action: manipulation;
@@ -669,7 +669,7 @@
   align-items: center;
   padding: 13px 20px;
   border: none;
-  border-bottom: 1px solid rgba(26,43,53,0.07);
+  border-bottom: 1px solid var(--color-divider);
   background: none;
   cursor: pointer;
   width: 100%;
@@ -704,7 +704,7 @@
 
 .pf-place-meta {
   font-size: 11px;
-  color: rgba(26,43,53,0.45);
+  color: rgba(26, 43, 53,0.45);
   font-family: var(--font-sans);
   letter-spacing: 0.01em;
 }
@@ -719,7 +719,7 @@
 .pf-place-score-val {
   font-size: 22px;
   font-weight: 900;
-  color: #C63B2F;
+  color: var(--color-accent);
   font-family: var(--font-sans);
   line-height: 1;
 }
@@ -732,7 +732,7 @@
 
 /* ── Three filter rows ── */
 .pf-filters {
-  border-top: 1px solid rgba(26,43,53,0.07);
+  border-top: 1px solid var(--color-divider);
   padding-bottom: 4px;
 }
 
@@ -740,7 +740,7 @@
   display: flex;
   align-items: center;
   padding: 5px 20px;
-  border-bottom: 1px solid rgba(26,43,53,0.05);
+  border-bottom: 1px solid rgba(26, 43, 53,0.05);
   min-height: 40px;
 }
 
@@ -750,7 +750,7 @@
   font-size: 9px;
   font-weight: 900;
   letter-spacing: 0.1em;
-  color: rgba(26,43,53,0.3);
+  color: rgba(26, 43, 53,0.3);
   font-family: var(--font-sans);
   text-transform: uppercase;
 }
@@ -773,7 +773,7 @@
   font-size: 10px;
   font-weight: 700;
   font-family: var(--font-sans);
-  color: rgba(26,43,53,0.4);
+  color: rgba(26, 43, 53,0.4);
   background: none;
   border: none;
   cursor: pointer;
@@ -799,7 +799,7 @@
 .pf-cat-pill {
   flex-shrink: 0;
   padding: 5px 11px;
-  border: 1.5px solid rgba(26,43,53,0.2);
+  border: 1.5px solid rgba(26, 43, 53,0.2);
   border-radius: 100px;
   background: none;
   font-size: 10px;
@@ -815,8 +815,8 @@
 }
 
 .pf-cat-pill--active {
-  background: #C63B2F;
-  border-color: #C63B2F;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
   color: #fff;
 }
 
@@ -1302,7 +1302,7 @@
 
 .pf-tab--active {
   color: var(--color-text-primary);
-  border-bottom-color: #C63B2F;
+  border-bottom-color: var(--color-accent);
   font-weight: 800;
 }
 

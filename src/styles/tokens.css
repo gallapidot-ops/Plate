@@ -1,0 +1,11 @@
+/* ── Design Tokens ──────────────────────────────────────── */
+:root {
+  --color-bg:          #F5F0E8;
+  --color-accent:      #C63B2F;
+  --color-blue:        #7BAEC4;
+  --color-text:        #1A2B35;
+  --color-text-muted:  rgba(26, 43, 53, 0.4);
+  --color-divider:     rgba(26, 43, 53, 0.07);
+  --font-main:         'Nunito', sans-serif;
+  --border-radius:     16px;
+}

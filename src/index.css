@@ -1,3 +1,4 @@
+@import './styles/tokens.css';
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
 
 /* ─────────────────────────────────────────
@@ -42,7 +43,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #F5F0E8;
+  background: var(--color-bg);
   font-family: var(--font-sans);
   font-weight: 400;
   color: var(--color-text-primary);
@@ -52,11 +53,11 @@ body {
 
 #root {
   min-height: 100svh;
-  background: #F5F0E8;
+  background: var(--color-bg);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-main);
   font-weight: 900;
   color: var(--color-text-primary);
 }
@@ -105,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-ghost:hover,
-.btn-secondary:hover { background: rgba(26,43,53,0.05); }
+.btn-secondary:hover { background: rgba(26, 43, 53,0.05); }
 
 /* Chips */
 .chip {
