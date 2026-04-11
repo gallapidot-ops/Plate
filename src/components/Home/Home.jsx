@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater } from 'lucide-react'
+import { Zap, MessageCircle, Users, Star, Coffee, Croissant, Sunrise, Sun, Moon, GlassWater, Wine } from 'lucide-react'
 import { addPlaceToWishlist, searchPlaces, searchUsers, followUser, unfollowUser, sendFollowRequest, cancelFollowRequest } from '../../lib/db'
 import { PlateCircleLogo } from '../Logo/Logo'
 import './Home.css'
@@ -14,6 +14,7 @@ const MEAL_TYPES = [
   { id: 'dinner',      label: 'Dinner',        subtitle: 'evening · full meal · candlelit',  Icon: Moon       },
   { id: 'bakery_deli', label: 'Bakery & Deli', subtitle: 'pastry · fresh bread · grab & go', Icon: Croissant  },
   { id: 'drinks',      label: 'Drinks',        subtitle: 'cocktails · wine · evening',       Icon: GlassWater },
+  { id: 'happy_hour',  label: 'Happy Hour',    subtitle: 'drinks · snacks · after work',     Icon: Wine       },
 ]
 
 const EXPERIENCES = [
@@ -25,26 +26,31 @@ const EXPERIENCES = [
 
 const EXP_LABELS = {
   quick_light:     'Quick & Light',
-  catchup:         'Catch-up / Hangout',
+  catchup:         'Catch-up',
   shared_table:    'Shared Table',
   full_experience: 'Full Experience',
 }
 
 const TAGS = [
-  { id: 'kosher',         label: 'Kosher'         },
-  { id: 'pet_friendly',   label: 'Pet Friendly'   },
-  { id: 'celebration',    label: 'Celebration'    },
-  { id: 'date',           label: 'Date Night'     },
-  { id: 'business',       label: 'Business'       },
-  { id: 'healthy',        label: 'Healthy'        },
-  { id: 'brunch_buffet',  label: 'Brunch Buffet'  },
-  { id: 'large_group',    label: 'Large Group 6+' },
-  { id: 'nice_view',      label: 'Nice View'      },
-  { id: 'outdoor',        label: 'Outdoor'        },
-  { id: 'vegan',          label: 'Vegan'          },
-  { id: 'work_friendly',  label: 'Work-Friendly'  },
-  { id: 'romantic',       label: 'Romantic'       },
-  { id: 'group_friendly', label: 'Group Friendly' },
+  { id: 'kosher',         label: 'Kosher'                },
+  { id: 'open_shabbat',   label: 'Open on Shabbat'       },
+  { id: 'vegan',          label: 'Vegan-Friendly'        },
+  { id: 'outdoor',        label: 'Outdoor Seating'       },
+  { id: 'rooftop',        label: 'Rooftop'               },
+  { id: 'sea_view',       label: 'Sea View'              },
+  { id: 'work_friendly',  label: 'Work-Friendly'         },
+  { id: 'romantic',       label: 'Good for Dates'        },
+  { id: 'group_friendly', label: 'Good for Groups'       },
+  { id: 'kids',           label: 'Good for Kids'         },
+  { id: 'pet_friendly',   label: 'Pet Friendly'          },
+  { id: 'parking',        label: 'Parking'               },
+  { id: 'late_night',     label: 'Late Night'            },
+  { id: 'live_music',     label: 'Live Music'            },
+  { id: 'quiet',          label: 'Quiet'                 },
+  { id: 'hidden_gem',     label: 'Hidden Gem'            },
+  { id: 'celebration',    label: 'Celebration'           },
+  { id: 'reservation',    label: 'Reservation Required'  },
+  { id: 'long_sit',       label: 'Long Sit'              },
 ]
 
 const PRICES = [
@@ -61,50 +67,47 @@ const RESERVATIONS = [
   { id: 'required', label: 'Reservation required'     },
 ]
 
-/* ── Swipe hook ── */
-function useSwipe(onNext, onPrev) {
-  const startX = useRef(null)
-  return {
-    onTouchStart: e => { startX.current = e.touches[0].clientX },
-    onTouchEnd: e => {
-      if (startX.current === null) return
-      const dx = e.changedTouches[0].clientX - startX.current
-      if (dx < -50) onNext()
-      else if (dx > 50) onPrev()
-      startX.current = null
-    },
-  }
-}
-
-/* ── Arrow SVGs ── */
-function ChevronLeft() {
+/* ════════════════════════════════════════
+   PRIVACY ICONS
+════════════════════════════════════════ */
+function GlobeIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 18l-6-6 6-6"/>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
     </svg>
   )
 }
-function ChevronRight() {
+
+function LockIconSmall() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 18l6-6-6-6"/>
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  )
+}
+
+function HourglassIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 22h14M5 2h14"/>
+      <path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12 7.59 16.41A2 2 0 0 0 7 17.83V22"/>
+      <path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/>
     </svg>
   )
 }
 
 /* ════════════════════════════════════════
    STEP 1 — Meal Type  (red background)
+   Multi-select pill grid
 ════════════════════════════════════════ */
-function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople, onOpenBestMatch }) {
-  const n    = MEAL_TYPES.length
-  const meal = MEAL_TYPES[mealIndex]
-  const swipe = useSwipe(
-    () => onChangeMeal((mealIndex + 1) % n),
-    () => onChangeMeal((mealIndex - 1 + n) % n),
-  )
+function MealStep({ selectedMeals, onToggleMeal, onNext, onSwitchToPeople, onOpenBestMatch }) {
+  const count = selectedMeals.size
 
   return (
-    <div className="conv-step conv-step--meal" {...swipe}>
+    <div className="conv-step conv-step--meal">
       {/* Top bar: logo + tabs */}
       <div className="conv-top-bar">
         <PlateCircleLogo size={44} circleFill="none" stroke="rgba(255,255,255,0.88)" />
@@ -114,48 +117,31 @@ function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople, onOpenBes
         </div>
       </div>
 
-      {/* Centered meal selector */}
-      <div className="conv-center">
-        <div className="conv-arrows-row">
-          <button
-            className="conv-arrow"
-            onClick={() => onChangeMeal((mealIndex - 1 + n) % n)}
-            aria-label="Previous meal type"
-          >
-            <ChevronLeft />
-          </button>
-
-          <div className="conv-card-content">
-            <h1 className="conv-card-name">{meal.label}</h1>
-            <p className="conv-card-subtitle">{meal.subtitle}</p>
-          </div>
-
-          <button
-            className="conv-arrow"
-            onClick={() => onChangeMeal((mealIndex + 1) % n)}
-            aria-label="Next meal type"
-          >
-            <ChevronRight />
-          </button>
+      {/* Pill grid */}
+      <div className="conv-center conv-center--scroll">
+        <p className="conv-question">What are you in the mood for?</p>
+        <div className="conv-pills-grid">
+          {MEAL_TYPES.map(m => (
+            <button
+              key={m.id}
+              className={`conv-pill${selectedMeals.has(m.id) ? ' conv-pill--active' : ''}`}
+              onClick={() => onToggleMeal(m.id)}
+            >
+              <m.Icon size={20} strokeWidth={1.5} />
+              <span>{m.label}</span>
+            </button>
+          ))}
         </div>
-      </div>
-
-      {/* Dot indicators */}
-      <div className="conv-dots">
-        {MEAL_TYPES.map((_, i) => (
-          <button
-            key={i}
-            className={`conv-dot${i === mealIndex ? ' conv-dot--active' : ''}`}
-            onClick={() => onChangeMeal(i)}
-            aria-label={`Select ${MEAL_TYPES[i].label}`}
-          />
-        ))}
       </div>
 
       {/* CTA */}
       <div className="conv-footer">
-        <button className="conv-btn conv-btn--dark" onClick={onNext}>
-          This one →
+        <button
+          className="conv-btn conv-btn--dark"
+          onClick={onNext}
+          disabled={count === 0}
+        >
+          {count >= 2 ? 'These →' : 'This one →'}
         </button>
         {onOpenBestMatch && (
           <button className="bm-entry-link" onClick={onOpenBestMatch}>
@@ -172,62 +158,38 @@ function MealStep({ mealIndex, onChangeMeal, onNext, onSwitchToPeople, onOpenBes
 
 /* ════════════════════════════════════════
    STEP 2 — Vibe  (sea-blue background)
+   Multi-select pill grid
 ════════════════════════════════════════ */
-function VibeStep({ vibeIdx, onChangeVibe, onNext, onSkip, onBack }) {
-  const n    = EXPERIENCES.length
-  const exp  = EXPERIENCES[vibeIdx]
-  const swipe = useSwipe(
-    () => onChangeVibe((vibeIdx + 1) % n),
-    () => onChangeVibe((vibeIdx - 1 + n) % n),
-  )
+function VibeStep({ selectedVibes, onToggleVibe, onNext, onSkip, onBack }) {
+  const count = selectedVibes.size
 
   return (
-    <div className="conv-step conv-step--vibe" {...swipe}>
+    <div className="conv-step conv-step--vibe">
       <div className="conv-top-row">
         <button className="conv-back" onClick={onBack} aria-label="Back">←</button>
         <button className="conv-skip" onClick={onSkip}>Skip</button>
       </div>
 
-      <div className="conv-center">
+      <div className="conv-center conv-center--scroll">
         <p className="conv-question">What's the vibe?</p>
-
-        <div className="conv-arrows-row">
-          <button
-            className="conv-arrow"
-            onClick={() => onChangeVibe((vibeIdx - 1 + n) % n)}
-            aria-label="Previous vibe"
-          >
-            <ChevronLeft />
-          </button>
-
-          <div className="conv-card-content">
-            <h1 className="conv-card-name">{exp.label}</h1>
-            <p className="conv-card-subtitle">{exp.subtitle}</p>
-          </div>
-
-          <button
-            className="conv-arrow"
-            onClick={() => onChangeVibe((vibeIdx + 1) % n)}
-            aria-label="Next vibe"
-          >
-            <ChevronRight />
-          </button>
+        <div className="conv-pills-grid">
+          {EXPERIENCES.map(e => (
+            <button
+              key={e.id}
+              className={`conv-pill conv-pill--tall${selectedVibes.has(e.id) ? ' conv-pill--active' : ''}`}
+              onClick={() => onToggleVibe(e.id)}
+            >
+              <e.Icon size={20} strokeWidth={1.5} />
+              <span className="conv-pill-label">{e.label}</span>
+              <span className="conv-pill-sub">{e.subtitle}</span>
+            </button>
+          ))}
         </div>
-      </div>
-
-      <div className="conv-dots">
-        {EXPERIENCES.map((_, i) => (
-          <button
-            key={i}
-            className={`conv-dot${i === vibeIdx ? ' conv-dot--active' : ''}`}
-            onClick={() => onChangeVibe(i)}
-          />
-        ))}
       </div>
 
       <div className="conv-footer">
         <button className="conv-btn conv-btn--dark" onClick={onNext}>
-          Next →
+          {count >= 2 ? 'These vibes →' : count === 1 ? 'This vibe →' : 'Next →'}
         </button>
       </div>
     </div>
@@ -237,7 +199,11 @@ function VibeStep({ vibeIdx, onChangeVibe, onNext, onSkip, onBack }) {
 /* ════════════════════════════════════════
    STEP 3 — Where  (cream background)
 ════════════════════════════════════════ */
-function WhereStep({ location, onChangeLocation, onSearch, onSkip, onBack }) {
+function WhereStep({ location, onChangeLocation, onSearch, onSkip, onBack, filters, onChangeFilters }) {
+  const [drawerOpen, setDrawerOpen] = useState(false)
+
+  const activeCount = [...filters.price, ...filters.reservation, ...filters.tags].filter(Boolean).length
+
   return (
     <div className="conv-step conv-step--where">
       <div className="conv-top-row">
@@ -260,13 +226,60 @@ function WhereStep({ location, onChangeLocation, onSearch, onSkip, onBack }) {
             onChange={e => onChangeLocation(e.target.value)}
           />
         </div>
+
+        {/* Active filter pills */}
+        {activeCount > 0 && (
+          <div className="conv-active-filters">
+            {filters.tags.map(id => {
+              const tag = TAGS.find(t => t.id === id)
+              return tag ? (
+                <span key={id} className="conv-active-filter-pill">
+                  {tag.label}
+                  <button onClick={() => onChangeFilters(f => ({ ...f, tags: f.tags.filter(t => t !== id) }))} aria-label={`Remove ${tag.label}`}>×</button>
+                </span>
+              ) : null
+            })}
+            {filters.price.map(id => {
+              const p = PRICES.find(pr => pr.id === id)
+              return p ? (
+                <span key={id} className="conv-active-filter-pill">
+                  {p.label}
+                  <button onClick={() => onChangeFilters(f => ({ ...f, price: f.price.filter(pr => pr !== id) }))} aria-label={`Remove ${p.label}`}>×</button>
+                </span>
+              ) : null
+            })}
+            {filters.reservation.map(id => {
+              const r = RESERVATIONS.find(rv => rv.id === id)
+              return r ? (
+                <span key={id} className="conv-active-filter-pill">
+                  {r.label}
+                  <button onClick={() => onChangeFilters(f => ({ ...f, reservation: f.reservation.filter(rv => rv !== id) }))} aria-label={`Remove ${r.label}`}>×</button>
+                </span>
+              ) : null
+            })}
+          </div>
+        )}
       </div>
 
       <div className="conv-footer">
+        <button
+          type="button"
+          className={`conv-more-filters${activeCount > 0 ? ' conv-more-filters--active' : ''}`}
+          onClick={() => setDrawerOpen(true)}
+        >
+          {activeCount > 0 ? `Filters (${activeCount}) ✓` : 'More filters +'}
+        </button>
         <button className="conv-btn conv-btn--red" onClick={onSearch}>
           Search →
         </button>
       </div>
+
+      <Drawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        filters={filters}
+        setFilters={onChangeFilters}
+      />
     </div>
   )
 }
@@ -352,43 +365,11 @@ function Drawer({ open, onClose, filters, setFilters }) {
             Clear all
           </button>
           <button type="button" className="btn-primary" onClick={onClose}>
-            Close
+            Done
           </button>
         </div>
       </div>
     </>
-  )
-}
-
-/* ════════════════════════════════════════
-   PRIVACY ICONS
-════════════════════════════════════════ */
-function GlobeIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="2" y1="12" x2="22" y2="12"/>
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-    </svg>
-  )
-}
-
-function LockIconSmall() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-  )
-}
-
-function HourglassIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 22h14M5 2h14"/>
-      <path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12 7.59 16.41A2 2 0 0 0 7 17.83V22"/>
-      <path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/>
-    </svg>
   )
 }
 
@@ -514,7 +495,7 @@ const RESULTS_TABS = [
   { id: 'explore', label: 'Explore'        },
 ]
 
-function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOpenPlace }) {
+function ResultsPanel({ mealTypes, experiences, location, filters, onBack, onGuestAction, onOpenPlace }) {
   const [activeTab,       setActiveTab]       = useState(onGuestAction ? 'explore' : 'mine')
   const [results,         setResults]         = useState([])
   const [loading,         setLoading]         = useState(true)
@@ -523,7 +504,9 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
   const [drawerOpen,      setDrawerOpen]      = useState(false)
   const [localFilters,    setLocalFilters]    = useState(filters)
 
-  const mealLabel = MEAL_TYPES.find(m => m.id === mealType)?.label || ''
+  const mealLabel = mealTypes.length === 1
+    ? (MEAL_TYPES.find(m => m.id === mealTypes[0])?.label || mealTypes[0])
+    : mealTypes.map(id => MEAL_TYPES.find(m => m.id === id)?.label || id).join(', ')
 
   useEffect(() => {
     let cancelled = false
@@ -531,8 +514,8 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
     setResults([])
     const scope = activeTab === 'mine' ? 'mine' : activeTab === 'social' ? 'social' : 'all'
     searchPlaces({
-      mealType,
-      experience:  localFilters.experience,
+      mealTypes,
+      experiences,
       location,
       tags:        localFilters.tags,
       price:       localFilters.price,
@@ -542,7 +525,7 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
       if (!cancelled) { setResults(data); setLoading(false) }
     })
     return () => { cancelled = true }
-  }, [activeTab, mealType, location, localFilters])
+  }, [activeTab, JSON.stringify(mealTypes), JSON.stringify(experiences), location, localFilters])
 
   async function handleBookmark(place) {
     if (onGuestAction) { onGuestAction(); return }
@@ -555,10 +538,10 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
     finally { setSavingWishlist(prev => { const s = new Set(prev); s.delete(place.id); return s }) }
   }
 
-  const activeCount = [localFilters.experience, ...localFilters.price, ...localFilters.reservation, ...localFilters.tags].filter(Boolean).length
-
-  const vibeLabel = localFilters.experience ? EXP_LABELS[localFilters.experience] : null
-  const tabLabel  = RESULTS_TABS.find(t => t.id === activeTab)?.label ?? ''
+  const activeCount = [...localFilters.price, ...localFilters.reservation, ...localFilters.tags].filter(Boolean).length
+  const vibeLabel   = experiences.length === 1
+    ? EXP_LABELS[experiences[0]]
+    : experiences.length > 1 ? `${experiences.length} vibes` : null
 
   return (
     <div className="home-results">
@@ -621,13 +604,10 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
               onClick={() => onOpenPlace?.(place)}
               style={{ cursor: onOpenPlace ? 'pointer' : 'default' }}
             >
-              {/* Left: name + meta */}
               <div className="home-result-info">
                 <span className="home-result-name">{place.name}</span>
                 {meta && <span className="home-result-meta">{meta}</span>}
               </div>
-
-              {/* Right: score + bookmark */}
               <div className="home-result-right">
                 {place.computed_score != null && (
                   <div className="home-result-score">
@@ -670,23 +650,38 @@ function ResultsPanel({ mealType, location, filters, onBack, onGuestAction, onOp
    HOME — main export
 ════════════════════════════════════════ */
 export default function Home({ onSearch, onViewUser, currentUserId, onGuestAction, onOpenPlace, onOpenBestMatch }) {
-  const [tab,          setTab]         = useState('places') // 'places' | 'people'
-  const [step,         setStep]        = useState(1)        // 1 | 2 | 3
-  const [mealIndex,    setMealIndex]   = useState(0)
-  const [vibeIdx,      setVibeIdx]     = useState(0)
-  const [vibeSelected, setVibeSelected] = useState(false)
-  const [location,     setLocation]    = useState('')
-  const [showResults,  setShowResults] = useState(false)
-  const [filters,      setFilters]     = useState({ experience: null, tags: [], price: [], reservation: [] })
+  const [tab,           setTab]          = useState('places')
+  const [step,          setStep]         = useState(1)
+  const [selectedMeals, setSelectedMeals] = useState(() => new Set())
+  const [selectedVibes, setSelectedVibes] = useState(() => new Set())
+  const [location,      setLocation]     = useState('')
+  const [showResults,   setShowResults]  = useState(false)
+  const [filters,       setFilters]      = useState({ tags: [], price: [], reservation: [] })
+
+  function toggleMeal(id) {
+    setSelectedMeals(prev => {
+      const s = new Set(prev)
+      if (s.has(id)) s.delete(id); else s.add(id)
+      return s
+    })
+  }
+
+  function toggleVibe(id) {
+    setSelectedVibes(prev => {
+      const s = new Set(prev)
+      if (s.has(id)) s.delete(id); else s.add(id)
+      return s
+    })
+  }
 
   /* Results */
   if (showResults) {
-    const experience = vibeSelected ? EXPERIENCES[vibeIdx].id : null
     return (
       <ResultsPanel
-        mealType={MEAL_TYPES[mealIndex].id}
+        mealTypes={[...selectedMeals]}
+        experiences={[...selectedVibes]}
         location={location}
-        filters={{ ...filters, experience }}
+        filters={filters}
         onBack={() => { setShowResults(false); setStep(1) }}
         onGuestAction={onGuestAction}
         onOpenPlace={onOpenPlace}
@@ -708,18 +703,18 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
   }
 
   /* Conversational flow */
-  function handleMealNext()  { setStep(2) }
-  function handleVibeNext()  { setVibeSelected(true);  setStep(3) }
-  function handleVibeSkip()  { setVibeSelected(false); setStep(3) }
-  function handleSearch()    { setShowResults(true); onSearch?.({ mealType: MEAL_TYPES[mealIndex].id, location }) }
-  function handleWhereSkip() { setLocation(''); setShowResults(true); onSearch?.({ mealType: MEAL_TYPES[mealIndex].id, location: '' }) }
+  function handleMealNext()  { if (selectedMeals.size > 0) setStep(2) }
+  function handleVibeNext()  { setStep(3) }
+  function handleVibeSkip()  { setSelectedVibes(new Set()); setStep(3) }
+  function handleSearch()    { setShowResults(true); onSearch?.({ mealTypes: [...selectedMeals], location }) }
+  function handleWhereSkip() { setLocation(''); setShowResults(true); onSearch?.({ mealTypes: [...selectedMeals], location: '' }) }
 
   return (
     <div className="home-conv">
       {step === 1 && (
         <MealStep
-          mealIndex={mealIndex}
-          onChangeMeal={setMealIndex}
+          selectedMeals={selectedMeals}
+          onToggleMeal={toggleMeal}
           onNext={handleMealNext}
           onSwitchToPeople={() => setTab('people')}
           onOpenBestMatch={onOpenBestMatch}
@@ -727,8 +722,8 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
       )}
       {step === 2 && (
         <VibeStep
-          vibeIdx={vibeIdx}
-          onChangeVibe={setVibeIdx}
+          selectedVibes={selectedVibes}
+          onToggleVibe={toggleVibe}
           onNext={handleVibeNext}
           onSkip={handleVibeSkip}
           onBack={() => setStep(1)}
@@ -741,6 +736,8 @@ export default function Home({ onSearch, onViewUser, currentUserId, onGuestActio
           onSearch={handleSearch}
           onSkip={handleWhereSkip}
           onBack={() => setStep(2)}
+          filters={filters}
+          onChangeFilters={setFilters}
         />
       )}
     </div>

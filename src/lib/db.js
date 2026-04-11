@@ -281,12 +281,17 @@ export async function removeFromWishlist(placeId) {
 ═══════════════════════════════════════════════════════════ */
 
 /**
- * Search places filtered by meal type + optional filters.
+ * Search places filtered by meal types + optional filters.
  * scope: 'mine' | 'social' | 'all'
+ *
+ * Accepts arrays: mealTypes[], experiences[]
+ * Also accepts legacy single values: mealType, experience (for backward compat)
  */
 export async function searchPlaces({
-  mealType,
-  experience,
+  mealTypes   = [],
+  experiences = [],
+  mealType,     // legacy single value
+  experience,   // legacy single value
   location,
   tags        = [],
   price       = [],
@@ -294,6 +299,10 @@ export async function searchPlaces({
   scope       = 'all',
 }) {
   const userId = await getUserId()
+
+  // Normalise to arrays (support legacy single-value callers)
+  const effectiveMealTypes = mealTypes.length > 0 ? mealTypes : (mealType ? [mealType] : [])
+  const effectiveExps      = experiences.length > 0 ? experiences : (experience ? [experience] : [])
 
   // Fetch following IDs for social scope
   let userIds = null
@@ -313,15 +322,18 @@ export async function searchPlaces({
       meal_type, experience_type, computed_score,
       places ( id, name, address, photo_url )
     `)
-    .eq('meal_type', mealType)
     .order('computed_score', { ascending: false })
+
+  if (effectiveMealTypes.length > 0) {
+    query = query.in('meal_type', effectiveMealTypes)
+  }
 
   if (userIds) {
     query = query.in('user_id', userIds)
   }
 
-  if (experience) {
-    query = query.eq('experience_type', experience)
+  if (effectiveExps.length > 0) {
+    query = query.in('experience_type', effectiveExps)
   }
 
   if (tags.length > 0) {
