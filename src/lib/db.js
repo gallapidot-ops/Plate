@@ -642,7 +642,6 @@ export async function sharePlace(toUserId, placeId) {
     from_user_id: userId,
     to_user_id:   toUserId,
     place_id:     placeId ?? null,
-    message:      'שיתפה איתך מקום',
   })
   if (error) throw new Error(`sharePlace: ${error.message}`)
 }
@@ -653,7 +652,7 @@ export async function getPlaceShareNotifications() {
   const { data, error } = await supabase
     .from('notifications')
     .select(`
-      id, message, read, created_at,
+      id, read, created_at,
       from_user:from_user_id ( id, name, username, avatar_url ),
       place:place_id ( id, name, address, photo_url )
     `)
