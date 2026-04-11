@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Zap, MessageCircle, UtensilsCrossed, Sparkles } from 'lucide-react'
 import { MOCK_FRIENDS, MOCK_CONVERSATIONS } from '../../data/mockSocial'
 import { enrichPlace, RESERVATION_LABELS, PRICE_LABELS } from '../../data/mockPlaceDetails'
 import { computeBreakdown, getPlaceScores } from '../../data/scoring'
+import { getPlacePhotos } from '../../lib/places'
 import './PlacePage.css'
 
 const EXPERIENCE_ICONS = {
@@ -158,12 +159,122 @@ function ShareSheet({ place, onClose }) {
   )
 }
 
+/* ── Photo Gallery ── */
+function PhotoGallery({ googlePlaceId, coverUrl, onClose }) {
+  const [photos,  setPhotos]  = useState(coverUrl ? [coverUrl] : [])
+  const [current, setCurrent] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const startXRef = useRef(null)
+
+  // Fetch full photo list once on open
+  useEffect(() => {
+    if (!googlePlaceId) return
+    setLoading(true)
+    getPlacePhotos(googlePlaceId, 10).then(urls => {
+      if (urls.length > 0) setPhotos(urls)
+      setLoading(false)
+    })
+  }, [googlePlaceId]) // eslint-disable-line
+
+  const handleTouchStart = (e) => { startXRef.current = e.touches[0].clientX }
+  const handleTouchEnd   = (e) => {
+    if (startXRef.current === null) return
+    const dx = e.changedTouches[0].clientX - startXRef.current
+    startXRef.current = null
+    if (Math.abs(dx) < 40) return
+    if (dx < 0) setCurrent(c => Math.min(c + 1, photos.length - 1))
+    else         setCurrent(c => Math.max(c - 1, 0))
+  }
+
+  const prev = () => setCurrent(c => Math.max(c - 1, 0))
+  const next = () => setCurrent(c => Math.min(c + 1, photos.length - 1))
+
+  return (
+    <>
+      <div className="pp-photos-backdrop" onClick={onClose} />
+      <div className="pp-photos-gallery">
+
+        {/* Top bar */}
+        <div className="pp-photos-topbar">
+          <button className="pp-photos-close" onClick={onClose} aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+          {photos.length > 0 && (
+            <span className="pp-photos-counter">{current + 1} / {photos.length}</span>
+          )}
+        </div>
+
+        {/* Main image */}
+        <div
+          className="pp-photos-main"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {loading ? (
+            <div className="pp-photos-loading">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'pp-spin 0.8s linear infinite' }}>
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+            </div>
+          ) : photos.length === 0 ? (
+            <div className="pp-photos-empty">No photos available</div>
+          ) : (
+            <img
+              key={current}
+              src={photos[current]}
+              alt=""
+              className="pp-photos-img"
+            />
+          )}
+        </div>
+
+        {/* Prev / Next arrows */}
+        {photos.length > 1 && !loading && (
+          <>
+            {current > 0 && (
+              <button className="pp-photos-arrow pp-photos-arrow--prev" onClick={prev} aria-label="Previous">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+            )}
+            {current < photos.length - 1 && (
+              <button className="pp-photos-arrow pp-photos-arrow--next" onClick={next} aria-label="Next">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            )}
+          </>
+        )}
+
+        {/* Dot indicators */}
+        {photos.length > 1 && !loading && (
+          <div className="pp-photos-dots">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                className={`pp-photos-dot${i === current ? ' pp-photos-dot--active' : ''}`}
+                onClick={() => setCurrent(i)}
+                aria-label={`Photo ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
 /* ── Main ── */
 export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete }) {
   const place = enrichPlace(rawPlace)
-  const [favorite, setFavorite] = useState(place.is_favorite ?? false)
-  const [showShare, setShowShare] = useState(false)
-  const [scoreOpen, setScoreOpen] = useState(true)
+  const [favorite,    setFavorite]    = useState(place.is_favorite ?? false)
+  const [showShare,   setShowShare]   = useState(false)
+  const [showPhotos,  setShowPhotos]  = useState(false)
+  const [scoreOpen,   setScoreOpen]   = useState(true)
 
   // Per-meal-type scores from ratings
   const mealTypeScores = getPlaceScores(place)
@@ -234,13 +345,15 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
             <div className="pp-hero-chips">
               {mealTypes.map(m => <span key={m} className="pp-hero-chip">{m}</span>)}
             </div>
-            <button className="pp-hero-photos-btn">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-              Photos
-            </button>
+            {(place.photo_url || place.google_place_id) && (
+              <button className="pp-hero-photos-btn" onClick={() => setShowPhotos(true)}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                Photos
+              </button>
+            )}
           </div>
           <h1 className="pp-hero-name">{place.name}</h1>
           <p className="pp-hero-address">
@@ -321,6 +434,15 @@ export default function PlacePage({ place: rawPlace, onBack, onEdit, onDelete })
       {/* ── Share sheet ── */}
       {showShare && (
         <ShareSheet place={place} onClose={() => setShowShare(false)} />
+      )}
+
+      {/* ── Photo gallery ── */}
+      {showPhotos && (
+        <PhotoGallery
+          googlePlaceId={place.google_place_id}
+          coverUrl={place.photo_url}
+          onClose={() => setShowPhotos(false)}
+        />
       )}
     </div>
   )

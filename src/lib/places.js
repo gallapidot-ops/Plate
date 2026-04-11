@@ -129,6 +129,29 @@ export async function getPlaceDetails(placeId) {
   }
 }
 
+/* ── Fetch all photos for a place ────────────────────────────────────
+   Returns up to `maxPhotos` ready-to-use Google photo URLs.
+   Requires google_place_id (the "places/ChIJ…" id stored in the DB).
+─────────────────────────────────────────────────────────────────────── */
+export async function getPlacePhotos(googlePlaceId, maxPhotos = 10) {
+  if (!googlePlaceId || !KEY) return []
+  try {
+    const res = await fetch(`${BASE}/places/${googlePlaceId}`, {
+      headers: {
+        'X-Goog-Api-Key':   KEY,
+        'X-Goog-FieldMask': 'photos',
+      },
+    })
+    if (!res.ok) return []
+    const p = await res.json()
+    return (p.photos ?? []).slice(0, maxPhotos).map(photo =>
+      `${BASE}/${photo.name}/media?maxHeightPx=900&key=${KEY}`
+    )
+  } catch {
+    return []
+  }
+}
+
 /* ── Check if a place is currently open ──────────────────────────────
    Returns true (open), false (closed), or null (no data / error)
 ─────────────────────────────────────────────────────────────────────── */

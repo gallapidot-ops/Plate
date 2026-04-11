@@ -284,7 +284,16 @@ function StepVisit({ place, photo, onPhotoChange, onPlaceChange,
                      date, onDate, isRegular, onIsRegular, with_, onWith, price, onPrice,
                      onBack, onNext, onWishlistSave }) {
   const fileRef = useRef()
+  const dateRef = useRef()
   const bgImage = photo || place?.photo_url
+
+  function formatDate(val) {
+    if (!val) return ''
+    // "YYYY-MM-DD" → "11 April 2026"  (T12:00 avoids UTC midnight tz shift)
+    return new Date(val + 'T12:00').toLocaleDateString('en-GB', {
+      day: 'numeric', month: 'long', year: 'numeric',
+    })
+  }
 
   function handlePhoto(e) {
     const file = e.target.files?.[0]
@@ -464,21 +473,27 @@ function StepVisit({ place, photo, onPhotoChange, onPlaceChange,
             {!isRegular && (
               <div className="ap-field-group">
                 <label className="ap-label ap-label--sm">When?</label>
-                <label className="ap-date-card">
+                <div
+                  className="ap-date-card"
+                  onClick={() => dateRef.current?.showPicker?.()}
+                >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                     <line x1="16" y1="2" x2="16" y2="6"/>
                     <line x1="8" y1="2" x2="8" y2="6"/>
                     <line x1="3" y1="10" x2="21" y2="10"/>
                   </svg>
-                  <span className="ap-date-card-text">{date || 'Select date…'}</span>
+                  <span className={`ap-date-card-text${date ? ' ap-date-card-text--set' : ''}`}>
+                    {date ? formatDate(date) : 'Select date…'}
+                  </span>
                   <input
+                    ref={dateRef}
                     type="date"
                     className="ap-date-hidden-input"
                     value={date}
                     onChange={e => onDate(e.target.value)}
                   />
-                </label>
+                </div>
               </div>
             )}
           </>
